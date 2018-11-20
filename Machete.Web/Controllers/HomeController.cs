@@ -14,6 +14,7 @@ namespace Machete.Web.Controllers
     {
         public IActionResult Index()
         {
+            var myEmployer = new Machete.Domain.Employer();
             return View();
         }
 
