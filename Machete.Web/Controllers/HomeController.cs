@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Machete.Web.Models;
 
+using Machete;
+
 namespace Machete.Web.Controllers
 {
     public class HomeController : Controller
