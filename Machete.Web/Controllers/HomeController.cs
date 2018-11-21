@@ -24,7 +24,9 @@ namespace Machete.Web.Controllers
                 business = true,
                 businessname = "adfs",
                 cellphone = "206-331-1311",
+                phone = "206-331-1311",
                 city = "Houston",
+                zipcode = "77018",
                 createdby = "asdf",
                 datecreated = DateTime.Now,
                 dateupdated = DateTime.Now,
@@ -35,6 +37,7 @@ namespace Machete.Web.Controllers
                 state = "TX",
                 updatedby = "asdf"
             });
+            context.SaveChanges();
             return View(model: employer);
         }
 
