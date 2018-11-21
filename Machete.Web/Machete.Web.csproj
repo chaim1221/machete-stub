@@ -2,13 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <UserSecretsId>aspnet-Machete.Web-97016831-75AA-4484-8616-4B96BB0522B9</UserSecretsId>
+    <UserSecretsId>aspnet-Machete.Web-989B45A2-280E-40E5-85C9-2EA24160C6D1</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="machete.db" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Machete.Data\Machete.Data.csproj" />
   </ItemGroup>
 
 </Project>

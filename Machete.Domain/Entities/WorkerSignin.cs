@@ -33,6 +33,10 @@ namespace Machete.Domain
         {
             idString = "wsi";
         }
+        
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new int ID { get; set; }
         public int? WorkAssignmentID { get; set; }
         public DateTime? lottery_timestamp { get; set; }
         public int? lottery_sequence { get; set; }

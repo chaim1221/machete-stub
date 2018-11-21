@@ -26,6 +26,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Data.Infrastructure
 {
@@ -41,6 +42,7 @@ namespace Machete.Data.Infrastructure
     public class DatabaseFactory : Disposable, IDatabaseFactory
     {
         string connString;
+        // ReSharper disable once InconsistentNaming
         private MacheteContext macheteContext;
         private BindingFlags bindFlags = BindingFlags.Instance |
              BindingFlags.Public |
@@ -59,16 +61,21 @@ namespace Machete.Data.Infrastructure
         }
 
         public MacheteContext Get()
-        {
+        {            
             if (macheteContext == null) 
             {
+                var optionsBuilder = new DbContextOptionsBuilder<MacheteContext>();
                 if (connString == null)
                 {
-                    macheteContext = new MacheteContext();
+                    optionsBuilder.UseSqlite("Data Source=machete.db");
+                    var options = optionsBuilder.Options;
+                    macheteContext = new MacheteContext(options);
                 }
                 else
                 {
-                    macheteContext = new MacheteContext(connString);
+                    optionsBuilder.UseSqlServer(connString);
+                    var options = optionsBuilder.Options; 
+                    macheteContext = new MacheteContext(options);
                 }
             }
             log_connection_count("DatabaseFactory.Get");
@@ -77,14 +84,16 @@ namespace Machete.Data.Infrastructure
 
         private void log_connection_count(string prefix)
         {
-            var sb = new StringBuilder();
-            var conn1 = (macheteContext as System.Data.Entity.DbContext).Database.Connection;
-            var objid1 = field.GetValue(conn1);
-            sb.AppendFormat("-----------{0} # [{1}], Conn: {2}",
-                prefix,
-                objid1.ToString(),
-                connString);
-            Debug.WriteLine(sb.ToString());
+            //var sb = new StringBuilder();
+            // ReSharper disable once RedundantCast
+            // ReSharper disable once RedundantNameQualifier
+            //var conn1 = (macheteContext as Microsoft.EntityFrameworkCore.DbContext).Database.GetDbConnection();
+            //var objid1 = field.GetValue(conn1); //TODO uncomment
+            //sb.AppendFormat("-----------{0} # [{1}], Conn: {2}",
+            //    prefix,
+            //    objid1.ToString(),
+            //    connString);
+            //Debug.WriteLine(sb.ToString());
         }
         //public void Set(MacheteContext context)
         //{

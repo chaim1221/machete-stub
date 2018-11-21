@@ -21,21 +21,21 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
+using Microsoft.EntityFrameworkCore;
+//using Microsoft.EntityFrameworkCore.Migrations; //doesn't exist
 using System.Linq;
 namespace Machete.Data
 {
-    public class MacheteInitializer : MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
-    public class TestInitializer : MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
-    public class MacheteConfiguration : DbMigrationsConfiguration<MacheteContext>
+    public class MacheteInitializer {}//: MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
+    public class TestInitializer {}//: MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
+    public class MacheteConfiguration //: DbMigrationsConfiguration<MacheteContext>
     {
         public MacheteConfiguration() : base()
         {
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = false;
+            //AutomaticMigrationsEnabled = true; // TODO: Add migrations, ignoring on first pass
+            //AutomaticMigrationDataLossAllowed = false;
         }
-        protected override void Seed(MacheteContext DB)
+        protected /* override */ void Seed(MacheteContext DB)
         {
             if (DB.Lookups.Count() == 0)
             {

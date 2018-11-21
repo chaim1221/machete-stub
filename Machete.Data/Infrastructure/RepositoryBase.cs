@@ -23,7 +23,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Machete.Data.Infrastructure
@@ -59,7 +59,7 @@ namespace Machete.Data.Infrastructure
         //             decorates a method, specifies its accessibility
         //             Access limited to this class
         protected MacheteContext dataContext;
-        protected readonly IDbSet<T> dbset;
+        protected readonly DbSet<T> dbset; // IDbSet (Framework)
         // protected -- [ method-modifier ]
         //                  Access limited to this class or classes derived from this class
         protected RepositoryBase(IDatabaseFactory databaseFactory)
@@ -85,7 +85,7 @@ namespace Machete.Data.Infrastructure
         //              compile-time type of the instance determines implem. to invoke             
         public virtual T Add(T entity)
         {
-            return dbset.Add(entity);           
+            return dbset.Add(entity) as T; // added `as` during conversion to .NET Core           
         }
       
         public virtual void Delete(T entity)

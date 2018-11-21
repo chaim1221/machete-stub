@@ -23,7 +23,7 @@
 #endregion
 
 using System;
-using System.Data.Entity.Validation;
+//using System.Data.Entity.Validation; // LEGACY, pre-dotnetCore
 using System.Linq;
 using System.Text;
 

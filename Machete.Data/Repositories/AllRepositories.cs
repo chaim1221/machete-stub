@@ -24,7 +24,7 @@
 using Machete.Data.Infrastructure;
 using Machete.Domain;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 
@@ -146,7 +146,7 @@ namespace Machete.Data
             sb.AppendFormat("select * from Emails e  with (UPDLOCK) where e.statusID = {0} or ", Email.iReadyToSend);
             sb.AppendFormat("(e.statusID = {0} and e.transmitAttempts < {1})", Email.iTransmitError, Email.iTransmitAttempts);
             var set = (DbSet<Email>)dbset;
-            return set.SqlQuery(sb.ToString()).AsEnumerable();
+            return set.FromSql(sb.ToString()).AsEnumerable();
         }
     }
     /// <summary>

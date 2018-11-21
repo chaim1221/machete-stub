@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Machete.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Machete.Web.Models;
-
-using Machete;
+using Activity = System.Diagnostics.Activity;
 
 namespace Machete.Web.Controllers
 {
@@ -14,7 +13,29 @@ namespace Machete.Web.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            var db = new Machete.Data.Infrastructure.DatabaseFactory();
+            var context = db.Get();
+            var employer = context.Employers.Add(new Employer
+            {
+                active = true,
+                address1 = "124 any street",
+                address2 = "",
+                blogparticipate = false,
+                business = true,
+                businessname = "adfs",
+                cellphone = "206-331-1311",
+                city = "Houston",
+                createdby = "asdf",
+                datecreated = DateTime.Now,
+                dateupdated = DateTime.Now,
+                email = "president@whitehouse.gov",
+                fax = "",
+                licenseplate = "589-GXF",
+                name = "Jaime Elias",
+                state = "TX",
+                updatedby = "asdf"
+            });
+            return View(model: employer);
         }
 
         public IActionResult About()
