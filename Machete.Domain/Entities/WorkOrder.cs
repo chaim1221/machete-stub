@@ -44,6 +44,8 @@ namespace Machete.Domain
 
         [LocalizedDisplayName("workerRequests", NameResourceType = typeof(Resources.WorkOrder))]
         public virtual ICollection<WorkerRequest> workerRequests { get; set; }
+        
+        [NotMapped]
         public virtual ICollection<Email> Emails { get; set; }
 
         // Constructor

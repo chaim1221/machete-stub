@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Configuration;
 using Machete.Domain;
 using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Data
 {

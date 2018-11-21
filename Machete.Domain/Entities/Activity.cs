@@ -93,6 +93,10 @@ namespace Machete.Domain
         {
             idString = "asi";
         }
+        
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public new int ID { get; set; }
         public virtual Activity Activity { get; set; }
         public int activityID { get; set; }
         public int? personID { get; set; }

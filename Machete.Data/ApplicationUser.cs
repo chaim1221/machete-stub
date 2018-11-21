@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace Machete.Data
         public bool IsAnonymous { get; set; }
         public DateTime LastActivityDate { get; set; }
         public string MobilePIN { get; set; }
-        public string Email { get; set; }
+        public override string Email { get; set; }
         public string LoweredEmail { get; set; }
         public string LoweredUserName { get; set; }
         public string PasswordQuestion { get; set; }
