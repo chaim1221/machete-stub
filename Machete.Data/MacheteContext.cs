@@ -45,6 +45,7 @@ namespace Machete.Data
     {
         public MacheteContext(DbContextOptions<MacheteContext> options) : base(options)
         {
+            
         }
 
         //public MacheteContext() : base("›", throwIfV1Schema: false) { }

@@ -32,8 +32,8 @@ namespace Machete.Data
     {
         public MacheteConfiguration() : base()
         {
-            //AutomaticMigrationsEnabled = true; // TODO: Add migrations, ignoring on first pass
-            //AutomaticMigrationDataLossAllowed = false;
+            //AutomaticMigrationsEnabled = true;         // TODO: Add migrations, ignoring on first pass
+            //AutomaticMigrationDataLossAllowed = false; // https://stackoverflow.com/a/42302429/2496266
         }
         protected /* override */ void Seed(MacheteContext DB)
         {
