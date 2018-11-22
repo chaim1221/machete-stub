@@ -30,8 +30,9 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Service
 {
@@ -97,8 +98,8 @@ namespace Machete.Service
         public IEnumerable<WorkOrder> GetActiveOrders(DateTime date, bool assignedOnly)
         {
             IQueryable<WorkOrder> query = repo.GetAllQ();
-                            query = query.Where(wo => wo.statusID == WorkOrder.iActive && 
-                                           DbFunctions.DiffDays(wo.dateTimeofWork, date) == 0 ? true : false)
+                            query = query.Where(wo => wo.statusID == WorkOrder.iActive 
+                                                   && wo.dateTimeofWork.Date == date.Date)
                                     .AsQueryable();
             List<WorkOrder> list = query.ToList();
             List<WorkOrder> final = list.ToList();
@@ -192,7 +193,7 @@ namespace Machete.Service
             else query = repo.GetAllQ();
             var group_query = from wo in query
                             group wo by new { 
-                                dateSoW = DbFunctions.TruncateTime(wo.dateTimeofWork),                                              
+                                dateSoW = wo.dateTimeofWork.Date,                                              
                                 wo.statusID
                             } into dayGroup
                             select new WorkOrderSummary()

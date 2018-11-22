@@ -28,7 +28,7 @@ using Machete.Data.Infrastructure;
 using Machete.Domain;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Machete.Service
@@ -136,8 +136,7 @@ namespace Machete.Service
             var sum_query = from wa in query //LINQ
                             group wa by new
                             {
-                                dateSoW = DbFunctions
-                                .TruncateTime(wa.workOrder.dateTimeofWork),                               
+                                dateSoW = wa.workOrder.dateTimeofWork.Date,                               
                                 wa.workOrder.statusID
                             } into dayGroup
                             select new WorkAssignmentSummary()

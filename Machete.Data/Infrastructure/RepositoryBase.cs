@@ -64,11 +64,11 @@ namespace Machete.Data.Infrastructure
         //                  Access limited to this class or classes derived from this class
         protected RepositoryBase(IDatabaseFactory databaseFactory)
         {
-            db = databaseFactory;
+            dbFactory = databaseFactory;
             _dbset = DataContext.Set<T>();
         }
 
-        protected IDatabaseFactory db
+        protected IDatabaseFactory dbFactory
         {
             get; private set;
         }
@@ -79,7 +79,7 @@ namespace Machete.Data.Infrastructure
             {
                 if (dataContext == null || dataContext.IsDead)
                 {
-                    dataContext = db.Get();
+                    dataContext = dbFactory.Get();
                 }
                 return dataContext;
             }
