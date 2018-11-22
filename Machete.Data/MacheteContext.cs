@@ -81,7 +81,23 @@ namespace Machete.Data
             }
             catch (ValidationException)
             {
-
+			// TODO: Jimmy: Need to understand why the code was moved out of the catch block
+			// Originally this printed out EF debug information when the SQL constraints errored
+			//                var details = new StringBuilder();
+            //    var preface = String.Format("DbEntityValidation Error: ");
+            //    Trace.TraceInformation(preface);
+            //    details.AppendLine(preface);
+            //    foreach (var validationErrors in dbEx.EntityValidationErrors)
+            //    {
+            //        foreach (var validationError in validationErrors.ValidationErrors)
+            //        {
+            //            var tempstr = String.Format("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+            //            details.AppendLine(tempstr);
+            //            Trace.TraceInformation(tempstr);
+            //        }
+            //    }
+            //    
+            //    throw new Exception(details.ToString());
             }
         }
 
@@ -99,6 +115,14 @@ namespace Machete.Data
 
             return base.SaveChanges();
         }
+        // TODO: Need to make sure GC is working with EF Core
+        // This looks half-baked from whatever I was doing previously
+        public bool IsDead { get; set; }
+        //protected override void Dispose(bool disposing)
+        //{
+        //    IsDead = true;
+        //    base.Dispose(disposing);
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

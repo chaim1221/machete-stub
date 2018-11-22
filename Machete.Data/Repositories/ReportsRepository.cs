@@ -23,13 +23,18 @@ namespace Machete.Data
         List<ReportDefinition> getList();
         List<QueryMetadata> getColumns(string tableName);
         DataTable getDataTable(string query, DTO.SearchOptions o);
+        List<string> validate(string query);
     }
     public class ReportsRepository : RepositoryBase<ReportDefinition>, IReportsRepository
     {
+        private IReadOnlyContext readOnlyContext;
 
+        public ReportsRepository(IDatabaseFactory dbFactory) : base(dbFactory) { }
 
-        public ReportsRepository(IDatabaseFactory dbFactory) : base(dbFactory)
-        {}
+        public ReportsRepository(IDatabaseFactory dbFactory, IReadOnlyContext readOnlyContext) : base(dbFactory) {
+            // there's no reason to put this in the base; this class needs a read-only context to perform server-side validation.
+            this.readOnlyContext = readOnlyContext;
+        }
 
         public List<SimpleDataRow> getSimpleAggregate(int id, DateTime beginDate, DateTime endDate)
         {
@@ -186,6 +191,11 @@ namespace Machete.Data
             propertyBuilder.SetSetMethod(setterMethod);
         }
         #endregion
+        public List<string> validate(string query)
+        {
+            var context = readOnlyContext.Get();
+            return readOnlyContext.ExecuteSql(context, query).ToList();
+        }
     }
 
     public class QueryMetadata

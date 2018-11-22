@@ -58,14 +58,14 @@ namespace Machete.Data.Infrastructure
         // private -- [ method-modifier ]
         //             decorates a method, specifies its accessibility
         //             Access limited to this class
-        protected MacheteContext dataContext;
-        protected readonly DbSet<T> dbset; // IDbSet (Framework)
+        private MacheteContext dataContext;
+        private DbSet<T> _dbset; // IDbSet (Framework)
         // protected -- [ method-modifier ]
         //                  Access limited to this class or classes derived from this class
         protected RepositoryBase(IDatabaseFactory databaseFactory)
         {
             db = databaseFactory;
-            dbset = DataContext.Set<T>();
+            _dbset = DataContext.Set<T>();
         }
 
         protected IDatabaseFactory db
@@ -75,7 +75,25 @@ namespace Machete.Data.Infrastructure
 
         protected MacheteContext DataContext
         {
-            get { return dataContext ?? (dataContext = db.Get()); }
+            get
+            {
+                if (dataContext == null || dataContext.IsDead)
+                {
+                    dataContext = db.Get();
+                }
+                return dataContext;
+            }
+        }
+        protected DbSet<T> dbset
+        {
+            get
+            {
+                if (dataContext.IsDead)
+                {
+                    _dbset = DataContext.Set<T>();
+                }
+                return _dbset;
+            }
         }
         // virtual -- [ method-modifier ] 
         //              runtime type of the instance determines implementation to invoke
@@ -85,32 +103,32 @@ namespace Machete.Data.Infrastructure
         //              compile-time type of the instance determines implem. to invoke             
         public virtual T Add(T entity)
         {
-            return dbset.Add(entity) as T; // added `as` during conversion to .NET Core           
+            return _dbset.Add(entity) as T; // added `as` during conversion to .NET Core           
         }
       
         public virtual void Delete(T entity)
         {
-            dbset.Remove(entity);
+            _dbset.Remove(entity);
         }
         public void Delete(Func<T, Boolean> where)
         {
-            IEnumerable<T> objects = dbset.Where<T>(where).AsEnumerable();
+            IEnumerable<T> objects = _dbset.Where<T>(where).AsEnumerable();
             foreach (T obj in objects)
-                dbset.Remove(obj);
+                _dbset.Remove(obj);
         } 
         public virtual T GetById(int id)
         {
-            return dbset.Find(id);
+            return _dbset.Find(id);
         }
 
         public virtual IQueryable<T> GetAllQ()
         {
-            return dbset.AsNoTracking().AsQueryable();
+            return _dbset.AsNoTracking().AsQueryable();
         }
 
         public virtual IQueryable<T> GetManyQ(Func<T, bool> where)
         {
-            return dbset.Where(where).AsQueryable();
+            return _dbset.Where(where).AsQueryable();
         }
     }
 }
