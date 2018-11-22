@@ -68,14 +68,14 @@ namespace Machete.Data.Infrastructure
                 if (connString == null)
                 {
                     optionsBuilder.UseSqlite("Data Source=machete.db", b =>
-                        b.MigrationsAssembly("Machete.Data"));
+                        b.MigrationsAssembly("Machete.Data.Migrations"));
                     var options = optionsBuilder.Options;
                     macheteContext = new MacheteContext(options);
                 }
                 else
                 {
                     optionsBuilder.UseSqlServer(connString, b =>
-                        b.MigrationsAssembly("Machete.Data"));
+                        b.MigrationsAssembly("Machete.Data.Migrations"));
                     var options = optionsBuilder.Options; 
                     macheteContext = new MacheteContext(options);
                 }

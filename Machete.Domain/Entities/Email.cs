@@ -74,7 +74,7 @@ namespace Machete.Domain
         public string subject { get; set; }
         //
         [StringLength(8000),Required()]
-        [Column(TypeName = "nvarchar(MAX)")]
+        [Column(TypeName = "nvarchar(8000)")]
         public string body { get; set; }
         public int transmitAttempts { get; set; }
         public int  statusID { get; set; }

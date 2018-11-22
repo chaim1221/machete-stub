@@ -84,7 +84,7 @@ namespace Machete.Domain
 
         [LocalizedDisplayName("emailTemplate", NameResourceType = typeof(Resources.Lookup))]
         [StringLength(8000, ErrorMessageResourceName = "stringlength", ErrorMessageResourceType = typeof(Resources.Lookup))]
-        [Column(TypeName = "nvarchar(MAX)")]
+        [Column(TypeName = "nvarchar(8000)")]
         public string emailTemplate { get; set; }
 
         [LocalizedDisplayName("skillDescriptionEn", NameResourceType = typeof(Resources.Lookup))]
