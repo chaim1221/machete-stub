@@ -2,7 +2,7 @@
 using Machete.Domain;
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+using System.Data.Entity;
 using System.Linq;
 
 namespace Machete.Service
