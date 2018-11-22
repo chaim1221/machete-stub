@@ -35,17 +35,14 @@ namespace Machete.Web
     {
         public static IWebHost CreateOrMigrateDatabase(this IWebHost webhost)
         {
-            var serviceScopeFactory = (IServiceScopeFactory)webhost.Services.GetService(typeof(IServiceScopeFactory));
+            var serviceScopeFactory = webhost.Services.GetRequiredService<IServiceScopeFactory>();
 
             using (var scope = serviceScopeFactory.CreateScope())
             {
-                var services = scope.ServiceProvider;
-                var dbContext = services.GetRequiredService<MacheteContext>();
- 
+                var dbContext = scope.ServiceProvider.GetService<MacheteContext>(); 
                 // g-d help us
                 dbContext.Database.Migrate();
-
-                var config = new MacheteConfiguration(dbContext, false); //true);
+                //var config = new MacheteConfiguration(dbContext, false); //true);
             }
             return webhost;
         }
