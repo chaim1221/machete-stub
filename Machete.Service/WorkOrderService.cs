@@ -32,7 +32,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Service
 {
