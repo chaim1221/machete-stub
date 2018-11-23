@@ -265,8 +265,11 @@ namespace Machete.Data
         {
             // TODO will break if Identity roles go away
             var teacherID = dbFactory.Get().Roles.First(r => r.Name == "Teacher").Id;
-            return dbFactory.Get().Users.Where(u => u.Roles.Any(r => r.RoleId == teacherID))
-              .Select(x => x.UserName).Distinct().ToList();
+            return dbFactory.Get().Users
+                //.Where(u => u.Roles.Any(r => r.RoleId == teacherID))
+                .Select(x => x.UserName)
+                .Distinct()
+                .ToList();
         }
     }
 

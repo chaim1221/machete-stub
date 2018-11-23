@@ -132,7 +132,7 @@ namespace Machete.Data
             modelBuilder.Configurations<WorkerSignin>().Add(typeof(WorkerSigninBuilder));
             modelBuilder.Configurations<Event>().Add(typeof(EventBuilder));
             modelBuilder.Configurations<JoinEventImage>().Add(typeof(JoinEventImageBuilder));
-            //modelBuilder.Configurations<JoinWorkorderEmail>().Add(typeof(JoinWorkorderEmailBuilder));
+            modelBuilder.Configurations<JoinWorkOrderEmail>().Add(typeof(JoinWorkOrderEmailBuilder));
             modelBuilder.Configurations<ActivitySignin>().Add(typeof(ActivitySigninBuilder));
             modelBuilder.Configurations<Activity>().Add(typeof(ActivityBuilder));
             modelBuilder.Configurations<Email>().Add(typeof(EmailBuilder));
@@ -150,6 +150,14 @@ namespace Machete.Data
             modelBuilder.Entity<WorkOrder>().ToTable("WorkOrders");
             modelBuilder.Entity<WorkAssignment>().ToTable("WorkAssignments");
             modelBuilder.Configurations<ReportDefinition>().Add(typeof(ReportDefinitionBuilder));
+        }
+    }
+
+    public class JoinWorkOrderEmailBuilder
+    {
+        public JoinWorkOrderEmailBuilder(EntityTypeBuilder<JoinWorkOrderEmail> entity)
+        {
+            entity.HasKey(k => new {k.EmailID, k.WorkOrderID});
         }
     }
 
@@ -396,4 +404,3 @@ namespace Machete.Data
         }
     }
 }
-
