@@ -8,38 +8,37 @@ namespace Machete.Data
 
         public static void Initialize(MacheteContext DB)
         {
-            IdentityResult ir;
-
             // TODO: A lot of the missing arguments exist in other places, we have to pull them into this class
             var rm = new RoleManager<IdentityRole>
                (new RoleStore<IdentityRole>(DB), null, null, null, null); // TODO: This is bad, very bad
-            ir = rm.CreateAsync(new IdentityRole("Administrator")).Result;
-            ir = rm.CreateAsync(new IdentityRole("Manager")).Result;
-            ir = rm.CreateAsync(new IdentityRole("Check-in")).Result;
-            ir = rm.CreateAsync(new IdentityRole("PhoneDesk")).Result;
-            ir = rm.CreateAsync(new IdentityRole("Teacher")).Result;
-            ir = rm.CreateAsync(new IdentityRole("User")).Result;
-            ir = rm.CreateAsync(new IdentityRole("Hirer")).Result; // This role is used exclusively for the online hiring interface
+            rm.CreateAsync(new IdentityRole("Administrator")).Wait();
+            rm.CreateAsync(new IdentityRole("Manager")).Wait();
+            rm.CreateAsync(new IdentityRole("Check-in")).Wait();
+            rm.CreateAsync(new IdentityRole("PhoneDesk")).Wait();
+            rm.CreateAsync(new IdentityRole("Teacher")).Wait();
+            rm.CreateAsync(new IdentityRole("User")).Wait();
+            rm.CreateAsync(new IdentityRole("Hirer")).Wait(); // This role is used exclusively for the online hiring interface
 
             var um = new UserManager<MacheteUser>(
                 new UserStore<MacheteUser>(DB), null, null, null, null, null, null, null, null); // TODO: This is bad, very bad
-            var admin = new MacheteUser()
+            var admin = new MacheteUser
             {
                 UserName = "jadmin",
                 IsApproved = true,
                 Email = "jciispam@gmail.com"
             };
-            var user = new MacheteUser()
+            var user = new MacheteUser
             {
                 UserName = "juser",
                 IsApproved = true,
                 Email = "user@there.org"
             };
-            ir = um.CreateAsync(admin, "ChangeMe").Result;
-            ir = um.AddToRoleAsync(admin, "Administrator").Result; //Default Administrator, edit to change
-            ir = um.AddToRoleAsync(admin, "Teacher").Result; //Required to make tests work
-            ir = um.CreateAsync(user, "ChangeMe").Result;
-            ir = um.AddToRoleAsync(admin, "User").Result; //Default Administrator, edit to change
+            um.CreateAsync(admin, "ChangeMe").Wait();
+            um.AddToRoleAsync(admin, "Administrator").Wait(); //Default Administrator, edit to change
+            um.AddToRoleAsync(admin, "Teacher").Wait(); //Required to make tests work
+            um.CreateAsync(user, "ChangeMe").Wait();
+            um.AddToRoleAsync(admin, "User").Wait(); //Default Administrator, edit to change
+            
             DB.Commit();
         }
 
