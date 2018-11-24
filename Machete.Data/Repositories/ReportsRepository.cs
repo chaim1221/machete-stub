@@ -23,18 +23,23 @@ namespace Machete.Data
         List<ReportDefinition> getList();
         List<QueryMetadata> getColumns(string tableName);
         DataTable getDataTable(string query, DTO.SearchOptions o);
+        List<string> validate(string query);
     }
     public class ReportsRepository : RepositoryBase<ReportDefinition>, IReportsRepository
     {
+        private IReadOnlyContext readOnlyContext;
 
+        public ReportsRepository(IDatabaseFactory dbFactory) : base(dbFactory) { }
 
-        public ReportsRepository(IDatabaseFactory dbFactory) : base(dbFactory)
-        {}
+        public ReportsRepository(IDatabaseFactory dbFactory, IReadOnlyContext readOnlyContext) : base(dbFactory) {
+            // there's no reason to put this in the base; this class needs a read-only context to perform server-side validation.
+            this.readOnlyContext = readOnlyContext;
+        }
 
         public List<SimpleDataRow> getSimpleAggregate(int id, DateTime beginDate, DateTime endDate)
         {
             var rdef = dbset.Single(a => a.ID == id);
-            return db.Get().Query<SimpleDataRow>().FromSql(rdef.sqlquery,
+            return dbFactory.Get().Query<SimpleDataRow>().FromSql(rdef.sqlquery,
             //return db.Get().Database.SqlQuery<SimpleDataRow>(rdef.sqlquery,
                 new SqlParameter { ParameterName = "beginDate", Value = beginDate },
                 new SqlParameter { ParameterName = "endDate", Value = endDate })
@@ -46,7 +51,7 @@ namespace Machete.Data
             var rdef = dbset.Single(a => a.ID == id);
             var meta = SqlServerUtils.getMetadata(DataContext, rdef.sqlquery);
             var queryType = buildQueryType(meta);
-            Task<List<object>> raw = db.Get().Query<dynamic>().FromSql(
+            Task<List<object>> raw = dbFactory.Get().Query<dynamic>().FromSql(
             //Task<List<object>> raw = db.Get().Database.SqlQuery(
                 //queryType, 
                 rdef.sqlquery,
@@ -105,7 +110,7 @@ namespace Machete.Data
 
         public List<ReportDefinition> getList()
         {
-            return db.Get().ReportDefinitions.AsEnumerable().ToList();
+            return dbFactory.Get().ReportDefinitions.AsEnumerable().ToList();
         }
 
         public List<QueryMetadata> getColumns(string tableName)
@@ -186,6 +191,11 @@ namespace Machete.Data
             propertyBuilder.SetSetMethod(setterMethod);
         }
         #endregion
+        public List<string> validate(string query)
+        {
+            var context = readOnlyContext.Get();
+            return readOnlyContext.ExecuteSql(context, query).ToList();
+        }
     }
 
     public class QueryMetadata

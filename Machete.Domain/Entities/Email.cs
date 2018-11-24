@@ -22,10 +22,12 @@
 // 
 #endregion
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Machete.Domain
 {
@@ -55,14 +57,19 @@ namespace Machete.Domain
         /// Limit on the number of attempts to send emails. Read from Config file.
         /// </summary>
         public static int iTransmitAttempts { get; set; }
+        
         public Email()
         {
             statusID = Email.iPending;
-            idString = "email";
+            WorkOrders = new JoinCollectionFacade<WorkOrder, JoinWorkOrderEmail>(
+                WorkOrderEmails,
+                woe => woe.WorkOrder,
+                wo => new JoinWorkOrderEmail { Email = this, WorkOrder = wo }
+            );
         }
 
-        public virtual ICollection<WorkOrder> WorkOrders { get; set; }
-
+        private ICollection<JoinWorkOrderEmail> WorkOrderEmails { get; } = new List<JoinWorkOrderEmail>();
+        [NotMapped] public ICollection<WorkOrder> WorkOrders { get; }
 
         [StringLength(50)]
         public string emailFrom { get; set; }
@@ -88,8 +95,7 @@ namespace Machete.Domain
         {
             get
             {
-                if (this.WorkOrders.Count() > 0) return true;
-                return false;
+                return this.WorkOrders.Count() > 0;
             }
         }
         [NotMapped]
@@ -97,9 +103,10 @@ namespace Machete.Domain
         {
             get
             {
-                return this.WorkOrders.AsQueryable();
+                return WorkOrders.AsQueryable();
             }
         }
+
         [NotMapped]
         public WorkOrder currentAssociatedWorkorder
         {
@@ -110,14 +117,13 @@ namespace Machete.Domain
         }
     }
 
-
-    public class JoinWorkorderEmail : Record
+    public class JoinWorkOrderEmail : Record
     {
         public int WorkOrderID { get; set; }
-        public virtual WorkOrder WorkOrder { get; set; }
+        public WorkOrder WorkOrder { get; set; }
 
         public int EmailID { get; set; }
-        public virtual Email Email { get; set; }
+        public Email Email { get; set; }
 
     }
 }
