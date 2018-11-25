@@ -1,46 +1,59 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Machete.Data
 {
     public static class MacheteUsers
     {
-
-        public static void Initialize(MacheteContext DB)
+        public static async void Initialize(IServiceProvider serviceProvider)
         {
-            // TODO: A lot of the missing arguments exist in other places, we have to pull them into this class
-            var rm = new RoleManager<IdentityRole>
-               (new RoleStore<IdentityRole>(DB), null, null, null, null); // TODO: This is bad, very bad
-            rm.CreateAsync(new IdentityRole("Administrator")).Wait();
-            rm.CreateAsync(new IdentityRole("Manager")).Wait();
-            rm.CreateAsync(new IdentityRole("Check-in")).Wait();
-            rm.CreateAsync(new IdentityRole("PhoneDesk")).Wait();
-            rm.CreateAsync(new IdentityRole("Teacher")).Wait();
-            rm.CreateAsync(new IdentityRole("User")).Wait();
-            rm.CreateAsync(new IdentityRole("Hirer")).Wait(); // This role is used exclusively for the online hiring interface
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetService<MacheteContext>();
+                var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
+                var userManager = scope.ServiceProvider.GetService<UserManager<MacheteUser>>();
 
-            var um = new UserManager<MacheteUser>(
-                new UserStore<MacheteUser>(DB), null, null, null, null, null, null, null, null); // TODO: This is bad, very bad
-            var admin = new MacheteUser
-            {
-                UserName = "jadmin",
-                IsApproved = true,
-                Email = "jciispam@gmail.com"
-            };
-            var user = new MacheteUser
-            {
-                UserName = "juser",
-                IsApproved = true,
-                Email = "user@there.org"
-            };
-            um.CreateAsync(admin, "ChangeMe").Wait();
-            um.AddToRoleAsync(admin, "Administrator").Wait(); //Default Administrator, edit to change
-            um.AddToRoleAsync(admin, "Teacher").Wait(); //Required to make tests work
-            um.CreateAsync(user, "ChangeMe").Wait();
-            um.AddToRoleAsync(admin, "User").Wait(); //Default Administrator, edit to change
-            
-            DB.Commit();
+                string[] roles = {"Administrator", "Manager", "Check-in", "PhoneDesk", "Teacher", "User", "Hirer"};
+                string[] adminRoles = {"Administrator", "Teacher", "User"};
+                string[] userRoles = {"User"}; // NOTE <~ this was not happening in legacy code, assuming mistake
+
+                var macheteUsers = new List<MacheteUser>
+                {
+                    new MacheteUser
+                    {
+                        UserName = "jadmin",
+                        IsApproved = true,
+                        Email = "jciispam@gmail.com"
+                    },
+                    new MacheteUser
+                    {
+                        UserName = "juser",
+                        IsApproved = true,
+                        Email = "user@there.org"
+                    }
+                };
+
+                foreach (var role in roles)
+                    await roleManager.CreateAsync(new IdentityRole(role));
+
+                foreach (var user in macheteUsers)
+                {
+                    var hasher = new PasswordHasher<MacheteUser>();
+                    user.PasswordHash = hasher.HashPassword(user, "ChangeMe");
+                    await userManager.CreateAsync(user);
+                }
+
+                var adminUser = await userManager.FindByEmailAsync("jciispam@gmail.com");
+                var regularUser = await userManager.FindByEmailAsync("user@there.org");
+
+                await userManager.AddToRolesAsync(adminUser, adminRoles);
+                await userManager.AddToRolesAsync(regularUser, userRoles);
+
+                await context.SaveChangesAsync();
+            }
         }
-
     }
 }

@@ -41,43 +41,30 @@ namespace Machete.Data.Infrastructure
     //
     public class DatabaseFactory : Disposable, IDatabaseFactory
     {
-        string connString;
+        DbContextOptions<MacheteContext> options;
         // ReSharper disable once InconsistentNaming
         private MacheteContext macheteContext;
-        private BindingFlags bindFlags = BindingFlags.Instance |
-             BindingFlags.Public |
-             BindingFlags.NonPublic |
-             BindingFlags.Static;
-        private FieldInfo field;
+        private const BindingFlags BindFlags = BindingFlags.Instance 
+                                             | BindingFlags.Public
+                                             | BindingFlags.NonPublic
+                                             | BindingFlags.Static;
+
         public DatabaseFactory() 
         {
-            //field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
+            typeof(SqlConnection).GetField("ObjectID", BindFlags);
         }
 
-        public DatabaseFactory(string connString)
+        public DatabaseFactory(DbContextOptions<MacheteContext> options)
         {
-            //field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
-            this.connString = connString;
+            typeof(SqlConnection).GetField("ObjectID", BindFlags);
+            this.options = options;
         }
 
         public MacheteContext Get()
         {            
             if (macheteContext == null) 
             {
-                var optionsBuilder = new DbContextOptionsBuilder<MacheteContext>();
-                if (connString == null)
-                {
-                    optionsBuilder.UseSqlite("Data Source=machete.db", b =>
-                        b.MigrationsAssembly("Machete.Data.Migrations"));
-                    var options = optionsBuilder.Options;
-                    macheteContext = new MacheteContext(options);
-                }
-                else
-                {
-                    optionsBuilder.UseSqlServer(connString);
-                    var options = optionsBuilder.Options; 
-                    macheteContext = new MacheteContext(options);
-                }
+                macheteContext = new MacheteContext(options);
             }
             log_connection_count("DatabaseFactory.Get");
             return macheteContext;

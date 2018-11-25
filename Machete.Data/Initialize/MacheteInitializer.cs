@@ -30,9 +30,8 @@ namespace Machete.Data
 {
     public static class MacheteConfiguration
     {
-        public static void Seed(MacheteContext db)
+        public static void Seed(MacheteContext db, IServiceProvider services)
         {
-            db.Database.Migrate();
             if (db.Lookups.Count() == 0)
             {
                 MacheteLookup.Initialize(db);
@@ -41,7 +40,7 @@ namespace Machete.Data
             {
                 MacheteTransports.Initialize(db);
             }
-            if (db.Users.Count() == 0)   MacheteUsers.Initialize(db);
+            if (db.Users.Count() == 0) MacheteUsers.Initialize(services);
             // MacheteConfigs.Initialize assumes Configs table has been populated by script
             if (db.Configs.Count() == 0) MacheteConfigs.Initialize(db);
             if (db.TransportRules.Count() == 0) MacheteRules.Initialize(db);

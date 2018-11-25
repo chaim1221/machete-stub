@@ -263,10 +263,9 @@ namespace Machete.Data
         }
         public IEnumerable<string> GetTeachers()
         {
-            // TODO will break if Identity roles go away
             var teacherID = dbFactory.Get().Roles.First(r => r.Name == "Teacher").Id;
             return dbFactory.Get().Users
-                //.Where(u => u.Roles.Any(r => r.RoleId == teacherID))
+                .Where(u => u.Roles.Any(r => r.Id == teacherID))
                 .Select(x => x.UserName)
                 .Distinct()
                 .ToList();
