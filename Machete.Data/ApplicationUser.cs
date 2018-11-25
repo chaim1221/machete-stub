@@ -11,6 +11,8 @@ namespace Machete.Data
 {
     public class MacheteUser : IdentityUser
     {
+        private string _email;
+
         public MacheteUser()
         {
             CreateDate = DateTime.Now;
@@ -40,7 +42,13 @@ namespace Machete.Data
         public bool IsAnonymous { get; set; }
         public DateTime LastActivityDate { get; set; }
         public string MobilePIN { get; set; }
-        public override string Email { get; set; }
+
+        public override string Email
+        {
+            get => _email;
+            set { _email = value; NormalizedEmail = value; }
+        }
+
         public string LoweredEmail { get; set; }
         public string LoweredUserName { get; set; }
         public string PasswordQuestion { get; set; }
@@ -56,8 +64,6 @@ namespace Machete.Data
         public int FailedPasswordAnswerAttemptCount { get; set; }
         public DateTime FailedPasswordAnswerAttemptWindowStart { get; set; }
         public string Comment { get; set; }
-        
-        
     }
 
     public class JoinMacheteUserIdentityRole : IdentityUserRole<Guid>

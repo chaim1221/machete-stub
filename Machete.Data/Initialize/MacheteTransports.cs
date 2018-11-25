@@ -12,13 +12,18 @@ namespace Machete.Data
     {
         public static void Initialize(MacheteContext c)
         {
-            if (c.TransportProviders.Count() == 0) { 
-                c.Database.ExecuteSqlCommand(@"insert into dbo.TransportProviders
+            if (c.TransportProviders.Count() == 0)
+            {
+                if (c.Database.GetDbConnection().GetType().Name == "SqlServerConnection")
+                {
+                    c.Database.ExecuteSqlCommand(@"insert into dbo.TransportProviders
                         ( [key], text_EN, text_ES, defaultAttribute, sortorder, active, datecreated, dateupdated, Createdby, Updatedby )
                             select [key], text_EN, text_ES, selected, sortorder, active, datecreated, dateupdated, Createdby, Updatedby
                             from dbo.Lookups
                             where category = 'transportmethod'");
-                c.Commit();
+                    c.Commit();
+                }
+                // TODO SQLite implementation
             }
 
             if (c.TransportProvidersAvailability.Count() == 0)

@@ -34,7 +34,6 @@ namespace Machete.Data.Helpers
 
         public static List<QueryMetadata> getMetadata(MacheteContext context, string fromQuery)
         {
-
             var param = new SqlParameter("@query", escapeQueryText(fromQuery));
             var queryResult = context.Query<QueryMetadata>().FromSql(
                 // https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-describe-first-result-set-transact-sql

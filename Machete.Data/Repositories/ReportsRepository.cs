@@ -205,5 +205,4 @@ namespace Machete.Data
         public string system_type_name { get; set; }
         public bool include { get; set; } /// default value for the UI
     }
-  
 }
