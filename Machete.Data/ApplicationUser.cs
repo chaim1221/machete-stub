@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Machete.Domain;
 
 namespace Machete.Data
 {
@@ -18,7 +21,18 @@ namespace Machete.Data
             LastLockoutDate = DateTime.Parse("1/1/1754");
             FailedPasswordAnswerAttemptWindowStart = DateTime.Parse("1/1/1754");
             FailedPasswordAttemptWindowStart = DateTime.Parse("1/1/1754");
+            
+            this.Roles = new JoinCollectionFacade<IdentityRole, JoinMacheteUserIdentityRole>(
+                IdentityUserRoles,
+                iur => iur.IdentityRole,
+                role => new JoinMacheteUserIdentityRole { MacheteUser = this, IdentityRole = role }
+            );
         }
+
+        private ICollection<JoinMacheteUserIdentityRole> IdentityUserRoles { get; }
+                 = new List<JoinMacheteUserIdentityRole>();
+        [NotMapped] public ICollection<IdentityRole> Roles { get; }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Guid ApplicationId { get; set; }
@@ -42,5 +56,13 @@ namespace Machete.Data
         public int FailedPasswordAnswerAttemptCount { get; set; }
         public DateTime FailedPasswordAnswerAttemptWindowStart { get; set; }
         public string Comment { get; set; }
+        
+        
+    }
+
+    public class JoinMacheteUserIdentityRole : IdentityUserRole<Guid>
+    {
+        public MacheteUser MacheteUser { get; set; }
+        public IdentityRole IdentityRole { get; set; }
     }
 }
