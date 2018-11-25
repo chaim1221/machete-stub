@@ -34,6 +34,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Activity = Machete.Domain.Activity;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace Machete.Data
 
@@ -81,7 +82,7 @@ namespace Machete.Data
             {
 			// TODO: Jimmy: Need to understand why the code was moved out of the catch block
 			// Originally this printed out EF debug information when the SQL constraints errored
-			//                var details = new StringBuilder();
+			//    var details = new StringBuilder();
             //    var preface = String.Format("DbEntityValidation Error: ");
             //    Trace.TraceInformation(preface);
             //    details.AppendLine(preface);
@@ -124,7 +125,9 @@ namespace Machete.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); //This calls the other builders (below)
+            base.OnModelCreating(modelBuilder); // call the other builders (below):
+            
+            // ENTITIES //
             modelBuilder.Configurations<Person>().Add(typeof(PersonBuilder));
             modelBuilder.Configurations<Worker>().Add(typeof(WorkerBuilder));
             modelBuilder.Configurations<WorkerSignin>().Add(typeof(WorkerSigninBuilder));
@@ -136,18 +139,17 @@ namespace Machete.Data
             modelBuilder.Configurations<Email>().Add(typeof(EmailBuilder));
             modelBuilder.Configurations<TransportProvider>().Add(typeof(TransportProviderBuilder));
             modelBuilder.Configurations<TransportProviderAvailability>()
-                .Add(typeof(TransportProvidersAvailabilityBuilder));
+                        .Add(typeof(TransportProvidersAvailabilityBuilder));
             modelBuilder.Configurations<TransportRule>().Add(typeof(TransportRuleBuilder));
             modelBuilder.Configurations<TransportCostRule>().Add(typeof(TransportCostRuleBuilder));
             modelBuilder.Configurations<ScheduleRule>().Add(typeof(ScheduleRuleBuilder));
             modelBuilder.Configurations<Employer>().Add(typeof(EmployerBuilder));
             modelBuilder.Configurations<WorkOrder>().Add(typeof(WorkOrderBuilder));
             modelBuilder.Configurations<WorkAssignment>().Add(typeof(WorkAssignmentBuilder));
-            // these should be in the builders
-            modelBuilder.Entity<Employer>().ToTable("Employers");
-            modelBuilder.Entity<WorkOrder>().ToTable("WorkOrders");
-            modelBuilder.Entity<WorkAssignment>().ToTable("WorkAssignments");
             modelBuilder.Configurations<ReportDefinition>().Add(typeof(ReportDefinitionBuilder));
+            
+            // VIEWS //
+            modelBuilder.Query<QueryMetadata>();
         }
     }
 
@@ -236,6 +238,7 @@ namespace Machete.Data
                 .WithOne(w => w.Employer).IsRequired(true) //Virtual property definition
                 .HasForeignKey(w => w.EmployerID) //DB foreign key definition
                 .OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable("Employers");
         }
     }
 
@@ -256,6 +259,7 @@ namespace Machete.Data
                 .WithMany(e => e.WorkOrders)
                 .HasForeignKey(e => e.EmployerID)
                 .IsRequired(true);
+            entity.ToTable("WorkOrders");
         }
     }
 
@@ -268,6 +272,7 @@ namespace Machete.Data
                 .WithMany(a => a.workAssignments)
                 .HasForeignKey(a => a.workOrderID)
                 .IsRequired(true);
+            entity.ToTable("WorkAssignments");
         }
     }
 

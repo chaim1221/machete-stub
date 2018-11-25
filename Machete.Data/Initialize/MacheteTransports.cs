@@ -22,8 +22,14 @@ namespace Machete.Data
                             from dbo.Lookups
                             where category = 'transportmethod'");
                     c.Commit();
+                } else {
+                    c.Database.ExecuteSqlCommand(@"insert into TransportProviders
+                        ( [key], text_EN, text_ES, defaultAttribute, sortorder, active, datecreated, dateupdated, Createdby, Updatedby )
+                            select [key], text_EN, text_ES, selected, sortorder, active, datecreated, dateupdated, Createdby, Updatedby
+                            from Lookups
+                            where category = 'transportmethod'");
+                    c.Commit();
                 }
-                // TODO SQLite implementation
             }
 
             if (c.TransportProvidersAvailability.Count() == 0)
