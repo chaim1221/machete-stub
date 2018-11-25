@@ -51,12 +51,12 @@ namespace Machete.Data.Infrastructure
         private FieldInfo field;
         public DatabaseFactory() 
         {
-            field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
+            //field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
         }
 
         public DatabaseFactory(string connString)
         {
-            field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
+            //field = typeof(SqlConnection).GetField("ObjectID", bindFlags);
             this.connString = connString;
         }
 

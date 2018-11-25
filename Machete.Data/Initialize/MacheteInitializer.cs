@@ -28,36 +28,24 @@ using System.Linq;
 
 namespace Machete.Data
 {
-    //public class MacheteInitializer : MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
-    //public class TestInitializer : MigrateDatabaseToLatestVersion<MacheteContext, MacheteConfiguration> {}
-    public class MacheteConfiguration // : DbMigrationsConfiguration<MacheteContext>
+    public static class MacheteConfiguration
     {
-        private MacheteContext _db;
-
-        public MacheteConfiguration(MacheteContext db, bool seed = false) // : base()
+        public static void Seed(MacheteContext db)
         {
-            //AutomaticMigrationsEnabled = true;         // TODO: Add migrations, ignoring on first pass
-            //AutomaticMigrationDataLossAllowed = false; // https://stackoverflow.com/a/42302429/2496266
-            _db = db;
-            if (seed) Seed();
-        }
-
-        //protected override void Seed(MacheteContext DB)
-        private void Seed()
-        {
-            if (_db.Lookups.Count() == 0)
+            db.Database.Migrate();
+            if (db.Lookups.Count() == 0)
             {
-                MacheteLookup.Initialize(_db);
+                MacheteLookup.Initialize(db);
             }
-            if (_db.TransportProviders.Count() == 0 || _db.TransportProvidersAvailability.Count() == 0)
+            if (db.TransportProviders.Count() == 0 || db.TransportProvidersAvailability.Count() == 0)
             {
-                MacheteTransports.Initialize(_db);
+                MacheteTransports.Initialize(db);
             }
-            if (_db.Users.Count() == 0)   MacheteUsers.Initialize(_db);
+            if (db.Users.Count() == 0)   MacheteUsers.Initialize(db);
             // MacheteConfigs.Initialize assumes Configs table has been populated by script
-            if (_db.Configs.Count() == 0) MacheteConfigs.Initialize(_db);
-            if (_db.TransportRules.Count() == 0) MacheteRules.Initialize(_db);
-            if (_db.ReportDefinitions.Count() != MacheteReportDefinitions.cache.Count) MacheteReportDefinitions.Initialize(_db);
+            if (db.Configs.Count() == 0) MacheteConfigs.Initialize(db);
+            if (db.TransportRules.Count() == 0) MacheteRules.Initialize(db);
+            if (db.ReportDefinitions.Count() != MacheteReportDefinitions.cache.Count) MacheteReportDefinitions.Initialize(db);
         }
     }   
 }

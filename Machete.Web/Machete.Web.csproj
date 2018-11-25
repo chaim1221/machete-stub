@@ -18,6 +18,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Machete.Data\Machete.Data.csproj" />
+    <ProjectReference Include="..\Machete.Service\Machete.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Start" />
+    <Folder Include="ViewModel" />
   </ItemGroup>
 
 </Project>

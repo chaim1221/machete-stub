@@ -38,19 +38,12 @@ using Activity = Machete.Domain.Activity;
 namespace Machete.Data
 
 {
-    // TODO: hmm...
-    //[DbConfigurationType(typeof(AzureConfiguration))]
-    // http://stackoverflow.com/questions/22105583/why-is-asp-net-identity-identitydbcontext-a-black-box
     public class MacheteContext : IdentityDbContext<MacheteUser>, IDisposable
     {
         public MacheteContext(DbContextOptions<MacheteContext> options) : base(options)
         {
             
         }
-
-        //public MacheteContext() : base("›", throwIfV1Schema: false) { }
-        //public MacheteContext(string connectionString) : base(connectionString, throwIfV1Schema: false) { }
-
         //Machete here defines the database to use, by convention.
         public DbSet<Person> Persons { get; set; }
         public DbSet<Worker> Workers { get; set; }
