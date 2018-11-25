@@ -16,7 +16,7 @@ namespace Machete.Test.Integration.Data
         public void Initialize()
         {
             frb = new FluentRecordBase();
-            frb.AddDBFactory();
+            frb.AddDBFactory("Server=tcp:localhost,1433;Database=machete_test;User ID=SA;Password=<YourStrong!Passw0rd>;Trusted_Connection=false;Connection Timeout=30;");
         }
 
         [TestMethod, TestCategory(TC.IT), TestCategory(TC.Data), TestCategory(TC.Reports)]

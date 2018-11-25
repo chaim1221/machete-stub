@@ -264,8 +264,8 @@ namespace Machete.Data.Migrations
 
                     b.Property<string>("body")
                         .IsRequired()
-                        .HasColumnType("nvarchar(MAX)")
-                        .HasMaxLength(8000);
+                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(4000);
 
                     b.Property<string>("createdby")
                         .HasColumnName("Createdby")
@@ -531,8 +531,8 @@ namespace Machete.Data.Migrations
                     b.Property<DateTime>("dateupdated");
 
                     b.Property<string>("emailTemplate")
-                        .HasColumnType("nvarchar(MAX)")
-                        .HasMaxLength(8000);
+                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(4000);
 
                     b.Property<bool?>("fixedJob");
 

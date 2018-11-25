@@ -74,8 +74,7 @@ namespace Machete.Data.Infrastructure
                 }
                 else
                 {
-                    optionsBuilder.UseSqlServer(connString, b =>
-                        b.MigrationsAssembly("Machete.Data.Migrations"));
+                    optionsBuilder.UseSqlServer(connString);
                     var options = optionsBuilder.Options; 
                     macheteContext = new MacheteContext(options);
                 }

@@ -131,7 +131,7 @@ namespace Machete.Data.Migrations
                     emailFrom = table.Column<string>(maxLength: 50, nullable: true),
                     emailTo = table.Column<string>(maxLength: 50, nullable: false),
                     subject = table.Column<string>(maxLength: 100, nullable: false),
-                    body = table.Column<string>(type: "nvarchar(8000)", maxLength: 8000, nullable: false),
+                    body = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
                     transmitAttempts = table.Column<int>(nullable: false),
                     statusID = table.Column<int>(nullable: false),
                     lastAttempt = table.Column<DateTime>(nullable: true),
@@ -206,7 +206,7 @@ namespace Machete.Data.Migrations
                 {
                     table.PrimaryKey("PK_Images", x => x.ID);
                 });
-
+            
             migrationBuilder.CreateTable(
                 name: "Lookups",
                 columns: table => new
@@ -230,7 +230,7 @@ namespace Machete.Data.Migrations
                     typeOfWorkID = table.Column<int>(nullable: true),
                     speciality = table.Column<bool>(nullable: false),
                     ltrCode = table.Column<string>(maxLength: 3, nullable: true),
-                    emailTemplate = table.Column<string>(type: "nvarchar(8000)", maxLength: 8000, nullable: true),
+                    emailTemplate = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     skillDescriptionEn = table.Column<string>(maxLength: 300, nullable: true),
                     skillDescriptionEs = table.Column<string>(maxLength: 300, nullable: true),
                     minimumCost = table.Column<double>(nullable: true),

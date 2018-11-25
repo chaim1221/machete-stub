@@ -94,9 +94,11 @@ namespace Machete.Test.Integration
         {
             //AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
 
-            _dbFactory = new DatabaseFactory();
+            _dbFactory = new DatabaseFactory(connStringName);
             //initializer.InitializeDatabase(_dbFactory.Get());
-            MacheteConfiguration.Seed(_dbFactory.Get());
+            var context = _dbFactory.Get();
+            context.Database.Migrate();
+            MacheteConfiguration.Seed(context);
             _uow = new UnitOfWork(_dbFactory);
             _uow.Commit();
 
