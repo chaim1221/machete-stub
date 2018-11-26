@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Machete.Data;
+using Machete.Data.Migrations;
+using Machete.Data.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -34,12 +36,19 @@ namespace Machete.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<MacheteContext>(options =>
-                // TODO this should configure itself based on type of environment
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
-            );
-            services.AddDefaultIdentity<MacheteUser>()
-                .AddEntityFrameworkStores<MacheteContext>();
+            var connString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<MacheteContext>(builder => {
+                if (connString == null || connString == "Data Source=machete.db")
+                    builder.UseSqlite("Data Source=machete.db", with =>
+                        with.MigrationsAssembly("Machete.Data"));
+                else
+                    builder.UseSqlServer(connString, with =>
+                        with.MigrationsAssembly("Machete.Data"));
+            });
+            
+            services.AddIdentity<MacheteUser, IdentityRole>()
+                .AddEntityFrameworkStores<MacheteContext>()
+                .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

@@ -13,31 +13,31 @@ namespace Machete.Web.Controllers
     {
         public IActionResult Index()
         {
-            var db = new Machete.Data.Infrastructure.DatabaseFactory();
-            var context = db.Get();
-            var employer = context.Employers.Add(new Employer
-            {
-                active = true,
-                address1 = "124 any street",
-                address2 = "",
-                blogparticipate = false,
-                business = true,
-                businessname = "adfs",
-                cellphone = "206-123-1231",
-                phone = "206-123-1231",
-                city = "Houston",
-                zipcode = "77018",
-                createdby = "asdf",
-                datecreated = DateTime.Now,
-                dateupdated = DateTime.Now,
-                email = "president@whitehouse.gov",
-                fax = "",
-                licenseplate = "123-DEF",
-                name = "Jaime Elias",
-                state = "TX",
-                updatedby = "asdf"
-            });
-            context.SaveChanges();
+//            var db = new Data.Infrastructure.DatabaseFactory();
+//            var context = db.Get();
+//            var employer = context.Employers.Add(new Employer
+//            {
+//                active = true,
+//                address1 = "124 any street",
+//                address2 = "",
+//                blogparticipate = false,
+//                business = true,
+//                businessname = "adfs",
+//                cellphone = "206-123-1231",
+//                phone = "206-123-1231",
+//                city = "Houston",
+//                zipcode = "77018",
+//                createdby = "asdf",
+//                datecreated = DateTime.Now,
+//                dateupdated = DateTime.Now,
+//                email = "president@whitehouse.gov",
+//                fax = "",
+//                licenseplate = "123-DEF",
+//                name = "Jaime Elias",
+//                state = "TX",
+//                updatedby = "asdf"
+//            });
+//            context.SaveChanges();
             return View(); //model: employer);
         }
 
