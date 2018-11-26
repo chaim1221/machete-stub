@@ -18,7 +18,6 @@ namespace Machete.Data
 
                 string[] roles = {"Administrator", "Manager", "Check-in", "PhoneDesk", "Teacher", "User", "Hirer"};
                 string[] adminRoles = {"Administrator", "Teacher", "User"};
-                string[] userRoles = {"User"}; // NOTE <~ this was not happening in legacy code, assuming mistake
 
                 var macheteUsers = new List<MacheteUser>
                 {
@@ -50,7 +49,6 @@ namespace Machete.Data
                 var regularUser = await userManager.FindByEmailAsync("user@there.org");
 
                 await userManager.AddToRolesAsync(adminUser, adminRoles);
-                await userManager.AddToRolesAsync(regularUser, userRoles);
 
                 await context.SaveChangesAsync();
             }
