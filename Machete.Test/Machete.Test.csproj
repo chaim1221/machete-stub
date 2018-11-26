@@ -30,4 +30,16 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="UnitTests\Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="UnitTests\Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="UnitTests\Controllers\**" />
+  </ItemGroup>
+
 </Project>

@@ -27,7 +27,6 @@ using Machete.Data;
 using Machete.Service;
 using Machete.Data.Infrastructure;
 using Machete.Domain;
-using System.IO;
 using AutoMapper;
 using System.Data;
 using System.Data.SqlClient;
@@ -35,9 +34,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Test.Integration
 {
-    public partial class FluentRecordBase :IDisposable
+    public partial class FluentRecordBase : IDisposable
     {
         #region internal fields
+
         private ActivityRepository _repoA;
         private ActivitySigninRepository _repoAS;
         private ConfigRepository _repoC;
@@ -67,38 +67,37 @@ namespace Machete.Test.Integration
         private Event _event;
         private Config _config = null;
         private Worker _w;
-        private WorkerRequest  _wr;
-        private Activity  _a;
+        private WorkerRequest _wr;
+        private Activity _a;
+
         private ActivitySignin _as;
+
         //private Event _e;
         private Lookup _l;
         private Image _i;
         private string _user = "FluentRecordBase";
-        private Random _random = new Random((int)DateTime.Now.Ticks);
+        private Random _random = new Random((int) DateTime.Now.Ticks);
         private IMapper _webMap;
         private IMapper _apiMap;
+        private IServiceProvider _serviceProvider;
 
         #endregion
 
+        
         public FluentRecordBase() { }
 
         public FluentRecordBase(string user)
         {
-
             _user = user;
             ToServLookup().populateStaticIds();
         }
 
-
         public FluentRecordBase AddDBFactory(string connStringName = null)
         {
-            //AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
-
             _dbFactory = new DatabaseFactory(connStringName);
-            //initializer.InitializeDatabase(_dbFactory.Get());
             var context = _dbFactory.Get();
             context.Database.Migrate();
-            MacheteConfiguration.Seed(context);
+            MacheteConfiguration.Seed(context, _serviceProvider);
             _uow = new UnitOfWork(_dbFactory);
             _uow.Commit();
 
@@ -110,7 +109,7 @@ namespace Machete.Test.Integration
         {
             if (_dbFactory == null) throw new InvalidOperationException("You must first initialize the database.");
             var db = _dbFactory.Get();
-            var connection = (db).Database.GetDbConnection();
+            var connection = db.Database.GetDbConnection();
 
             using (var command = connection.CreateCommand())
             {
@@ -130,8 +129,12 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
                     command.ExecuteNonQuery();
                 }
                 catch (SqlException ex)
-                {                               // user already exists
-                    if (ex.Errors[0].Number.Equals(15025)) { } else throw ex;
+                {
+                    // user already exists
+                    if (ex.Errors[0].Number.Equals(15025))
+                    {
+                    }
+                    else throw ex;
                 }
             }
 
@@ -157,6 +160,7 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
         }
 
         #region Persons
+
         #endregion
 
         #region Workers
@@ -214,17 +218,17 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_servW == null) AddServWorker();
             //
             // ARRANGE
-            _w = (Worker)Records.worker.Clone();
+            _w = (Worker) Records.worker.Clone();
             _w.Person = _p;
             _w.ID = _p.ID; // mimics MVC UI behavior. the POST to create worker includes the person record's ID
             if (skill1 != null) _w.skill1 = skill1;
             if (skill2 != null) _w.skill2 = skill2;
             if (skill3 != null) _w.skill3 = skill3;
-            if (status != null) _w.memberStatusID = (int)status;
-            if (datecreated != null) _w.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _w.dateupdated = (DateTime)dateupdated;
-            if (memberexpirationdate != null) _w.memberexpirationdate = (DateTime)memberexpirationdate;
-            if (memberReactivateDate != null) _w.memberReactivateDate = (DateTime)memberReactivateDate;
+            if (status != null) _w.memberStatusID = (int) status;
+            if (datecreated != null) _w.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _w.dateupdated = (DateTime) dateupdated;
+            if (memberexpirationdate != null) _w.memberexpirationdate = (DateTime) memberexpirationdate;
+            if (memberReactivateDate != null) _w.memberReactivateDate = (DateTime) memberReactivateDate;
             if (testID != null) _w.Person.firstname2 = testID;
             // kludge
             _w.dwccardnum = Records.GetNextMemberID(_dbFactory.Get().Workers);
@@ -292,11 +296,11 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_w == null) AddWorker();
             //
             // ARRANGE
-            _wr = (WorkerRequest)Records.request.Clone();
+            _wr = (WorkerRequest) Records.request.Clone();
             _wr.workOrder = _wo;
             _wr.workerRequested = _w;
-            if (datecreated != null) _wr.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _wr.dateupdated = (DateTime)dateupdated;
+            if (datecreated != null) _wr.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _wr.dateupdated = (DateTime) dateupdated;
             //
             // ACT
             _servWR.Create(_wr, _user);
@@ -353,9 +357,9 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_servI == null) AddServImage();
             //
             // ARRANGE
-            _i = (Image)Records.image.Clone();
-            if (datecreated != null) _i.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _i.dateupdated = (DateTime)dateupdated;
+            _i = (Image) Records.image.Clone();
+            if (datecreated != null) _i.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _i.dateupdated = (DateTime) dateupdated;
             //
             // ACT
             _servI.Create(_i, _user);
@@ -414,9 +418,9 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_servL == null) AddServLookup();
             //
             // ARRANGE
-            _l = (Lookup)Records.lookup.Clone();
-            if (datecreated != null) _l.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _l.dateupdated = (DateTime)dateupdated;
+            _l = (Lookup) Records.lookup.Clone();
+            if (datecreated != null) _l.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _l.dateupdated = (DateTime) dateupdated;
             //
             // ACT
             _servL.Create(_l, _user);
@@ -471,7 +475,7 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             DateTime? dateupdated = null,
             DateTime? startTime = null,
             DateTime? endTime = null,
-            string    teacher = null
+            string teacher = null
         )
         {
             //
@@ -479,11 +483,11 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_servA == null) AddServActivity();
             //
             // ARRANGE
-            _a = (Activity)Records.activity.Clone();
-            if (datecreated != null) _a.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _a.dateupdated = (DateTime)dateupdated;
-            if (startTime != null) _a.dateStart = (DateTime)startTime;
-            if (endTime != null) _a.dateEnd = (DateTime)endTime;
+            _a = (Activity) Records.activity.Clone();
+            if (datecreated != null) _a.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _a.dateupdated = (DateTime) dateupdated;
+            if (startTime != null) _a.dateStart = (DateTime) startTime;
+            if (endTime != null) _a.dateEnd = (DateTime) endTime;
             if (teacher != null) _a.teacher = teacher;
             //
             // ACT
@@ -550,11 +554,11 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_w == null) AddWorker();
             //
             // ARRANGE
-            _as = (ActivitySignin)Records.activitysignin.Clone();
+            _as = (ActivitySignin) Records.activitysignin.Clone();
             _as.Activity = _a;
             _as.activityID = _a.ID;
-            if (datecreated != null) _as.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _as.dateupdated = (DateTime)dateupdated;
+            if (datecreated != null) _as.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _as.dateupdated = (DateTime) dateupdated;
             _as.dwccardnum = _w.dwccardnum;
             _as.dateforsignin = DateTime.Now;
             //
@@ -629,10 +633,9 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             return _servRV2;
         }
 
-
-
         #endregion
 
+        
         #region Emails
 
         public FluentRecordBase AddRepoEmail()
@@ -680,10 +683,10 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_servEM == null) AddServEmail();
             //
             // ARRANGE
-            _email = (Email)Records.email.Clone();
-            if (datecreated != null) _email.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _email.dateupdated = (DateTime)dateupdated;
-            if (status != null) _email.statusID = (int)status;
+            _email = (Email) Records.email.Clone();
+            if (datecreated != null) _email.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _email.dateupdated = (DateTime) dateupdated;
+            if (status != null) _email.statusID = (int) status;
             if (attachment != null) _email.attachment = attachment;
             if (attachmentType != null) _email.attachment = attachmentType;
             //
@@ -700,7 +703,7 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
 
         public Email CloneEmail()
         {
-            var p = (Email)Records.email.Clone();
+            var p = (Email) Records.email.Clone();
             p.emailFrom = "joe@foo.com";
             p.emailTo = "foo@joe.com";
             p.subject = RandomString(5);
@@ -755,10 +758,10 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_p == null) AddPerson();
             //
             // ARRANGE
-            _event = (Event)Records.event1.Clone();
+            _event = (Event) Records.event1.Clone();
             _event.PersonID = _p.ID;
-            if (datecreated != null) _event.datecreated = (DateTime)datecreated;
-            if (dateupdated != null) _event.dateupdated = (DateTime)dateupdated;
+            if (datecreated != null) _event.datecreated = (DateTime) datecreated;
+            if (dateupdated != null) _event.dateupdated = (DateTime) dateupdated;
             _event.updatedby = _user;
             _event.createdby = _user;
             //
@@ -772,6 +775,7 @@ EXEC sp_addrolemember 'db_datareader', 'readonlyUser';
             if (_event == null) AddEvent();
             return _event;
         }
+
         #endregion
 
         #region Configs

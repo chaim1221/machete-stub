@@ -49,8 +49,15 @@ namespace Machete.Data.Infrastructure
                                              | BindingFlags.NonPublic
                                              | BindingFlags.Static;
 
-        public DatabaseFactory() 
+        public DatabaseFactory(string connString)
         {
+            var caller = Assembly.GetCallingAssembly();
+
+            if (!string.Equals(caller.FullName, "Machete.Test.Integration"))
+            {
+                throw new UnauthorizedAccessException("This constructor can no longer retrieve a context for any class but the test class.");
+            }
+            
             typeof(SqlConnection).GetField("ObjectID", BindFlags);
         }
 
