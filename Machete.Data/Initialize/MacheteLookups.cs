@@ -24,6 +24,7 @@
 using Machete.Domain;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Data
 {
@@ -200,7 +201,10 @@ namespace Machete.Data
                 u.updatedby = "Init T. Script";
                 context.Lookups.Add(u); 
             });
-            context.Commit();
+            context.Database.OpenConnection();
+            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups ON");
+            context.SaveChanges();
+            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups OFF");
         }
     }    
 }

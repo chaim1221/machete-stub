@@ -1,4 +1,4 @@
-﻿#region COPYRIGHT
+#region COPYRIGHT
 // File:     MacheteContext.cs
 // Author:   Savage Learning, LLC.
 // Created:  2012/06/17 
@@ -46,10 +46,6 @@ namespace Machete.Data
         {
             
         }
-
-        //public MacheteContext() : base("›", throwIfV1Schema: false) { }
-        //public MacheteContext(string connectionString) : base(connectionString, throwIfV1Schema: false) { }
-
         //Machete here defines the database to use, by convention.
         public DbSet<Person> Persons { get; set; }
         public DbSet<Worker> Workers { get; set; }

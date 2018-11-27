@@ -80,8 +80,8 @@ namespace Machete.Domain
         [StringLength(100),Required()]
         public string subject { get; set; }
         //
-        [StringLength(8000),Required()]
-        [Column(TypeName = "nvarchar(8000)")]
+        [StringLength(4000),Required()]
+        [Column(TypeName = "nvarchar(4000)")]
         public string body { get; set; }
         public int transmitAttempts { get; set; }
         public int  statusID { get; set; }
