@@ -1,75 +1,89 @@
-﻿<!DOCTYPE html>
+﻿@using Machete.Web.Helpers
+<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Machete.Web</title>
+@Scripts.Render("~/bundles/jquery")
 
-    <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    </environment>
+@{
+    string controllerName = Request.RequestContext.RouteData.Values["controller"].ToString();
+}
+<head>
+    <link href="@Url.Content("~/Content/jquery.lightbox-0.5.css")" rel="stylesheet" type="text/css" />
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/reportcss")
+    <title>@Machete.Web.Resources.Shared.title@ViewBag.title</title>
+    <link rel="shortcut icon" href="/Content/favicon.ico" type="image/png"/>
+    <link rel="icon" href="/Content/favicon.ico" type="image/png"/> 
 </head>
+
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Machete.Web</a>
+    <div class="page">
+        <div>
+            @*<input type="button" value="@Machete.Web.Resources.Shared.bannerbtn" id="showbanner" class="formButton"/>*@
+        </div>
+        <div id="header">
+            <div id="title" class="print-off">
+                @*<img alt="@Machete.Web.Resources.Shared.title" src="/Content/casa_logo.png" title="CasaLogo" class="casaLogo"/>*@
+                @*<img class="print_off" alt="@Machete.Web.Resources.Shared.title" src="/Content/machete_1_close_crop.png" title="Click to hide"/>*@
+                @Html.ActionLink(@Machete.Web.Resources.Shared.hometab, "Index", "Home", null, new { id = "menulinkhome" })
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+            <div id="logindisplay" class="print-off">
+                @Html.Partial("_LogOnPartial")
+                @Html.Partial("_CultureChooser")
+            </div>
+            <div id="menucontainer" class="print-off">
+                <ul id="menu">
+                    <li></li>
+                    @if (Html.IsInRole(Html.Role_AM()))
+                    {
+                        <li>@Html.ActionLink("V2", "Index", "V2", null, new { id = "menulinkV2" })</li>
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.reportstab, "Index", "Reports", null, new { id = "menulinkreports" })</li>
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.emailstab, "Index", "Email", null, new { id = "menulinkemails" })</li>
+                    }
+                    @if (Html.IsInRole(Html.Role_AMP()))
+                    {
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.employerstab, "Index", "Employer", null, new { id = "menulinkemployer" })</li>
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.workorderstab, "Index", "WorkOrder", null, new { id = "menulinkworkorder" })</li>
+                    }
+                    @if (Html.IsInRole(Html.Role_AMPCU()))
+                    {
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.workassignmentstab, "Index", "WorkAssignment")</li>
+                    }
+                    @if (Html.IsInRole(Html.Role_AMP()) || Html.IsInRole(Html.Role_T()))
+                    { 
+                        <li>@Html.ActionLink(@Machete.Web.Resources.Shared.persontab, "Index", "Person", null, new { id = "menulinkperson" })</li>
+                    }
+                    @if (Html.IsInRole(Html.Role_AM()) || Html.IsInRole(Html.Role_T()))
+                    { 
+                    <li>@Html.ActionLink(@Machete.Web.Resources.Shared.activitytab, "Index", "Activity", null, new { id = "menulinkactivity" })</li>
+                    }
+                    @if (Html.IsInRole(Html.Role_AMPCU()))
+                    { 
+                    <li>@Html.ActionLink(@Machete.Web.Resources.Shared.workersignintab, "Index", "WorkerSignin", null, new { id = "menulinkworkersignin" })</li>
+                    }
                 </ul>
-                <partial name="_LoginPartial" />
             </div>
         </div>
-    </nav>
 
-    <partial name="_CookieConsentPartial" />
-
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; 2018 - Machete.Web</p>
-        </footer>
-    </div>
-
-    <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                asp-fallback-test="window.jQuery"
-                crossorigin="anonymous"
-                integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
-        </script>
-        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                crossorigin="anonymous"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-        </script>
-        <script src="~/js/site.min.js" asp-append-version="true"></script>
-    </environment>
-
-    @RenderSection("Scripts", required: false)
+        <div id="main">
+            @RenderBody()
+            <div id="footer" class="print-off">
+            <p class="print-off">
+                Web solution by Savage Learning, LLC. Copyright 2011-2015. Licensed under GNU GPL v3.0.
+            </p>
+            </div><!--footer-->        
+        </div><!--main-->
+    </div><!--page-->
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.formButton').button();
+        $("a[href='/@(controllerName)']").addClass('menulinkactive');
+
+        function callback() {
+            setTimeout(function () {
+
+            }, 1000);
+        };
+    });
+</script>
