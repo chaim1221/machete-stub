@@ -22,16 +22,13 @@
 // 
 #endregion
 using AutoMapper;
-using Machete.Data;
 using Machete.Domain;
 using Machete.Service;
 using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
-using System;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -55,7 +52,7 @@ namespace Machete.Web.Controllers
             this.map = map;
             this.def = def;
         }
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (System.Globalization.CultureInfo)Session["Culture"];
@@ -93,8 +90,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -140,8 +136,7 @@ namespace Machete.Web.Controllers
                 sNewLabel = result.tablabel,
                 iNewID = result.ID,
                 jobSuccess = true
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -176,7 +171,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 jobSuccess = true
-            }, JsonRequestBehavior.AllowGet);
+            });
 
         }
         /// <summary>
@@ -195,8 +190,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 

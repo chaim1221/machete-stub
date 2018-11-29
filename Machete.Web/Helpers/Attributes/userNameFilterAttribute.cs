@@ -22,23 +22,23 @@
 // 
 #endregion
 using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Machete.Web.Helpers
 {
-    /// <summary>
-    /// Controller decorator to handle UserName
-    /// </summary>
+    /// <inheritdoc />
+    /// <summary>Controller decorator to handle UserName</summary>
 	public class UserNameFilter : ActionFilterAttribute
 	{
 	    public override void OnActionExecuting(ActionExecutingContext filterContext)
 	    {
 	        const string Key = "userName";
 	 
-	        if (filterContext.ActionParameters.ContainsKey(Key))
+	        if (filterContext.ActionArguments.ContainsKey(Key))
 	        {
 	            if (filterContext.HttpContext.User.Identity.IsAuthenticated)
 	            {
-	                filterContext.ActionParameters[Key] = filterContext.HttpContext.User.Identity.Name;
+	                filterContext.ActionArguments[Key] = filterContext.HttpContext.User.Identity.Name;
 	            }
 	        }	 
 	        base.OnActionExecuting(filterContext);

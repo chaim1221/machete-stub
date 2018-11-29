@@ -21,31 +21,42 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using System.Web.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Helpers
 {
     public class AuthorizeExAttribute : AuthorizeAttribute
-    {
-        public override void OnAuthorization(AuthorizationContext filterContext)
+    {        
+        public void OnAuthorization(AuthorizationHandlerContext filterContext)
         {
-            base.OnAuthorization(filterContext);
             CheckIfUserIsAuthenticated(filterContext);
         }
 
-        private void CheckIfUserIsAuthenticated(AuthorizationContext filterContext)
+        private void CheckIfUserIsAuthenticated(AuthorizationHandlerContext filterContext)
         {
-            // If result is null, we're authorized
-            if (filterContext.Result == null) return;
+            // Framework 4.5
+//            // If result is null, we're authorized
+//            if (filterContext.Result == null) return;
+//
+//            // If here, you're getting an HTTP 401 status code
+//            if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+//            {
+//                
+//                ViewResult result = new ViewResult();
+//                result.ViewName = "Error";
+//                filterContext.Result = result;
+//            }
+            
+            // .NET Core 2.1
+            if (filterContext.HasSucceeded) return;
 
             // If here, you're getting an HTTP 401 status code
-            if (filterContext.HttpContext.User.Identity.IsAuthenticated)
-            {
-                
-                ViewResult result = new ViewResult();
-                result.ViewName = "Error";
-                filterContext.Result = result;
-            }
+            if (!filterContext.User.Identity.IsAuthenticated) return;
+            ViewResult result = new ViewResult();
+            result.ViewName = "Error";
+            filterContext.Fail();
         }
 
     }

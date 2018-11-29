@@ -28,9 +28,8 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System;
 using System.Linq;
-using System.Web.Configuration;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -50,10 +49,10 @@ namespace Machete.Web.Controllers
             this.def = def;
         }
 
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         //
         // GET: /WorkerSignin/
@@ -71,7 +70,7 @@ namespace Machete.Web.Controllers
         {
             var wsi = serv.CreateSignin(dwccardnum, dateforsignin, this.User.Identity.Name);
             var result = map.Map<WorkerSignin, ViewModel.WorkerSignin>(wsi);
-            return Json(result, JsonRequestBehavior.AllowGet);
+            return Json(result);
 
         }
         /// <summary>
@@ -93,8 +92,7 @@ namespace Machete.Web.Controllers
                 jobSuccess = true,
                 status = "OK", 
                 workerID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         /// <summary>
@@ -116,8 +114,7 @@ namespace Machete.Web.Controllers
                 jobSuccess = true,
                 status = "OK",
                 workerID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         // GET: /WorkerSignin/Delete/5
@@ -138,8 +135,7 @@ namespace Machete.Web.Controllers
                     {
                         jobSuccess = false,
                         rtnMessage = "You cannot delete a signin that has been associated with an Assignment. Disassociate the sigin with the assignment first."
-                    },
-                    JsonRequestBehavior.AllowGet);
+                    });
             }
             else
             { 
@@ -149,8 +145,7 @@ namespace Machete.Web.Controllers
                     jobSuccess = true,
                     status = "OK",
                     deletedID = id
-                },
-                JsonRequestBehavior.AllowGet);
+                });
             }
         }
 
@@ -169,8 +164,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = was.totalCount,
                 iTotalDisplayRecords = was.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
     }
 }

@@ -28,9 +28,9 @@ using Machete.Web.Helpers;
 using Machete.Web.ViewModel;
 using System;
 using System.Linq;
-using System.Web.Configuration;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -56,7 +56,7 @@ namespace Machete.Web.Controllers
             this.map = map;
             this.def = def;
         }
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (System.Globalization.CultureInfo)Session["Culture"];
@@ -92,8 +92,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = was.totalCount,
                 iTotalDisplayRecords = was.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }          
         //
         // GET: /WorkAssignment/Create
@@ -132,8 +131,7 @@ namespace Machete.Web.Controllers
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,
                 iNewID = result.ID
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -160,8 +158,7 @@ namespace Machete.Web.Controllers
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,
                 iNewID = result.ID
-            },
-            JsonRequestBehavior.AllowGet);
+            });
 
         }
         #endregion
@@ -178,7 +175,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 jobSuccess = true
-            }, JsonRequestBehavior.AllowGet);            
+            });            
         }
 
         [HttpPost, UserNameFilter]
@@ -189,7 +186,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 jobSuccess = true,
-            }, JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
         //
@@ -215,7 +212,7 @@ namespace Machete.Web.Controllers
             UpdateModel(asmt);
             waServ.Save(asmt, workerAssignedID, userName);
                 
-            return Json(new { jobSuccess = true }, JsonRequestBehavior.AllowGet);
+            return Json(new { jobSuccess = true });
         }
         #endregion      
         //
@@ -244,8 +241,7 @@ namespace Machete.Web.Controllers
                 status = "OK",
                 jobSuccess = true,
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
     }

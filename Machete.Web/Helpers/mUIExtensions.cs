@@ -21,13 +21,14 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using Machete.Web.Resources;
+
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq.Expressions;
-using System.Web.Mvc;
-using System.Web.Mvc.Html;
+using Machete.Web.Resources;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
 
 namespace Machete.Web.Helpers
 {
@@ -38,47 +39,47 @@ namespace Machete.Web.Helpers
         public static string tbfield = "<div class=\"tb-field\">";
         public static string tbclose = "</div>";
 
-        public static MvcHtmlString mUIDropDownYesNoFor<TModel, TBool>(
-            this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUIDropDownYesNoFor<TModel, TBool>(
+            this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TBool>> expression,
              List<SelectListItem> yesNo,
             object attribs
             )
         {
-            ModelMetadata metadata = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
-            return MvcHtmlString.Create(
+            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, htmlHelper.ViewData, htmlHelper.MetadataProvider);
+            return new HtmlString(
                     tbfield +
                     htmlHelper.DropDownListFor(
                         expression,
                         new SelectList(yesNo,
-                                                "Value",
-                                                "Text",
-                                                metadata.Model),
+                            "Value",
+                            "Text",
+                            metadata.Model),
                         Shared.choose,
                         attribs
-                    ).ToString() +
+                    ) +
                     htmlHelper.ValidationMessageFor(expression) +
                     tbclose
                     );
         }
 
-        public static MvcHtmlString mUIDropDownListFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUIDropDownListFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             SelectList list,
             object attribs)
         {
-            ModelMetadata metadata = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
-            return MvcHtmlString.Create(
+            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, htmlHelper.ViewData, htmlHelper.MetadataProvider);
+            return new HtmlString(
                 tbfield +
                 htmlHelper.DropDownListFor(
                     expression,
                     new SelectList(list,
-                                "Value",
-                                "Text",
-                                metadata.Model),
+                        "Value",
+                        "Text",
+                        metadata.Model),
                     Shared.choose,
                     attribs
-                ).ToString() +
+                ) +
                 htmlHelper.ValidationMessageFor(expression) +
                 tbclose);
         }
@@ -92,13 +93,13 @@ namespace Machete.Web.Helpers
         /// <param name="list"></param>
         /// <param name="attribs"></param>
         /// <returns></returns>
-        public static MvcHtmlString mUITableDropDownListFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableDropDownListFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             SelectList list,
             object attribs)
         {
-            ModelMetadata metadata = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
-            return MvcHtmlString.Create(
+            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, htmlHelper.ViewData, htmlHelper.MetadataProvider);
+            return new HtmlString(
                 tbfield +
                 htmlHelper.DropDownListFor(
                     expression,
@@ -108,8 +109,8 @@ namespace Machete.Web.Helpers
                                 metadata.Model),
                     Shared.choose,
                     attribs
-                ).ToHtmlString() +
-                htmlHelper.ValidationMessageFor(expression).ToString() +
+                ) +
+                htmlHelper.ValidationMessageFor(expression) +
                 tbclose
                 );
         }
@@ -121,12 +122,12 @@ namespace Machete.Web.Helpers
         /// <param name="htmlHelper"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static MvcHtmlString mUITableLabelFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableLabelFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression)
         {
-            return MvcHtmlString.Create(
+            return new HtmlString(
                 tblabel +
-                htmlHelper.LabelFor(expression).ToString() +
+                htmlHelper.LabelFor(expression) +
                 tbclose
                 );
         }
@@ -138,12 +139,12 @@ namespace Machete.Web.Helpers
         /// <param name="htmlHelper"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static MvcHtmlString mUITableDescLabelFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableDescLabelFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression)
         {
-            return MvcHtmlString.Create(
+            return new HtmlString(
                 tbdesclabel +
-                htmlHelper.LabelFor(expression).ToString() +
+                htmlHelper.LabelFor(expression) +
                 tbclose
                 );
         }
@@ -156,62 +157,66 @@ namespace Machete.Web.Helpers
         /// <param name="expression"></param>
         /// <param name="attribs"></param>
         /// <returns></returns>
-        public static MvcHtmlString mUITableTextBoxFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             object attribs)
         {
             var foo = htmlHelper.ValidationMessageFor(expression).ToString();
-            return MvcHtmlString.Create(
+            return new HtmlString(
                 tbfield +
-                htmlHelper.TextBoxFor(expression, attribs).ToString() +
-                htmlHelper.ValidationMessageFor(expression).ToString() +
+                htmlHelper.TextBoxFor(expression, attribs) +
+                htmlHelper.ValidationMessageFor(expression) +
                 tbclose
                 );
         }
 
-        public static MvcHtmlString mUITableDisplayFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableDisplayFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
     Expression<Func<TModel, TSelect>> expression,
     object attribs)
         {
             var foo = htmlHelper.ValidationMessageFor(expression).ToString();
-            return MvcHtmlString.Create(
+            return new HtmlString(
                 tbfield +
-                htmlHelper.DisplayFor(expression, attribs).ToString() +
-                htmlHelper.ValidationMessageFor(expression).ToString() +
+                htmlHelper.DisplayFor(expression, attribs) +
+                htmlHelper.ValidationMessageFor(expression) +
                 tbclose
                 );
         }
 
 
-        public static MvcHtmlString mUITableLabelAndTextBoxFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableLabelAndTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             object attribs)
         {
-            return MvcHtmlString.Create(mUITableLabelFor(htmlHelper, expression).ToHtmlString() + mUITableTextBoxFor(htmlHelper, expression, attribs).ToHtmlString());
+            return new HtmlString(mUITableLabelFor(htmlHelper, expression)
+                              + mUITableTextBoxFor(htmlHelper, expression, attribs)
+                                      .ToString());
         }
 
-        public static MvcHtmlString mUITableLabelAndDisplayFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableLabelAndDisplayFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             object attribs)
         {
-            return MvcHtmlString.Create(mUITableLabelFor(htmlHelper, expression).ToHtmlString() + mUITableDisplayFor(htmlHelper, expression, attribs).ToHtmlString());
+            return new HtmlString(mUITableLabelFor(htmlHelper, expression)
+                              + mUITableDisplayFor(htmlHelper, expression, attribs)
+                                  .ToString());
         }
 
 
-        public static MvcHtmlString mUITableDateTextBoxFor<TModel, TSelect>(this HtmlHelper<TModel> htmlHelper,
+        public static HtmlString mUITableDateTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TSelect>> expression,
             object attribs)
         {
             string value = String.Empty;
-            ModelMetadata metadata = ModelMetadata.FromLambdaExpression(expression, htmlHelper.ViewData);
+            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, htmlHelper.ViewData, htmlHelper.MetadataProvider);
             value = (DateTime?)metadata.Model == DateTime.MinValue ? "" : metadata.Model == null ? "" : ((DateTime)metadata.Model).ToShortDateString();
 
-            return MvcHtmlString.Create(
+            return new HtmlString(
             tbfield +
-                htmlHelper.TextBox(metadata.PropertyName,
-                              htmlHelper.Encode(value),
-                              attribs).ToString() +
-                htmlHelper.ValidationMessageFor(expression).ToString() +
+                htmlHelper.TextBox(metadata.Metadata.PropertyName,
+                    htmlHelper.Encode(value),
+                    attribs) +
+                htmlHelper.ValidationMessageFor(expression) +
             tbclose
                 );
         }

@@ -21,18 +21,21 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
-using DTO = Machete.Service.DTO;
+using Machete.Service.DTO;
 using Machete.Web.Helpers;
-using Machete.Web.Resources;
 using Machete.Web.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Employer = Machete.Domain.Employer;
 
 namespace Machete.Web.Controllers
 {
@@ -43,21 +46,21 @@ namespace Machete.Web.Controllers
         private readonly IEmployerService serv;
         private readonly IMapper map;
         private readonly IDefaults def;
-        private System.Globalization.CultureInfo CI;
+        private CultureInfo CI;
 
         public EmployerController(
             IEmployerService employerService, 
             IDefaults def,
             IMapper map
         ) {
-            this.serv = employerService;
+            serv = employerService;
             this.map = map;
             this.def = def;
         }
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = (CultureInfo)Session["Culture"];
             ViewBag.idPrefix = "employer";
         }
         /// <summary>
@@ -79,19 +82,18 @@ namespace Machete.Web.Controllers
         {
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<DTO.EmployersList> list = serv.GetIndexView(vo);
+            dataTableResult<EmployersList> list = serv.GetIndexView(vo);
             //return what's left to datatables
             var result = list.query
-                .Select(e => map.Map<DTO.EmployersList, ViewModel.EmployerList>(e))
+                .Select(e => map.Map<EmployersList, EmployerList>(e))
                 .AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// GET: /Employer/Create
@@ -100,7 +102,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public ActionResult Create()
         {
-            var m = map.Map<Domain.Employer, ViewModel.Employer>(new Domain.Employer()
+            var m = map.Map<Employer, ViewModel.Employer>(new Employer
             {
                 active = true,
                 blogparticipate = false,
@@ -117,19 +119,18 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public JsonResult Create(Domain.Employer employer, string userName)
+        public JsonResult Create(Employer employer, string userName)
         {
             UpdateModel(employer);
-            Domain.Employer newEmployer = serv.Create(employer, userName);                          
-            var result = map.Map<Domain.Employer, ViewModel.Employer>(newEmployer);
+            Employer newEmployer = serv.Create(employer, userName);                          
+            var result = map.Map<Employer, ViewModel.Employer>(newEmployer);
             return Json(new
             {
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,    
                 iNewID = result.ID,
                 jobSuccess = true
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         /// <summary>
@@ -141,7 +142,7 @@ namespace Machete.Web.Controllers
         public ActionResult Edit(int id)
         {
             var e = serv.Get(id);
-            var m = map.Map<Domain.Employer, ViewModel.Employer>(e);
+            var m = map.Map<Employer, ViewModel.Employer>(e);
             m.def = def;
             return PartialView("Edit", m);
         }
@@ -156,13 +157,13 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public JsonResult Edit(int id, FormCollection collection, string userName)
         {
-            Domain.Employer employer = serv.Get(id);
+            Employer employer = serv.Get(id);
             UpdateModel(employer);
             serv.Save(employer, userName);                            
             return Json(new
             {
                 jobSuccess = true
-            }, JsonRequestBehavior.AllowGet);            
+            });            
         }
         /// <summary>
         /// 
@@ -181,15 +182,14 @@ namespace Machete.Web.Controllers
                 status = "OK",
                 jobSuccess = true,
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         private List<Dictionary<string, string>> DuplicateEmployers(string name, string address, 
             string phone, string city, string zipcode)
         {
             //Get all the records            
-            IEnumerable<Domain.Employer> list = serv.GetAll();
+            IEnumerable<Employer> list = serv.GetAll();
             var employersFound = new List<Dictionary<string, string>>();
             name = name.Replace(" ", "");
             address = address.Replace(" ", "");
@@ -236,7 +236,7 @@ namespace Machete.Web.Controllers
             string phone, string city, string zipcode )
         {
             var duplicateFound = DuplicateEmployers(name, address, phone, city, zipcode);
-            return Json(new { duplicates = duplicateFound }, JsonRequestBehavior.AllowGet);
+            return Json(new { duplicates = duplicateFound });
         }
     }
 }

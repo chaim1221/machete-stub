@@ -22,7 +22,9 @@
 // 
 #endregion
 using System.Collections.Generic;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Machete.Web.Helpers
 {
@@ -36,7 +38,7 @@ namespace Machete.Web.Helpers
             {"Employer.CreateNew.ShowTab", new[] { "Administrator", "Manager", "PhoneDesk"}}
         };
 
-        public static bool IsInRole(this HtmlHelper instance, params string[] roles)
+        public static bool IsInRole(this IHtmlHelper instance, params string[] roles)
         {
             var user = instance.ViewContext.HttpContext.User;
             foreach (var role in roles)
@@ -47,7 +49,7 @@ namespace Machete.Web.Helpers
             return false;
         }
 
-        public static bool IsRoleAllowed(this HtmlHelper instance, string functionality)
+        public static bool IsRoleAllowed(this IHtmlHelper instance, string functionality)
         {
             var user = instance.ViewContext.HttpContext.User;
             foreach (var role in _functionalityRole[functionality])
@@ -61,13 +63,13 @@ namespace Machete.Web.Helpers
     // TODO: RoleGroupHelper relies on magic strings; replace magic strings
     public static class RoleGroupHelper
     {
-        public static string[] Role_AMPCU(this HtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "Check-in", "User"}; }
-        public static string[] Role_AMPC(this HtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "Check-in"}; }
-        public static string[] Role_AMPU(this HtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "User"}; }
-        public static string[] Role_AMP(this HtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk"}; }
-        public static string[] Role_AM(this HtmlHelper html) { return new[] { "Administrator", "Manager" }; }
-        public static string[] Role_A(this HtmlHelper html) {return new[]{"Administrator"}; }
-        public static string[] Role_T(this HtmlHelper html) { return new[] { "Teacher" }; }
-        public static string[] Role_H(this HtmlHelper html) { return new[] { "Hirer" }; }
+        public static string[] Role_AMPCU(this IHtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "Check-in", "User"}; }
+        public static string[] Role_AMPC(this IHtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "Check-in"}; }
+        public static string[] Role_AMPU(this IHtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk", "User"}; }
+        public static string[] Role_AMP(this IHtmlHelper html) { return new[]{"Administrator", "Manager", "PhoneDesk"}; }
+        public static string[] Role_AM(this IHtmlHelper html) { return new[] { "Administrator", "Manager" }; }
+        public static string[] Role_A(this IHtmlHelper html) {return new[]{"Administrator"}; }
+        public static string[] Role_T(this IHtmlHelper html) { return new[] { "Teacher" }; }
+        public static string[] Role_H(this IHtmlHelper html) { return new[] { "Hirer" }; }
     }  
 }

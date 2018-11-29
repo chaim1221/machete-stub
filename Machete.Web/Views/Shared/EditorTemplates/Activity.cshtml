@@ -1,41 +1,45 @@
-﻿@model Machete.Web.ViewModel.Activity
-@using Machete.Web.ViewModel
+﻿@using Machete.Domain
 @using Machete.Web.Helpers
-@using Machete.Web.Resources
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@model Machete.Web.ViewModel.Activity
 
 @{
-    System.Globalization.CultureInfo CI = (System.Globalization.CultureInfo)Session["Culture"];
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
     string recType = "activity";
     string idPrefix = recType + Model.ID + "-";
 }
 @Html.HiddenFor(model => model.ID, new { @class = "hiddenRecID", id = idPrefix + "ID" })
-@Html.HiddenFor(model => model.firstID, new { @class = "hiddenRecID", id = Model.firstID.ToString() + "isFirstID" })
+@Html.HiddenFor(model => model.firstID, new { @class = "hiddenRecID", id = Model.firstID + "isFirstID" })
 <div class="tb-table" style="float: left;">
     <div class="tb-row">
         @Html.mUITableLabelFor(model => model.typeID)
-        @Html.mUIDropDownListFor(model => model.typeID, Model.def.getSelectList(Machete.Domain.LCategory.activityType),
+        @Html.mUIDropDownListFor(model => model.typeID, Model.def.getSelectList(LCategory.activityType),
                 new { tabindex = "1", id = idPrefix + "type" })
     </div>
     <div class="tb-row" id="className">
         @Html.mUITableLabelFor(model => model.nameID)
-        @Html.mUIDropDownListFor(model => model.nameID, Model.def.getSelectList(Machete.Domain.LCategory.activityName),
+        @Html.mUIDropDownListFor(model => model.nameID, Model.def.getSelectList(LCategory.activityName),
                 new { tabindex = "1", id = idPrefix + "name" })
     </div>
     <div class="tb-row">
         @Html.mUITableLabelFor(model => model.dateStart)
         <div class="tb-field">
-            @Html.TextBox("dateStart", Html.Encode(System.String.Format("{0:g}",
-                                                                        Model.dateStart)),
-                                                     new { @id = idPrefix + "dateStart" })
+            @Html.TextBox("dateStart", Html.Encode(String.Format("{0:g}",
+                Model.dateStart)),
+                new { id = idPrefix + "dateStart" })
             @Html.ValidationMessageFor(model => model.dateStart)
         </div>
     </div>
     <div class="tb-row">
         @Html.mUITableLabelFor(model => model.dateEnd)
         <div class="tb-field">
-            @Html.TextBox("dateEnd", Html.Encode(System.String.Format("{0:g}",
-                                                                                 Model.dateEnd)),
-                                                     new { @id = idPrefix + "dateEnd" })
+            @Html.TextBox("dateEnd", Html.Encode(String.Format("{0:g}",
+                Model.dateEnd)),
+                new { id = idPrefix + "dateEnd" })
             @Html.ValidationMessageFor(model => model.dateEnd)
         </div>
     </div>
@@ -56,9 +60,9 @@
         @Html.mUITableLabelFor(model => model.teacher)
         <div class="tb-field">
             @Html.DropDownListFor(model => model.teacher,
-                    new SelectList(Model.def.getTeachers(), Model.teacher),
-                    @Machete.Web.Resources.Shared.choose,
-                    new { tabindex = "1", id = idPrefix + "teacher" })
+                new SelectList(Model.def.getTeachers(), Model.teacher),
+                Shared.choose,
+                new { tabindex = "1", id = idPrefix + "teacher" })
         </div>
     </div>
 </div>
@@ -81,8 +85,8 @@
         $('#@(idPrefix)type').change(
             function () {
                 if (
-                    $('#@(idPrefix)type option:selected').val() == "@(Model.def.byKeys(Machete.Domain.LCategory.activityType, Machete.Domain.LActType.Assembly))" || 
-                    $('#@(idPrefix)type option:selected').val() == "@(Model.def.byKeys(Machete.Domain.LCategory.activityType, Machete.Domain.LActType.OrgMtg))"
+                    $('#@(idPrefix)type option:selected').val() == "@(Model.def.byKeys(LCategory.activityType, LActType.Assembly))" || 
+                    $('#@(idPrefix)type option:selected').val() == "@(Model.def.byKeys(LCategory.activityType, LActType.OrgMtg))"
                    )
                 {
                     $('#@(idPrefix)name').attr('disabled', 'disabled');

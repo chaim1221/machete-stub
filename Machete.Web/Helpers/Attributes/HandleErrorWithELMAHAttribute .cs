@@ -21,16 +21,20 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using Elmah;
+using ElmahCore;
+using ElmahCore.Sql;
 using System;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Machete.Web.Helpers
 {
     //From http://stackoverflow.com/questions/766610/
     //public class HandleErrorWithELMAHAttribute : HandleErrorAttribute
-    public class ElmahHandleErrorAttribute : System.Web.Mvc.HandleErrorAttribute
+    public class ElmahHandleErrorAttribute : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)
         {
@@ -45,15 +49,15 @@ namespace Machete.Web.Helpers
             LogException(e);
         }
 
-        private static bool RaiseErrorSignal(Exception e)
+        private static bool RaiseErrorSignal(Exception e, ActionContext context)
         {
-            var context = HttpContext.Current;
-            if (context == null)
+            var httpContext = context.HttpContext;
+            if (httpContext == null)
                 return false;
-            var signal = ErrorSignal.FromContext(context);
+            var signal = ErrorSignal.FromContext(httpContext);
             if (signal == null)
                 return false;
-            signal.Raise(e, context);
+            signal.Raise(e, httpContext);
             return true;
         }
 

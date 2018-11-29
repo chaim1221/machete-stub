@@ -1,16 +1,16 @@
-﻿@using Microsoft.AspNet.Identity
-@using Machete.Web.Helpers
-@if (Request.IsAuthenticated)
+﻿@using Machete.Web.Helpers
+
+@if (User.Identity.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
         @Html.AntiForgeryToken()
         <!-- Greeting announcing signed in user -->
-        <text>@Machete.Web.Resources.ValidationStrings.Welcome <b>@User.Identity.GetUserName()</b>
+        <text>@ValidationStrings.Welcome <b>@User.Identity.Name</b>
         [ @if(Html.IsInRole(Html.Role_AM())) 
             { 
                 @* Settings console *@
-                @Html.ActionLink(@Machete.Web.Resources.ValidationStrings.Settings, "Index", "Account") 
+                @Html.ActionLink(ValidationStrings.Settings, "Index", "Account")
             }
             else 
             { 
@@ -21,14 +21,16 @@
                     @Html.ActionLink("Manage", "Manage", "Account") 
                 }
             } ]
-        [ @if(Html.IsInRole(Html.Role_H())) 
-            {
-                @Html.ActionLink(@Machete.Web.Resources.ValidationStrings.LogOff, "LogOff", "HirerAccount")
-            }
-            else
-            {
-                @Html.ActionLink(@Machete.Web.Resources.ValidationStrings.LogOff, "LogOff", "Account") 
-            } ]
+
+@* thought to be entirely unnecessary, but commenting out for now *@
+@*         [ @if(Html.IsInRole(Html.Role_H()))  *@
+@*             { *@
+@*                 @Html.ActionLink(ValidationStrings.LogOff, "LogOff", "HirerAccount") *@
+@*             } *@
+@*             else *@
+@*             { *@
+                @Html.ActionLink(ValidationStrings.LogOff, "LogOff", "Account")
+@*             } ] *@
         </text>
     }
 

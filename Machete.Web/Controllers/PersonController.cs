@@ -30,8 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -53,7 +53,7 @@ namespace Machete.Web.Controllers
             this.def = def;
         }
 
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (CultureInfo)Session["Culture"];
@@ -83,8 +83,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -120,8 +119,7 @@ namespace Machete.Web.Controllers
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,
                 iNewID = result.ID
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -152,8 +150,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 status = "OK"
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -182,8 +179,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
  
@@ -227,7 +223,7 @@ namespace Machete.Web.Controllers
         public JsonResult GetDuplicates(string firstname, string lastname, string phone)
         {
             var duplicateFound = DuplicatePersons(firstname, lastname, phone);
-            return Json(new { duplicates = duplicateFound }, JsonRequestBehavior.AllowGet);
+            return Json(new { duplicates = duplicateFound });
         }
     }
 }

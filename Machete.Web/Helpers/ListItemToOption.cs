@@ -22,6 +22,8 @@
 // 
 #endregion
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace System.Web.Mvc.Html
 {
     public static class SelectExtensions
@@ -33,10 +35,10 @@ namespace System.Web.Mvc.Html
         /// <returns></returns>
         internal static string ListItemToOption(SelectListItemEx item)
         {
-            TagBuilder builder = new TagBuilder("option")
-            {
-                InnerHtml = HttpUtility.HtmlEncode(item.Text)
-            };
+            TagBuilder builder = new TagBuilder("option");
+//            {
+//                InnerHtml = HttpUtility.HtmlEncode(item.Text)
+//            };
             if (item.Value != null)
             {
                 builder.Attributes["value"] = item.Value;
@@ -49,7 +51,7 @@ namespace System.Web.Mvc.Html
             {
                 builder.Attributes["wage"] = item.wage;
             }
-            return builder.ToString(TagRenderMode.Normal);
+            return builder.ToString(); //TagRenderMode.Normal
         }
     }
 }

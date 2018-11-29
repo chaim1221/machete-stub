@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using Machete.Domain;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.Resources;
 using Machete.Web.ViewModel;
 using System;
-using System.Configuration;
 using System.Globalization;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace Machete.Web.Controllers
 {
@@ -31,7 +31,7 @@ namespace Machete.Web.Controllers
             this.map = map;
             this.def = def;
         }
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (CultureInfo)Session["Culture"];
@@ -79,8 +79,7 @@ namespace Machete.Web.Controllers
                              updatedby = p.updatedby,
                              hasAttachment = string.IsNullOrEmpty(p.attachment) ?  Shared.False : Shared.True
                          }
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         private string _getTabRef(Domain.Email email)
@@ -142,8 +141,7 @@ namespace Machete.Web.Controllers
                 sNewLabel = _getTabLabel(newEmail),
                 iNewID = newEmail.ID,
                 jobSuccess = true
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [HttpPost, UserNameFilter]
@@ -156,8 +154,7 @@ namespace Machete.Web.Controllers
                 sNewRef = _getTabRef(duplicate),
                 sNewLabel = _getTabLabel(duplicate),
                 iNewID = duplicate.ID
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
 
@@ -213,7 +210,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 jobSuccess = true
-            }, JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -232,8 +229,7 @@ namespace Machete.Web.Controllers
                 status = "OK",
                 jobSuccess = true,
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [UserNameFilter]

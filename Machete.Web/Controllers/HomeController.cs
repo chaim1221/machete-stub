@@ -22,7 +22,8 @@
 // 
 #endregion
 using Machete.Web.Helpers;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {

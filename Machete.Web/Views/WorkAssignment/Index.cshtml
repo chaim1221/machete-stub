@@ -3,8 +3,12 @@
 @using Machete.Web.Resources
 
 @using Machete.Service
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
 @{
-    System.Globalization.CultureInfo CI = (System.Globalization.CultureInfo)Session["Culture"];
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
 }
 <div class="wa-content">
     @using (Html.BeginForm())
@@ -164,7 +168,7 @@ $(document).ready(function () {
         "bServerSide": true,
         "aaSorting": [[0, 'asc']],
         "sAjaxSource": "/WorkerSignin/AjaxHandler",
-        "oLanguage": datatable_lang_@(CI.TwoLetterISOLanguageName),
+        "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
         "bProcessing": true,
         "aoColumns": [
             { "mDataProp": "lotterySequence"},
@@ -251,7 +255,7 @@ $(document).ready(function () {
             "bAutoWidth": false,
             "bServerSide": true,
             "sAjaxSource": "/WorkerSignin/AjaxHandler",
-            "oLanguage": datatable_lang_@(CI.TwoLetterISOLanguageName),
+            "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
             "bProcessing": true,
             "aoColumns": [
                 {"mDataProp": "dwccardnum"},
@@ -294,7 +298,7 @@ $(document).ready(function () {
             "bInfo": true,
             "bServerSide": true,
             "sAjaxSource": "/WorkAssignment/AjaxHandler",
-            "oLanguage": datatable_lang_@(CI.TwoLetterISOLanguageName),
+            "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
             "bProcessing": true,
             "aoColumns": [
                             { "mDataProp": "assignedWorker", "bVisible": false, "bSortable": true},

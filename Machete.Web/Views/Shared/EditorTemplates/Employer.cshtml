@@ -1,9 +1,14 @@
-﻿@model Machete.Web.ViewModel.Employer
-@using Machete.Web.ViewModel
+﻿@using Machete.Domain
 @using Machete.Web.Helpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@model Machete.Web.ViewModel.Employer
 
 @{
-    System.Globalization.CultureInfo CI = (System.Globalization.CultureInfo)Session["Culture"];
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
     string recType = "employer";
     string idPrefix = recType + Model.ID + "-";
 }
@@ -32,7 +37,7 @@
     <!--tb-row-->
     <div class="tb-row">
         @Html.mUITableLabelFor(model => model.referredby)
-        @Html.mUIDropDownListFor(model => model.referredby, Model.def.getSelectList(Machete.Domain.LCategory.emplrreference), new { tabindex = "10", id = idPrefix + "referredby" })
+        @Html.mUIDropDownListFor(model => model.referredby, Model.def.getSelectList(LCategory.emplrreference), new { tabindex = "10", id = idPrefix + "referredby" })
         @Html.mUITableLabelAndTextBoxFor(model => model.state, new { tabindex = "11", id = idPrefix + "state" })
     </div>
     <!--tb-row-->

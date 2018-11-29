@@ -26,14 +26,14 @@ using Machete.Domain;
 using Machete.Service;
 using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
-using Machete.Web.Resources;
 using Machete.Web.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Machete.Web.Controllers
 {
@@ -70,7 +70,7 @@ namespace Machete.Web.Controllers
         /// Initialize controller
         /// </summary>
         /// <param name="requestContext">Request Context</param>
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             this.CI = (CultureInfo)Session["Culture"];
@@ -131,8 +131,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = dtr.totalCount,
                 iTotalDisplayRecords = dtr.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -162,8 +161,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = dtr.totalCount,
                 iTotalDisplayRecords = dtr.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         #endregion
@@ -212,8 +210,7 @@ namespace Machete.Web.Controllers
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,
                 iNewID = result.ID
-            }, 
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         #endregion
@@ -265,8 +262,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 editedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
  
         #endregion
@@ -334,8 +330,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 completedCount = count
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         #region Delete
@@ -354,8 +349,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -377,8 +371,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 status = "activated"
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 

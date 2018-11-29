@@ -28,8 +28,9 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Machete.Web.Controllers
 {
@@ -51,7 +52,7 @@ namespace Machete.Web.Controllers
             this.def = def;
         }
 
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (System.Globalization.CultureInfo)Session["Culture"];
@@ -94,8 +95,7 @@ namespace Machete.Web.Controllers
                 memberExpelled = w.isExpelled,
                 imageRef = imageRef,
                 expirationDate = w.memberexpirationdate
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -113,8 +113,7 @@ namespace Machete.Web.Controllers
                 jobSuccess = true,
                 status = "OK",
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 
@@ -137,8 +136,7 @@ namespace Machete.Web.Controllers
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
     }

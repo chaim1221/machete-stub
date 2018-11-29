@@ -1,6 +1,4 @@
 ﻿@model Machete.Web.ViewModel.EmailView
-@using Machete.Web.Helpers
-@using Machete.Web.Resources
 
 @Html.HiddenFor(model => model.ID)
 @Html.HiddenFor(model => model.woid)
@@ -23,7 +21,7 @@
         </div>
     </div>
     <div class="tb-row">
-        @Html.HiddenFor(m => m.attachment, new { @id = Model.idPrefix + "attachment" })
+        @Html.HiddenFor(m => m.attachment, new { id = Model.idPrefix + "attachment" })
     </div>
     <div class="tb-row">
         <div class="tb-label">

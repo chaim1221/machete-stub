@@ -1,5 +1,5 @@
 ﻿@using Machete.Web.ViewModel;
-@using Microsoft.AspNet.Identity;
+@using Microsoft.AspNetCore.Identity;
 @{
     ViewBag.Title = "Manage Account";
 }
@@ -19,7 +19,7 @@
             }
 
             <section id="externalLogins">
-                @Html.Action("RemoveAccountList")
+                @Html.ActionLink("Remove Account", "RemoveAccountList");@*.Action("RemoveAccountList")*@
                 @Html.Partial("_ExternalLoginsListPartial")
             </section>
         </div>

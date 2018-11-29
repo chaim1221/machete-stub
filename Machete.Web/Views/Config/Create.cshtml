@@ -1,11 +1,12 @@
 ﻿@model Machete.Domain.Lookup
-@using Machete.Web.Resources
+
 @{  
     string recType = "config";
     string idPrefix = recType + Model.ID + "-";
 }
+
 @using (Html.BeginForm("Create", "Config", FormMethod.Post,
-    new { @id = "configCreateForm", enctype = "multipart/form-data" }))
+    new { id = "configCreateForm", enctype = "multipart/form-data" }))
 {
     <div>
     <input type="submit" id="@(idPrefix)SaveBtn" class="formButton saveBtn" 
@@ -14,6 +15,7 @@
     @Html.ValidationSummary(true)
     @Html.EditorForModel("Config")
 }
+
 <script type="text/javascript">
     $(document).ready(function () {
         var configCreateForm = $('#configCreateForm');
@@ -32,8 +34,8 @@
         configCreateForm.mUI('formDetectChanges', {
             recType: "@(recType)",
             formLevel: 1,
-            changeConfirm: "@(Machete.Web.Resources.Shared.changeConfirm)",
-            changeTitle: "@(Machete.Web.Resources.Shared.changeTitle)"
+            changeConfirm: "@Shared.changeConfirm",
+            changeTitle: "@Shared.changeTitle"
         });
     });
 </script>

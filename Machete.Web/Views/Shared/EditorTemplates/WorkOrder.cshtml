@@ -1,14 +1,22 @@
-﻿@model Machete.Web.ViewModel.WorkOrder
+﻿@using Machete.Domain
 @using Machete.Web.Helpers
-@using Machete.Web.Resources
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@using WorkOrder = Machete.Web.Resources.WorkOrder
+@using Worker = Machete.Web.Resources.Worker
+@using Person = Machete.Web.Resources.Person
+@model Machete.Web.ViewModel.WorkOrder
 
 @{
-    System.Globalization.CultureInfo CI = (System.Globalization.CultureInfo)Session["Culture"];
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
     string recType = "WO";
     string idPrefix = recType + Model.ID + "-";
 }
 @Html.HiddenFor(model => model.ID, new { @class = "hiddenRecID" })
-@Html.HiddenFor(model => model.EmployerID, new { @id = idPrefix + "EmployerID" })
+@Html.HiddenFor(model => model.EmployerID, new { id = idPrefix + "EmployerID" })
 
 <!-- MAIN WORK ORDER FORM -->
 <div class="tb-table">
@@ -19,7 +27,7 @@
     <div class="tb-row">
         @Html.mUITableLabelFor(model => model.statusID)
         @Html.mUIDropDownListFor(model => model.statusID,
-                    Model.def.getSelectList(Machete.Domain.LCategory.orderstatus),
+                    Model.def.getSelectList(LCategory.orderstatus),
                     new { tabindex = "2", id = idPrefix + "status" })                
         @Html.mUITableLabelFor(model => model.timeFlexible)
         @Html.mUIDropDownYesNoFor(model => model.timeFlexible, Model.def.yesnoSelectList(), new { tabindex = "12", id = idPrefix + "timeFlexible" }) 
@@ -86,8 +94,8 @@
         <div class="tb-label desc-label">
             @Html.LabelFor(model => model.workerRequests)
             <br />
-            <input type="button" value="@Machete.Web.Resources.WorkOrder.requestAdd" class="formButton" id="addRequestBtn-@(Model.ID)"/>
-            <input type="button" value="@Machete.Web.Resources.WorkOrder.requestRemove" class="formButton" id="removeRequestBtn-@(Model.ID)"/>
+            <input type="button" value="@WorkOrder.requestAdd" class="formButton" id="addRequestBtn-@(Model.ID)"/>
+            <input type="button" value="@WorkOrder.requestRemove" class="formButton" id="removeRequestBtn-@(Model.ID)"/>
         </div>
         <div class="tb-field desc-field">
             @Html.ListBox("workerRequests2", new SelectList(ViewBag.workerRequests, "Value", "Text"), new { id = "workerRequests2_WO-"+ Model.ID, tabindex = "22", style="min-width: 16em;"})
@@ -106,7 +114,7 @@
 <!-- LOAD ADMINISTRATOR INFO PARTIAL FORM -->
 
 
-<div id="workerDialog-@(Model.ID)" title="@Machete.Web.Resources.WorkOrder.requestTitle">
+<div id="workerDialog-@(Model.ID)" title="@WorkOrder.requestTitle">
     <table id="workerTable-@(Model.ID)" class="display" style="display: none">
         <thead>
             <tr>
@@ -151,7 +159,7 @@
             "bAutoWidth": false,
             "bServerSide": true,
             "sAjaxSource": "/Worker/AjaxHandler", 
-            "oLanguage": datatable_lang_@(CI.TwoLetterISOLanguageName),
+            "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
             "bProcessing": true,
             "aoColumns": [
                 { "mDataProp": "tabref","bSearchable": false, "bSortable": false, "bVisible": false },

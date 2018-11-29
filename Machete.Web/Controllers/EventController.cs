@@ -21,17 +21,17 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
-using DTO = Machete.Service.DTO;
+using Machete.Service.DTO;
 using Machete.Web.Helpers;
-using System;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -42,7 +42,7 @@ namespace Machete.Web.Controllers
         private readonly IImageService iServ;
         private readonly IMapper map;
         private readonly IDefaults def;
-        System.Globalization.CultureInfo CI;
+        CultureInfo CI;
         //
         //
         public EventController(IEventService eventService, 
@@ -50,46 +50,43 @@ namespace Machete.Web.Controllers
             IDefaults def,
             IMapper map)
         {
-            this.serv = eventService;
-            this.iServ = imageServ;
+            serv = eventService;
+            iServ = imageServ;
             this.map = map;
             this.def = def;
         }
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = (CultureInfo)Session["Culture"];
         }
         //
         //
         [Authorize(Roles = "Manager, Administrator")]
-
         public ActionResult AjaxHandler(jQueryDataTableParam param)
         {            
             //Get all the records
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<DTO.EventList> list = serv.GetIndexView(vo);
+            dataTableResult<EventList> list = serv.GetIndexView(vo);
             //return what's left to datatables
             var result = list.query
-                .Select(e => map.Map<DTO.EventList, ViewModel.EventList>(e))
+                .Select(e => map.Map<EventList, ViewModel.EventList>(e))
                 .AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         //
         // GET: /Event/Create
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Create(int PersonID)
         {
-            Event ev = new Event();
-            var m = map.Map<Domain.Event, ViewModel.Event>(new Event()
+            var m = map.Map<Event, ViewModel.Event>(new Event
             {
                 dateFrom = DateTime.Today,
                 dateTo = DateTime.Today,
@@ -107,15 +104,14 @@ namespace Machete.Web.Controllers
         {
             UpdateModel(evnt);
             Event newEvent = serv.Create(evnt, userName);
-            var result = map.Map<Domain.Event, ViewModel.Event>(newEvent);
+            var result = map.Map<Event, ViewModel.Event>(newEvent);
             return Json(new
             {
                 sNewRef = result.tabref,
                 sNewLabel = result.tablabel,
                 iNewID = newEvent.ID,
                 jobSuccess = true
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         //
@@ -123,7 +119,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Edit(int id)
         {
-            var m = map.Map<Domain.Event, ViewModel.Event>(serv.Get(id));
+            var m = map.Map<Event, ViewModel.Event>(serv.Get(id));
             m.def = def;
             return PartialView("Edit", m);
         }
@@ -139,7 +135,7 @@ namespace Machete.Web.Controllers
             UpdateModel(evnt);
             serv.Save(evnt, userName);
   
-            return Json(new { status = "OK" }, JsonRequestBehavior.AllowGet);
+            return Json(new { status = "OK" });
         }
         //
         // AddImage
@@ -176,8 +172,7 @@ namespace Machete.Web.Controllers
             return Json(new
             {
                 status = "OK"                
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         //
         // GET: /Event/Delete/5
@@ -190,8 +185,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 deletedID = id
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [HttpPost, UserNameFilter]
@@ -209,8 +203,7 @@ namespace Machete.Web.Controllers
             {
                 status = "OK",
                 deletedID = deletedJEVI
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
     }
 }

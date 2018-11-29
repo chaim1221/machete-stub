@@ -1,10 +1,15 @@
-﻿@model Machete.Web.ViewModel.ActivitySchedule
-@using Machete.Web.ViewModel
+﻿@using System.Globalization
+@using Machete.Domain
 @using Machete.Web.Helpers
-@using Machete.Web.Resources
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@model Machete.Web.ViewModel.ActivitySchedule
 
 @{
-    System.Globalization.CultureInfo CI = (System.Globalization.CultureInfo)Session["Culture"];
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+    
     string recType = "activity";
     string idPrefix = recType + Model.ID + "-";
     
@@ -15,8 +20,8 @@
         @Html.mUITableLabelFor(model => model.type): @(Model.def.byID(Model.type))
         @Html.HiddenFor(model => model.type)
     </div>
-    @if(Model.type == Model.def.byKeys(Machete.Domain.LCategory.activityType, Machete.Domain.LActType.Assembly) ||
-        Model.type == Model.def.byKeys(Machete.Domain.LCategory.activityType, Machete.Domain.LActType.OrgMtg))
+    @if(Model.type == Model.def.byKeys(LCategory.activityType, LActType.Assembly) ||
+        Model.type == Model.def.byKeys(LCategory.activityType, LActType.OrgMtg))
     {
         @Html.HiddenFor(model => model.name)
     }
@@ -31,9 +36,9 @@
         @Html.mUITableLabelFor(model => model.dateStart)
         <div class="tb-field">
             @Html.TextBox("dateStart", 
-                Html.Encode(System.String.Format("{0:g}",
-                Model.dateStart)),
-                new { @id = idPrefix + "dateStart" })
+                Html.Encode(String.Format("{0:g}",
+                    Model.dateStart)),
+                new { id = idPrefix + "dateStart" })
             @Html.ValidationMessageFor(model => model.dateStart)
         </div>
     </div>
@@ -41,9 +46,9 @@
         @Html.mUITableLabelFor(model => model.dateEnd)
         <div class="tb-field">
             @Html.TextBox("dateEnd", 
-                Html.Encode(System.String.Format("{0:g}",
-                Model.dateEnd)),
-                new { @id = idPrefix + "dateEnd" })
+                Html.Encode(String.Format("{0:g}",
+                    Model.dateEnd)),
+                new { id = idPrefix + "dateEnd" })
             @Html.ValidationMessageFor(model => model.dateEnd)
         </div>
     </div>
@@ -52,7 +57,7 @@
         <div class="tb-field">
             @Html.DropDownListFor(model => model.teacher, 
                 new SelectList(Model.def.getTeachers(), Model.teacher),
-                @Machete.Web.Resources.Shared.choose,
+                Shared.choose,
                 new { tabindex = "1", id = idPrefix + "teacher" })
         </div>
     </div>
@@ -95,9 +100,9 @@
         @Html.mUITableLabelFor(model => model.stopDate)
         <div class="tb-field">
             @Html.TextBox("stopDate", 
-                Html.Encode(System.String.Format("{0:g}",
-                Model.dateEnd)),
-                new { @id = idPrefix + "stopDate" })
+                Html.Encode(String.Format("{0:g}",
+                    Model.dateEnd)),
+                new { id = idPrefix + "stopDate" })
             @Html.ValidationMessageFor(model => model.stopDate)
         </div>
     </div>

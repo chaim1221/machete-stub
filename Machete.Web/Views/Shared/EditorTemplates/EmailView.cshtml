@@ -1,7 +1,6 @@
-﻿@model Machete.Web.ViewModel.EmailView
+﻿@using Machete.Domain
 @using Machete.Web.Helpers
-@using Machete.Web.Resources
-@using Machete.Web.ViewModel
+@model Machete.Web.ViewModel.EmailView
 
 @Html.HiddenFor(model => model.ID, new { @class = "hiddenRecID", id = Model.idPrefix + "EMAILID" })
 @Html.HiddenFor(model => model.woid, new { @class = "hiddenRecID", id = Model.idPrefix + "WOID" })
@@ -23,13 +22,13 @@
         </div>
         @if (Html.IsInRole(Html.Role_AM()) && Model.editable)
         {
-            @Html.mUIDropDownListFor(model => model.statusID, Model.def.getSelectList(Machete.Domain.LCategory.emailstatus), new { @id = Model.idPrefix + "status" })
+            @Html.mUIDropDownListFor(model => model.statusID, Model.def.getSelectList(LCategory.emailstatus), new { id = Model.idPrefix + "status" })
         }
         else
         { 
             <div class="tb-header">
                 @Model.status
-                @Html.HiddenFor(model => model.statusID, new { @id = Model.idPrefix + "status" })
+                @Html.HiddenFor(model => model.statusID, new { id = Model.idPrefix + "status" })
             </div>
         }
     </div>
@@ -51,7 +50,7 @@
     </div>
     <div class="tb-row">
         @*@Html.mUITableLabelAndTextBoxFor(model => model.attachment, new { @id = Model.idPrefix + "attachment" })*@
-        @Html.HiddenFor(m => m.attachment, new { @id = Model.idPrefix + "attachment" })
+        @Html.HiddenFor(m => m.attachment, new { id = Model.idPrefix + "attachment" })
     </div>
     <div class="tb-row">
         @Html.mUITableLabelAndTextBoxFor(model => model.emailTo,

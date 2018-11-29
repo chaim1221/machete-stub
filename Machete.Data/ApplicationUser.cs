@@ -29,11 +29,22 @@ namespace Machete.Data
                 iur => iur.IdentityRole,
                 role => new JoinMacheteUserIdentityRole { MacheteUser = this, IdentityRole = role }
             );
+            
+            this.Logins = new JoinCollectionFacade<UserLoginInfo, JoinMacheteUserIdentityUserLoginInfo>(
+                IdentityUserLogins,
+                iul => iul.UserLoginInfo,
+                login => new JoinMacheteUserIdentityUserLoginInfo { MacheteUser = this, UserLoginInfo = login }
+            );
         }
 
         private ICollection<JoinMacheteUserIdentityRole> IdentityUserRoles { get; }
                  = new List<JoinMacheteUserIdentityRole>();
         [NotMapped] public ICollection<IdentityRole> Roles { get; }
+
+        private ICollection<JoinMacheteUserIdentityUserLoginInfo> IdentityUserLogins { get; }
+                 = new List<JoinMacheteUserIdentityUserLoginInfo>();
+        [NotMapped] public ICollection<UserLoginInfo> Logins { get; }
+
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -64,6 +75,12 @@ namespace Machete.Data
         public int FailedPasswordAnswerAttemptCount { get; set; }
         public DateTime FailedPasswordAnswerAttemptWindowStart { get; set; }
         public string Comment { get; set; }
+    }
+
+    public class JoinMacheteUserIdentityUserLoginInfo
+    {
+        public MacheteUser MacheteUser { get; set; }
+        public UserLoginInfo UserLoginInfo { get; set; }
     }
 
     public class JoinMacheteUserIdentityRole : IdentityUserRole<Guid>

@@ -32,8 +32,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 
 
 namespace Machete.Web.Controllers
@@ -60,7 +61,7 @@ namespace Machete.Web.Controllers
         /// Initialize the controller context for the reports.
         /// </summary>
         /// <param name="requestContext">RequestContext</param>
-        protected override void Initialize(RequestContext requestContext)
+        protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
             CI = (CultureInfo)Session["Culture"];
@@ -160,8 +161,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = dcl.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         /// <summary>
         /// 'WEC' is 'Weekly, El Centro' -- a weekly report for Machete that comes from
@@ -211,8 +211,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = wec.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         /// <summary>
@@ -263,8 +262,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = mwd.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         /// <summary>
@@ -316,8 +314,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = ywd.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -365,8 +362,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = year.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [Authorize(Roles = "Administrator, Manager")]
@@ -412,8 +408,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = year.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [Authorize(Roles = "Administrator, Manager")]
@@ -461,8 +456,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = year.filteredCount, //total records, after filtering
                 sEcho = param.sEcho, //unaltered copy of sEcho sent from the client side
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -498,8 +492,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newWkr.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         [Authorize(Roles = "Administrator, Manager")]
         public JsonResult AjaxMonthWkr(jQueryDataTableParam param)
@@ -531,8 +524,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newWkr.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         [Authorize(Roles = "Administrator, Manager")]
         public JsonResult AjaxYearWkr(jQueryDataTableParam param)
@@ -564,8 +556,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newWkr.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
@@ -603,8 +594,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newEmp.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [Authorize(Roles = "Administrator, Manager")]
@@ -640,8 +630,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newEmp.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
 
         [Authorize(Roles = "Administrator, Manager")]
@@ -677,8 +666,7 @@ namespace Machete.Web.Controllers
                 iTotalDisplayRecords = newEmp.filteredCount,
                 sEcho = param.sEcho,
                 aaData = result
-            },
-            JsonRequestBehavior.AllowGet);
+            });
         }
         #endregion
 
