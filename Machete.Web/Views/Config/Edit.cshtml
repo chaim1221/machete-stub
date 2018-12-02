@@ -11,7 +11,7 @@
     string idPrefix = recType + Model.ID + "-";
 }
 
-@using (Html.BeginForm("Edit", "Config", FormMethod.Post,
+@using (Html.BeginForm("Edit", "Lookup", FormMethod.Post,
                     new { @class = "edittab-form EditPost", 
                           id = "configEditForm-" + Model.ID, 
                           enctype = "multipart/form-data" }))
@@ -29,7 +29,7 @@
 
 @if (Html.IsInRole(Html.Role_A()))
 {
-    using (Html.BeginForm("Delete", "Config", FormMethod.Post,
+    using (Html.BeginForm("Delete", "Lookup", FormMethod.Post,
                             new { @class = "edittab-form DeletePost", id = "deleteConfigForm-" + Model.ID }))
     {
         @Html.HiddenFor(model => model.ID);
