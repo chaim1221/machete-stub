@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Localization
 @model Machete.Web.ViewModel.ActivitySchedule
 
+@using Machete.Web.Resources;
+
 @{
     var httpContext = ViewContext.HttpContext;
     var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;

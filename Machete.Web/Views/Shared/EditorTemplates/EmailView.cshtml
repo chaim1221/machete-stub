@@ -2,6 +2,8 @@
 @using Machete.Web.Helpers
 @model Machete.Web.ViewModel.EmailView
 
+@using Machete.Web.Resources;
+
 @Html.HiddenFor(model => model.ID, new { @class = "hiddenRecID", id = Model.idPrefix + "EMAILID" })
 @Html.HiddenFor(model => model.woid, new { @class = "hiddenRecID", id = Model.idPrefix + "WOID" })
 

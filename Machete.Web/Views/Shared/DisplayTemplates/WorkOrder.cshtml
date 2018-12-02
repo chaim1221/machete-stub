@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Localization
 @model Machete.Web.ViewModel.WorkOrder
 
+@using Machete.Web.Resources;
+
 @Html.HiddenFor(model => model.ID, new { @class = "hiddenRecID" })
 @Html.HiddenFor(model => model.EmployerID)
 @{

@@ -1,5 +1,7 @@
 ﻿@using Machete.Web.Helpers
 
+@using Machete.Web.Resources
+
 @if (User.Identity.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))

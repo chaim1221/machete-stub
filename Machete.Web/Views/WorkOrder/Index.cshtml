@@ -3,6 +3,9 @@
 @using Microsoft.AspNetCore.Localization
 @using WorkOrder = Machete.Web.Resources.WorkOrder
 @using Record = Machete.Web.Resources.Record
+
+@using Machete.Web.Resources
+
 @{
     var httpContext = ViewContext.HttpContext;
     var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
