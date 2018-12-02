@@ -36,6 +36,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Employer = Machete.Domain.Employer;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {

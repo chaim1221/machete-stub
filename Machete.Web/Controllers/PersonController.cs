@@ -32,6 +32,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -161,7 +162,9 @@ namespace Machete.Web.Controllers
         public ActionResult View(int id)
         {
             Person person = serv.Get(id);
-            return View(person);
+            var m = map.Map<Domain.Person, ViewModel.Person>(person);
+            m.def = def;
+            return View(m);
         }
         /// <summary>
         /// 

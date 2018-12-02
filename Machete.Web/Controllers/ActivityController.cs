@@ -36,6 +36,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Activity = Machete.Domain.Activity;
 using ActivityList = Machete.Service.DTO.ActivityList;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -178,7 +179,7 @@ namespace Machete.Web.Controllers
         public JsonResult CreateMany(ActivitySchedule actSched, string userName)
         {
             UpdateModel(actSched); // copy values from form to object. why this is necessary if the object is being passed as arg, I don't know.
-            Activity firstActivity = serv.Get(actSched.firstID);
+            var firstActivity = serv.Get(actSched.firstID);
             var instances = actSched.stopDate.Subtract(actSched.dateStart).Days;
             var length = actSched.dateEnd.Subtract(actSched.dateStart).TotalMinutes;
 
@@ -204,7 +205,7 @@ namespace Machete.Web.Controllers
                 activ.teacher = actSched.teacher;
                 activ.notes = actSched.notes;
 
-                Activity act = serv.Create(activ, userName);
+                var act = serv.Create(activ, userName);
             }
             var result = map.Map<Activity, ViewModel.Activity>(firstActivity);
             return Json(new

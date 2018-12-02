@@ -64,7 +64,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
 
     #endregion
@@ -84,11 +84,12 @@ namespace Machete.Web.Controllers
             return PartialView();
         }
 
-        [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult Orders()
-        {
-            return PartialView();
-        }
+        // TODO where is this view?
+//        [Authorize(Roles = "Administrator, Manager")]
+//        public ActionResult Orders()
+//        {
+//            return PartialView();
+//        }
 
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Employers()

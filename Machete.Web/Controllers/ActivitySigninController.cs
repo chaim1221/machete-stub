@@ -29,7 +29,6 @@ using Machete.Web.Helpers;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.AspNetCore.Authorization;
 
 namespace Machete.Web.Controllers
@@ -55,7 +54,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         /// <summary>
         /// 
@@ -64,7 +63,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Manager, Administrator, Check-in, Teacher")]
         public ActionResult Index()
         {
-            return View();
+            return View("~/Views/Shared/ActivitySigninIndex.cshtml");
         }
         /// <summary>
         /// 

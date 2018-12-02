@@ -31,12 +31,13 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Machete.Data;
-using Machete.Domain;
+using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using NLog;
+using Record = Machete.Domain.Record;
 
 namespace Machete.Web.Controllers
 {
@@ -54,7 +55,7 @@ namespace Machete.Web.Controllers
         {
             if (filterContext.ExceptionHandled) return;
 
-            var exceptionMsg = ControllerHelpers.GetRootException(filterContext.Exception, ToString());
+            var exceptionMsg = Helpers.GetRootException(filterContext.Exception, ToString());
             var modelerrors = string.Join("; ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
             _levent.Level = LogLevel.Error;
 
@@ -99,17 +100,16 @@ namespace Machete.Web.Controllers
 
     public class MacheteSessionState
     {
-        private ICollection<string> salad;
-
-        public void  { }
+        private IDictionary<string, CultureInfo> salad;
 
         public CultureInfo this[string culture]
         {
-            get { throw new NotImplementedException(); }
+            get { return salad[culture]; }
+            set => salad[culture] = value;
         }
     }
 
-    public static class ControllerHelpers
+    public static class Helpers
     {
         public static async Task<string> GetUserId(this IIdentity principal, UserManager<MacheteUser> manager)
         {
@@ -131,9 +131,15 @@ namespace Machete.Web.Controllers
             return messages;
         }
 
-        public static void UpdateModel(Record changed)
+        public static void UpdateModel(Domain.Record changed)
         {
             // do something with database/EF
         }
+                
+        public static void UpdateModel(ViewModel.Record changed)
+        {
+            // do stuff
+        }
+
     }
 }

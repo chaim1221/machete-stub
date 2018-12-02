@@ -42,7 +42,7 @@ namespace Machete.Web.Helpers
 
             var e = context.Exception;
             if (!context.ExceptionHandled   // if unhandled, will be logged anyhow
-                    || RaiseErrorSignal(e)      // prefer signaling, if possible
+                    || RaiseErrorSignal(e, context)      // prefer signaling, if possible
                     || IsFiltered(context))     // filtered?
                 return;
 
@@ -54,31 +54,32 @@ namespace Machete.Web.Helpers
             var httpContext = context.HttpContext;
             if (httpContext == null)
                 return false;
-            var signal = ErrorSignal.FromContext(httpContext);
-            if (signal == null)
-                return false;
-            signal.Raise(e, httpContext);
+//            var signal = ErrorSignal.FromContext(httpContext);
+//            if (signal == null)
+//                return false;
+//            signal.Raise(e, httpContext);
             return true;
         }
 
         private static bool IsFiltered(ExceptionContext context)
         {
-            var config = context.HttpContext.GetSection("elmah/errorFilter")
-                                     as ErrorFilterConfiguration;
+//            var config = context.HttpContext.GetSection("elmah/errorFilter")
+//                                     as ErrorFilterConfiguration;
 
-            if (config == null)
-                return false;
+//            if (config == null)
+//                return false;
 
-            var testContext = new ErrorFilterModule.AssertionHelperContext(
-                                                                context.Exception, HttpContext.Current);
-
-            return config.Assertion.Test(testContext);
+//            var testContext = new ErrorFilterModule.AssertionHelperContext(
+//                                                                context.Exception, HttpContext.Current);
+//
+//            return config.Assertion.Test(testContext);
+            return false;
         }
 
         private static void LogException(Exception e)
         {
-            var context = HttpContext.Current;
-            ErrorLog.GetDefault(context).Log(new Error(e, context));
+//            var context = HttpContext.Current;
+//            ErrorLog.GetDefault(context).Log(new Error(e, context));
         }
     }
 }

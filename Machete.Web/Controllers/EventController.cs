@@ -31,7 +31,9 @@ using Machete.Service;
 using Machete.Service.DTO;
 using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -141,7 +143,7 @@ namespace Machete.Web.Controllers
         // AddImage
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult AddImage(int id, string userName, HttpPostedFileBase imagefile)
+        public ActionResult AddImage(int id, string userName, IFormFile imagefile)
         {
             if (imagefile == null) throw new MacheteNullObjectException("AddImage called with null imagefile");
             JoinEventImage joiner = new JoinEventImage();
@@ -152,10 +154,11 @@ namespace Machete.Web.Controllers
             image.parenttable = "Events";
             image.filename = imagefile.FileName;
             image.recordkey = id.ToString();
-            image.ImageData = new byte[imagefile.ContentLength];
-            imagefile.InputStream.Read(image.ImageData,
-                                       0,
-                                       imagefile.ContentLength);
+            image.ImageData = new byte[imagefile.Length];
+            imagefile.OpenReadStream();//(image.ImageData,
+                                       //0,
+                                       //imagefile.Length);
+            // TODO read the stream, close the file
             Image newImage = iServ.Create(image, userName);
             joiner.ImageID = newImage.ID;
             joiner.EventID = evnt.ID;

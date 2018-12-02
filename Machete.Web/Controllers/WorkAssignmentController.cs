@@ -21,16 +21,23 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.ViewModel;
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Machete.Web.Controllers.Helpers;
+using String = System.String;
+using WorkAssignment = Machete.Domain.WorkAssignment;
+using WorkAssignmentsList = Machete.Service.DTO.WorkAssignmentsList;
+using WorkerSignin = Machete.Domain.WorkerSignin;
 
 namespace Machete.Web.Controllers
 {
@@ -42,7 +49,7 @@ namespace Machete.Web.Controllers
         private readonly IWorkerSigninService wsiServ;
         private readonly IMapper map;
         private readonly IDefaults def;
-        private System.Globalization.CultureInfo CI;
+        private CultureInfo CI;
         public WorkAssignmentController(IWorkAssignmentService workAssignmentService,
             IWorkOrderService workOrderService,
             IWorkerSigninService signinService,
@@ -50,16 +57,16 @@ namespace Machete.Web.Controllers
             IMapper map)
 
         {
-            this.waServ = workAssignmentService;
-            this.woServ = workOrderService;
-            this.wsiServ = signinService;
+            waServ = workAssignmentService;
+            woServ = workOrderService;
+            wsiServ = signinService;
             this.map = map;
             this.def = def;
         }
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         #region Index
         //
@@ -69,7 +76,7 @@ namespace Machete.Web.Controllers
         public ActionResult Index()
         {
             WorkAssignmentIndex wai = new WorkAssignmentIndex();
-            wai.todaysdate = System.String.Format("{0:MM/dd/yyyy}", DateTime.Today);
+            wai.todaysdate = String.Format("{0:MM/dd/yyyy}", DateTime.Today);
             wai.def = def;
             return View(wai);
         }
@@ -82,13 +89,13 @@ namespace Machete.Web.Controllers
             //Get all the records            
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<Service.DTO.WorkAssignmentsList> was = waServ.GetIndexView(vo);
+            dataTableResult<WorkAssignmentsList> was = waServ.GetIndexView(vo);
             var result = was.query
-                .Select(e => map.Map<Service.DTO.WorkAssignmentsList, ViewModel.WorkAssignmentsList>(e))
+                .Select(e => map.Map<WorkAssignmentsList, ViewModel.WorkAssignmentsList>(e))
                 .AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = was.totalCount,
                 iTotalDisplayRecords = was.filteredCount,
                 aaData = result
@@ -101,7 +108,7 @@ namespace Machete.Web.Controllers
         #region Create
         public ActionResult Create(int WorkOrderID, string _description)
         {
-            var wa = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(new Domain.WorkAssignment()
+            var wa = map.Map<WorkAssignment, ViewModel.WorkAssignment>(new WorkAssignment
             {
                 active = true,
                 workOrderID = WorkOrderID,
@@ -120,12 +127,12 @@ namespace Machete.Web.Controllers
     //
     [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Create(Domain.WorkAssignment assignment, string userName)
+        public ActionResult Create(WorkAssignment assignment, string userName)
         {
             UpdateModel(assignment);
             assignment.workOrder = woServ.Get(assignment.workOrderID);
             var newAssignment = waServ.Create(assignment, userName);
-            var result = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(newAssignment);
+            var result = map.Map<WorkAssignment, ViewModel.WorkAssignment>(newAssignment);
             return Json(new
             {
                 sNewRef = result.tabref,
@@ -145,14 +152,14 @@ namespace Machete.Web.Controllers
         {
             //
             // TODO: Move duplication functionality to the service layer
-            Domain.WorkAssignment _assignment = waServ.Get(id);
-            Domain.WorkAssignment duplicate = _assignment;
+            WorkAssignment _assignment = waServ.Get(id);
+            WorkAssignment duplicate = _assignment;
             duplicate.workerAssigned = null;
             duplicate.workerAssignedID = null;
             duplicate.workerSiginin = null;
             duplicate.workerSigninID = null;
             var saved = waServ.Create(duplicate, userName);
-            var result = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(saved);
+            var result = map.Map<WorkAssignment, ViewModel.WorkAssignment>(saved);
             return Json(new
             {
                 sNewRef = result.tabref,
@@ -168,8 +175,8 @@ namespace Machete.Web.Controllers
         #region Assign
         public ActionResult Assign(int waid, int wsiid, string userName)
         {
-            Domain.WorkerSignin signin = wsiServ.Get(wsiid);
-            Domain.WorkAssignment assignment = waServ.Get(waid);
+            WorkerSignin signin = wsiServ.Get(wsiid);
+            WorkAssignment assignment = waServ.Get(waid);
             waServ.Assign(assignment, signin, userName);
 
             return Json(new
@@ -185,7 +192,7 @@ namespace Machete.Web.Controllers
             waServ.Unassign(waid, wsiid, userName);
             return Json(new
             {
-                jobSuccess = true,
+                jobSuccess = true
             });
         }
         #endregion
@@ -196,8 +203,8 @@ namespace Machete.Web.Controllers
         #region Edit
         public ActionResult Edit(int id)
         {
-            Domain.WorkAssignment wa = waServ.Get(id);
-            var m = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(wa);
+            WorkAssignment wa = waServ.Get(id);
+            var m = map.Map<WorkAssignment, ViewModel.WorkAssignment>(wa);
             m.def = def;
             return PartialView("Edit", m);
         }
@@ -207,7 +214,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public ActionResult Edit(int id, int? workerAssignedID, string userName)
         {
-            Domain.WorkAssignment asmt = waServ.Get(id);    
+            WorkAssignment asmt = waServ.Get(id);    
             //Update from HTML attributes
             UpdateModel(asmt);
             waServ.Save(asmt, workerAssignedID, userName);
@@ -220,12 +227,14 @@ namespace Machete.Web.Controllers
         //
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         #region View
-        public ActionResult View(int id)
-        {
-            Domain.WorkAssignment workAssignment = waServ.Get(id);
-            
-            return View(workAssignment);
-        }
+//        public ActionResult View(int id)
+//        {
+//            WorkAssignment workAssignment = waServ.Get(id);
+//            
+////            var m = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(wa);
+////            m.def = def;
+//            return View("~/Views/???", m);
+//        }
         #endregion
         #region Delete
         //

@@ -33,7 +33,7 @@ namespace Machete.Web.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return View("~/Views/Shared/Error.cshtml");
         }
         public ActionResult Http404(string url)
         {

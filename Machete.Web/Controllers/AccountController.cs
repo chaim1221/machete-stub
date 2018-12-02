@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using NLog;
 using DbFunctions = Machete.Service.DbFunctions;
 
+
 namespace Machete.Web.Controllers
 {
     [Authorize]

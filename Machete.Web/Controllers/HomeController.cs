@@ -44,11 +44,12 @@ namespace Machete.Web.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
-        public ActionResult Changes()
-        {
-            return PartialView();
-        }
+        // ???
+//        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+//        public ActionResult Changes()
+//        {
+//            return PartialView();
+//        }
 
         [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
         public ActionResult About()
@@ -73,11 +74,13 @@ namespace Machete.Web.Controllers
         {
             return PartialView();
         }
-        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
-        public ActionResult Reports()
-        {
-            return PartialView();
-        }
+        
+        // ???
+//        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+//        public ActionResult Reports()
+//        {
+//            return PartialView();
+//        }
         [AllowAnonymous]
         public ActionResult NotFound()
         {

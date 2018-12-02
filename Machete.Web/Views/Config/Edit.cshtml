@@ -1,7 +1,7 @@
 ﻿@using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
-@model Machete.Domain.Lookup
+@model Machete.Web.ViewModel.Lookup
 @{
     var httpContext = ViewContext.HttpContext;
     var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;

@@ -28,7 +28,13 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using static Machete.Web.Controllers.Helpers;
+using Attribute = System.Attribute;
 
 namespace Machete.Web.Controllers
 {
@@ -51,7 +57,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         /// <summary>
         /// 
@@ -60,7 +66,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Index()
         {
-            return View();
+            return View("~/Views/Config/Index.cshtml");
         }
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult AjaxHandler(jQueryDataTableParam param)
@@ -90,7 +96,7 @@ namespace Machete.Web.Controllers
         {
             var m = map.Map<Domain.Lookup, ViewModel.Lookup>(new Lookup());
             m.def = def;
-            return PartialView(m);
+            return PartialView("~/Views/Config/Create.cshtml", m);
         }
         /// <summary>
         /// 
@@ -125,7 +131,7 @@ namespace Machete.Web.Controllers
         {
             var m = map.Map<Domain.Lookup, ViewModel.Lookup>(serv.Get(id));
             m.def = def;
-            return PartialView("Edit", m);
+            return PartialView("~/Views/Config/Edit.cshtml", m);
         }
         /// <summary>
         /// 
@@ -155,7 +161,7 @@ namespace Machete.Web.Controllers
         {
             var m = map.Map<Domain.Lookup, ViewModel.Lookup>(serv.Get(id));
             m.def = def;
-            return PartialView("Edit", m);
+            return PartialView("~/Views/Config/Edit.cshtml", m);
         }
         /// <summary>
         /// 
@@ -175,5 +181,21 @@ namespace Machete.Web.Controllers
                 deletedID = id
             });
         }
+    }
+
+    public class HandleErrorAttribute : ExceptionFilterAttribute
+    {
+        // TODO http://www.binaryintellect.net/articles/5df6e275-1148-45a1-a8b3-0ba2c7c9cea1.aspx
+        public override void OnException(ExceptionContext context)
+        {
+            var result = new ViewResult { ViewName = "Error" };
+            var modelMetadata = new EmptyModelMetadataProvider();
+            result.ViewData = new ViewDataDictionary(
+                modelMetadata, context.ModelState);
+            result.ViewData.Add("HandleException", 
+                context.Exception);
+            context.Result = result;
+            context.ExceptionHandled = true;
+        }     
     }
 }

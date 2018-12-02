@@ -28,7 +28,9 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -124,7 +126,7 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        public ActionResult Create(Domain.Worker worker, string userName, HttpPostedFileBase imagefile)
+        public ActionResult Create(Domain.Worker worker, string userName, IFormFile imagefile)
         {
             UpdateModel(worker);
             if (imagefile != null) updateImage(worker, imagefile);
@@ -161,7 +163,7 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        public ActionResult Edit(int id, Worker _model, string userName, HttpPostedFileBase imagefile)
+        public ActionResult Edit(int id, Worker _model, string userName, IFormFile imagefile)
         {
             Worker worker = serv.Get(id);
             UpdateModel(worker);
@@ -198,7 +200,7 @@ namespace Machete.Web.Controllers
         /// <param name="worker"></param>
         /// <param name="imagefile"></param>
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        private void updateImage(Worker worker, HttpPostedFileBase imagefile)
+        private void updateImage(Worker worker, IFormFile imagefile)
         {
             // TODO: Move this to the business layer
             if (worker == null) throw new MacheteNullObjectException("updateImage called with null worker");
@@ -210,10 +212,12 @@ namespace Machete.Web.Controllers
                 image.parenttable = "Workers";
                 image.filename = imagefile.FileName;
                 image.recordkey = worker.ID.ToString();
-                image.ImageData = new byte[imagefile.ContentLength];
-                imagefile.InputStream.Read(image.ImageData,
-                                           0,
-                                           imagefile.ContentLength);
+                image.ImageData = new byte[imagefile.Length];
+                imagefile.OpenReadStream();
+//                                        (image.ImageData,
+//                                           0,
+//                                           imagefile.ContentLength);
+                // TODO actually read the file
                 imageServ.Save(image, this.User.Identity.Name);
             }
             else
@@ -222,10 +226,12 @@ namespace Machete.Web.Controllers
                 image.ImageMimeType = imagefile.ContentType;
                 image.parenttable = "Workers";
                 image.recordkey = worker.ID.ToString();
-                image.ImageData = new byte[imagefile.ContentLength];
-                imagefile.InputStream.Read(image.ImageData,
-                                           0,
-                                           imagefile.ContentLength);
+                image.ImageData = new byte[imagefile.Length];
+                imagefile.OpenReadStream();
+//                                        (image.ImageData,
+//                                           0,
+//                                           imagefile.ContentLength);
+                // TODO actually read the file
                 Image newImage = imageServ.Create(image, this.User.Identity.Name);
                 worker.ImageID = newImage.ID;
             }

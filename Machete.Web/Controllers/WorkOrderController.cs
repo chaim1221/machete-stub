@@ -21,19 +21,24 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using AutoMapper;
-using Machete.Domain;
-using Machete.Service;
-using DTO = Machete.Service.DTO;
-using Machete.Web.Helpers;
-using Machete.Web.ViewModel;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AutoMapper;
+using Machete.Domain;
+using Machete.Service;
+using Machete.Web.Helpers;
+using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using String = System.String;
+using WorkerRequest = Machete.Domain.WorkerRequest;
+using WorkOrder = Machete.Domain.WorkOrder;
+using WorkOrdersList = Machete.Service.DTO.WorkOrdersList;
+using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -73,8 +78,8 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            this.CI = (CultureInfo)Session["Culture"];
-            ViewBag.def = def; //TDODO kludge
+            CI = Session["Culture"];
+            ViewBag.def = def; //TODO kludge
         }
 
         #region Index
@@ -105,14 +110,14 @@ namespace Machete.Web.Controllers
             // Retrieve WO/WA Summary based on parameters
             dataTableResult<WOWASummary> dtr = 
                 woServ.CombinedSummary(param.sSearch,
-                    Request["sSortDir_0"] == "asc" ? false : true,
+                    Request.Form["sSortDir_0"] == "asc" ? false : true, // ???
                     param.iDisplayStart,
                     param.iDisplayLength);
             //
             //return what's left to datatables
             var result = from p in dtr.query
-                         select new[] { System.String.Format("{0:MM/dd/yyyy}", p.date),
-                                         p.weekday.ToString(),
+                         select new[] { String.Format("{0:MM/dd/yyyy}", p.date),
+                                         p.weekday,
                                          p.pending_wo > 0 ? p.pending_wo.ToString(): null,
                                          p.pending_wa > 0 ? p.pending_wa.ToString(): null,
                                          p.active_wo > 0 ? p.active_wo.ToString(): null,
@@ -127,7 +132,7 @@ namespace Machete.Web.Controllers
 
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = dtr.totalCount,
                 iTotalDisplayRecords = dtr.filteredCount,
                 aaData = result
@@ -150,14 +155,14 @@ namespace Machete.Web.Controllers
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI =  CI;
             //Get all the records
-            dataTableResult<DTO.WorkOrdersList> dtr = woServ.GetIndexView(vo);
+            dataTableResult<WorkOrdersList> dtr = woServ.GetIndexView(vo);
             var result = dtr.query
                 .Select(
-                    e => map.Map<DTO.WorkOrdersList, ViewModel.WorkOrdersList>(e)
+                    e => map.Map<WorkOrdersList, ViewModel.WorkOrdersList>(e)
                 ).AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = dtr.totalCount,
                 iTotalDisplayRecords = dtr.filteredCount,
                 aaData = result
@@ -175,7 +180,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public ActionResult Create(int EmployerID)
         {
-            var wo = map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(new Domain.WorkOrder()
+            var wo = map.Map<WorkOrder, ViewModel.WorkOrder>(new WorkOrder
             {
                 EmployerID = EmployerID,
                 dateTimeofWork = DateTime.Today,
@@ -185,7 +190,7 @@ namespace Machete.Web.Controllers
                 timeFlexible = true
             });
             wo.def = def;
-            ViewBag.workerRequests = new List<SelectListItem> {};
+            ViewBag.workerRequests = new List<SelectListItem>();
             return PartialView("Create", wo);
         }
 
@@ -198,13 +203,13 @@ namespace Machete.Web.Controllers
         /// <returns>JSON Object representing new Work Order</returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Create(Domain.WorkOrder wo, string userName, List<Domain.WorkerRequest> workerRequestList)
+        public ActionResult Create(WorkOrder wo, string userName, List<WorkerRequest> workerRequestList)
         {
             UpdateModel(wo);
-            Domain.WorkOrder neworder = woServ.Create(wo, userName);           
+            WorkOrder neworder = woServ.Create(wo, userName);           
 
             // JSON object with new work order data
-            var result = map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(neworder);
+            var result = map.Map<WorkOrder, ViewModel.WorkOrder>(neworder);
             return Json(new 
             {
                 sNewRef = result.tabref,
@@ -225,7 +230,7 @@ namespace Machete.Web.Controllers
         public ActionResult Edit(int id)
         {
             // Retrieve Work Order
-            Domain.WorkOrder workOrder = woServ.Get(id);
+            WorkOrder workOrder = woServ.Get(id);
             
             // Retrieve Worker Requests associated with Work Order
             ViewBag.workerRequests = workOrder.workerRequests.Select(a => 
@@ -236,7 +241,7 @@ namespace Machete.Web.Controllers
                     a.workerRequested.Person.firstname1 + ' ' + 
                     a.workerRequested.Person.lastname1 
                 });
-            var m = map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(workOrder);
+            var m = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
             m.def = def;
             return PartialView("Edit", m);
         }
@@ -252,9 +257,9 @@ namespace Machete.Web.Controllers
         //[Bind(Exclude = "workerRequests")]
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Edit(int id, string userName, List<Domain.WorkerRequest> workerRequestList)
+        public ActionResult Edit(int id, string userName, List<WorkerRequest> workerRequestList)
         {
-            Domain.WorkOrder workOrder = woServ.Get(id);
+            WorkOrder workOrder = woServ.Get(id);
             UpdateModel(workOrder);
 
             woServ.Save(workOrder, workerRequestList, userName);
@@ -275,8 +280,8 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public ActionResult View(int id)
         {
-            Domain.WorkOrder workOrder = woServ.Get(id);
-            var m = map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(workOrder);
+            WorkOrder workOrder = woServ.Get(id);
+            var m = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
             m.def = def;
             return View(m);
         }
@@ -289,8 +294,8 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public ActionResult ViewForEmail(int id)
         {
-            Domain.WorkOrder workOrder = woServ.Get(id);
-            var m = map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(workOrder);
+            WorkOrder workOrder = woServ.Get(id);
+            var m = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
             m.def = def;
             ViewBag.OrganizationName = def.getConfig("OrganizationName");
             return PartialView(m);
@@ -306,7 +311,7 @@ namespace Machete.Web.Controllers
         {
             WorkOrderGroupPrintView view = new WorkOrderGroupPrintView();
             var v = woServ.GetActiveOrders(date, assignedOnly ?? false);
-            view.orders = v.Select(e => map.Map<Domain.WorkOrder, ViewModel.WorkOrder>(e)).ToList();
+            view.orders = v.Select(e => map.Map<WorkOrder, ViewModel.WorkOrder>(e)).ToList();
             foreach (var i in view.orders) // inelegant, but functional
             {
                 i.def = def;
@@ -366,7 +371,7 @@ namespace Machete.Web.Controllers
         {
             var workOrder = woServ.Get(id);
             // lookup int value for status active
-            workOrder.statusID = Domain.WorkOrder.iActive;
+            workOrder.statusID = WorkOrder.iActive;
             woServ.Save(workOrder, userName);         
             return Json(new
             {
