@@ -104,7 +104,7 @@ namespace Machete.Web
                 SupportedUICultures = supportedCultures
             });
 
-            app.UseStaticFiles("Content");
+            app.UseStaticFiles("/Content");
 // To configure external authentication, 
 // see: http://go.microsoft.com/fwlink/?LinkID=532715
             app.UseAuthentication();
