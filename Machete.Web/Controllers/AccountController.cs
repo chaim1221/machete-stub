@@ -7,12 +7,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Machete.Data;
-using Machete.Data.Infrastructure;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.Resources;
 using Machete.Web.ViewModel;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -29,11 +27,11 @@ namespace Machete.Web.Controllers
     [ElmahHandleError]
     public class AccountController : MacheteController
     {
-        Logger log = LogManager.GetCurrentClassLogger();
-        LogEventInfo levent = new LogEventInfo(LogLevel.Debug, "AccountController", "");
+        readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        readonly LogEventInfo _levent = new LogEventInfo(LogLevel.Debug, "AccountController", "");
         private UserManager<MacheteUser> UserManager { get; set; }
         private SignInManager<MacheteUser> SignInManager { get; set; }
-        private readonly IDatabaseFactory _databaseFactory;
+        private readonly MacheteContext _context;
         private const int PasswordExpirationInMonths = 6; // this constant represents number of months where users passwords expire 
         private readonly IHtmlLocalizer<AccountController> _localizer;
 
@@ -41,11 +39,11 @@ namespace Machete.Web.Controllers
             UserManager<MacheteUser> userManager,
             SignInManager<MacheteUser> signInManager,
             IHtmlLocalizer<AccountController> localizer,
-            IDatabaseFactory databaseFactory)
+            MacheteContext context)
         {
             UserManager = userManager;
             SignInManager = signInManager;
-            _databaseFactory = databaseFactory;
+            _context = context;
             _localizer = localizer;
         }
 
@@ -56,7 +54,7 @@ namespace Machete.Web.Controllers
             // Retrieve users 
             // Note: Hirer accounts use email addresses as username, so the list filters out usernames that are email addresses
             // This display is only to modify internal Machete user accounts (not to modify employer accounts)
-            DbSet<MacheteUser> users = _databaseFactory.Get().Users;
+            DbSet<MacheteUser> users = _context.Users;
             if (users == null)
             {
                 // TODO: throw alert
@@ -109,8 +107,8 @@ namespace Machete.Web.Controllers
                 var user = await UserManager.FindByNameAsync(model.UserName);//, model.Password);
                 if (user != null)
                 {
-                    levent.Level = LogLevel.Info; levent.Message = "Logon successful";
-                    levent.Properties["username"] = model.UserName; log.Log(levent);
+                    _levent.Level = LogLevel.Info; _levent.Message = "Logon successful";
+                    _levent.Properties["username"] = model.UserName; _logger.Log(_levent);
                     await SignInAsync(user, model.RememberMe);
                     return RedirectToLocal(returnUrl);
                 }
@@ -119,8 +117,8 @@ namespace Machete.Web.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            levent.Level = LogLevel.Info; levent.Message = "Logon failed for " + model.UserName;
-            log.Log(levent);
+            _levent.Level = LogLevel.Info; _levent.Message = "Logon failed for " + model.UserName;
+            _logger.Log(_levent);
             return View(model);
         }
 
@@ -166,9 +164,8 @@ namespace Machete.Web.Controllers
                         status = true;
 
                         user.LastPasswordChangedDate = DateTime.Today;
-                        var db = _databaseFactory.Get();
-                        db.Entry(user).State = EntityState.Modified;
-                        await db.SaveChangesAsync();
+                        _context.Entry(user).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                     }
                     else
                     {
@@ -195,32 +192,26 @@ namespace Machete.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+            var newUserName = model.FirstName.Trim() + "." + model.LastName.Trim();
+            var user = new MacheteUser { UserName = newUserName, LoweredUserName = newUserName.ToLower(), ApplicationId = GetApplicationId(), Email = model.Email.Trim(), LoweredEmail = model.Email.Trim() };
+            var result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
             {
-                string newUserName = model.FirstName.Trim() + "." + model.LastName.Trim();
-                MacheteUser user = new MacheteUser { UserName = newUserName, LoweredUserName = newUserName.ToLower(), ApplicationId = GetApplicationID(), Email = model.Email.Trim(), LoweredEmail = model.Email.Trim() };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    // TODO: provide messaging to administrator to add appropriate roles to their account
-                    //await SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
-
-                AddErrors(result);
+                // TODO: provide messaging to administrator to add appropriate roles to their account
+                //await SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
             }
+
+            AddErrors(result);
 
             // If we got this far, something failed, redisplay form
             return View(model);
         }
 
-        private Guid GetApplicationID()
-        {
-            Guid appId = _databaseFactory.Get().Users
-                .Select(p => p.ApplicationId)
-                .First();
-            return appId;
-        }
+        private Guid GetApplicationId() => _context.Users
+            .Select(p => p.ApplicationId)
+            .First();
 
         //
         // POST: /Account/Disassociate
@@ -249,7 +240,6 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk, Check-in, Teacher")]
         public async Task<ActionResult> Manage(ManageMessageId? message)
         {
-            var Db = _databaseFactory.Get();
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
@@ -257,20 +247,20 @@ namespace Machete.Web.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
             var id = await User.Identity.GetUserId(UserManager);
-            var user = Db.Users.First(x => x.Id == id);
+            var user = _context.Users.First(x => x.Id == id);
             ViewBag.HasLocalPassword = HasPassword(user);
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (user == null)
             {
                 return StatusCode(404);
             }
-            ManageUserViewModel model = new ManageUserViewModel();
+            var model = new ManageUserViewModel();
             model.Action = "LinkLogin";
             model.ReturnUrl = "Manage";
             var old = ModelState["OldPassword"];
-            if (old != null) old.Errors.Clear();
+            old?.Errors.Clear();
             var blah = ModelState["NewPassword"];
-            if (blah != null) blah.Errors.Clear();
+            blah?.Errors.Clear();
             return View(model);
         }
 
@@ -281,10 +271,9 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk, Check-in, Teacher")]
         public async Task<ActionResult> Manage(ManageUserViewModel model)
         {
-            var db = _databaseFactory.Get();
             var id = await User.Identity.GetUserId(UserManager);
-            var user = db.Users.First(x => x.Id == id);
-            bool hasPassword = HasPassword(user);
+            var user = _context.Users.First(x => x.Id == id);
+            var hasPassword = HasPassword(user);
             ViewBag.HasLocalPassword = hasPassword;
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (hasPassword)
@@ -295,8 +284,8 @@ namespace Machete.Web.Controllers
                     if (result.Succeeded)
                     {
                         user.LastPasswordChangedDate = DateTime.Today;
-                        db.Entry(user).State = EntityState.Modified;
-                        await db.SaveChangesAsync();
+                        _context.Entry(user).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                         return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
                     }
 
@@ -307,22 +296,17 @@ namespace Machete.Web.Controllers
             {
                 // User does not have a password so remove any validation errors caused by a missing OldPassword field
                 var state = ModelState["OldPassword"];
-                if (state != null)
+                state?.Errors.Clear();
+
+                if (!ModelState.IsValid) return View(model);
+                //var user = await User.Identity.GetUserId(UserManager);
+                var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
+                if (result.Succeeded)
                 {
-                    state.Errors.Clear();
+                    return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
                 }
 
-                if (ModelState.IsValid)
-                {
-                    //var user = await User.Identity.GetUserId(UserManager);
-                    var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Manage", new { Message = ManageMessageId.SetPasswordSuccess });
-                    }
-
-                    AddErrors(result);
-                }
+                AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
@@ -332,7 +316,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Edit(string id, ManageMessageId? Message = null)
         {
-            MacheteUser user = _databaseFactory.Get().Users.First(u => u.Id == id);
+            MacheteUser user = _context.Users.First(u => u.Id == id);
             if (user == null)
             {
                 return StatusCode(404);
@@ -348,11 +332,9 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public async Task<ActionResult> Edit(EditUserViewModel model)
         {
-            var db = _databaseFactory.Get();
-
             if (ModelState.IsValid)
             {
-                var user = db.Users.First(u => u.Id == model.Id);
+                var user = _context.Users.First(u => u.Id == model.Id);
                 string name = model.FirstName.Trim() + "." + model.LastName.Trim();
                 // Update the user data:
                 //user.FirstName = model.FirstName; //We can't have FirstName and
@@ -390,15 +372,15 @@ namespace Machete.Web.Controllers
                         return View(model);
                     }
                 }
-                else if (changePassword && !hasPassword)
+                else if (changePassword)
                 {
                     model.ErrorMessage = "This user's password is managed by another service.";
                     model.NewPassword = "";
                     model.ConfirmPassword = "";
                     return View(model);
                 }
-                db.Entry(user).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
@@ -413,8 +395,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Delete(string id = null)
         {
-            var Db = _databaseFactory.Get();
-            var user = Db.Users.First(u => u.Id == id);
+            var user = _context.Users.First(u => u.Id == id);
             var model = new EditUserViewModel(user);
             if (user == null)
             {
@@ -428,19 +409,17 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult DeleteConfirmed(string id)
         {
-            var Db = _databaseFactory.Get();
-            var user = Db.Users.First(u => u.Id == id);
-            Db.Users.Remove(user);
-            Db.SaveChanges();
+            var user = _context.Users.First(u => u.Id == id);
+            _context.Users.Remove(user);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult UserRoles(string id)
         {
-            var Db = _databaseFactory.Get();
-            var user = Db.Users.First(u => u.Id == id);
-            var model = new SelectUserRolesViewModel(user, _databaseFactory);
+            var user = _context.Users.First(u => u.Id == id);
+            var model = new SelectUserRolesViewModel(user, _context);
 
             return View(model);
         }
@@ -611,7 +590,7 @@ namespace Machete.Web.Controllers
 // TODO https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx
         public async Task<ActionResult> RemoveAccountList()
         {
-            var db = _databaseFactory.Get();
+            var db = _context;
             var id = await User.Identity.GetUserId(UserManager);
             var user = db.Users.First(x => x.Id == id);
             ICollection<UserLoginInfo> linkedAccounts = new Collection<UserLoginInfo>

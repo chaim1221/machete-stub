@@ -200,7 +200,7 @@ namespace Machete.Web.ViewModel
         }
 
         // Enable initialization with an instance of ApplicationUser:
-        public SelectUserRolesViewModel(MacheteUser user, IDatabaseFactory dbFactory)
+        public SelectUserRolesViewModel(MacheteUser user, MacheteContext dbFactory)
             : this()
         {
             UserName = user.UserName;
@@ -217,8 +217,9 @@ namespace Machete.Web.ViewModel
 
             UserId = user.Id;
 
+            // ReSharper disable once SuggestVarOrType_Elsewhere
             // Add all available roles to the list of EditorViewModels:
-            DbSet<IdentityRole> allRoles = dbFactory.Get().Roles;
+            DbSet<IdentityRole> allRoles = dbFactory.Roles;
             foreach (var role in allRoles)
             {
                 // An EditorViewModel will be used by Editor Template:
