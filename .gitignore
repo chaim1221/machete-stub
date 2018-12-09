@@ -32,9 +32,10 @@ test-results/
 Thumbs.db
 .vs/
 
-# Mac bundle stuff
+# Mac/bundle stuff
 *.dmg
 *.app
+Machete.Web/Content/css.css
 
 # resharper
 *_Resharper.*
