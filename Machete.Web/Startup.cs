@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 using Machete.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace Machete.Web
 {
@@ -105,6 +107,19 @@ namespace Machete.Web
             });
 
             app.UseStaticFiles("/Content");
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "Content")),
+                RequestPath = "/Content"
+            });
+            
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "Content")),
+                RequestPath = "/Content"
+            });
 // To configure external authentication, 
 // see: http://go.microsoft.com/fwlink/?LinkID=532715
             app.UseAuthentication();

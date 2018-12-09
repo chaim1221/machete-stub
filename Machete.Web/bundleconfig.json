@@ -1,0 +1,17 @@
+[
+  {
+    "outputFileName": "Content/css.css",
+    "inputFiles": [
+      "Content/Site.css",
+      "Content/confirm/jquery.alerts.css",
+      "Content/dataTables/demo_table_jui.css",
+      "Content/jquery-ui-1.8.6.custom.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/reportcss",
+    "inputFiles": [
+      "Content/jquery.jqplot.css"
+    ]
+  }
+]

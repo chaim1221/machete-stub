@@ -139,7 +139,7 @@ page width. Or, you can specify an exact pixel width. */
 /* TAB MENU   
 ----------------------------------------------------------*/
 #menulinkhome {
-    background: url(/Content/machete_1_close_crop.png) no-repeat top left;
+    background: url(machete_1_close_crop.png) no-repeat top left;
     display: block;
     width: 202px;
     height: 69px;
@@ -312,7 +312,7 @@ table {
 }
 
 div#title {
-    background-image: url(/Content/machete_1_close_crop.png);
+    background-image: url(machete_1_close_crop.png);
     display: block;
     float: left;
     text-align: left;

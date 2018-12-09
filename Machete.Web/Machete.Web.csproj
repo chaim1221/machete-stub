@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
     <PackageReference Include="ElmahCore" Version="1.2.0" />
     <PackageReference Include="ElmahCore.Sql" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
