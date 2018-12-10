@@ -5,7 +5,7 @@
 
 <!DOCTYPE html>
 <html>
-<script src="~/bundles/jquery"></script>
+<script src="~/Content/jquery.js"></script>
 
 @{
     var controllerName = Context.Request.HttpContext.GetRouteData().Values["controller"].ToString();
@@ -13,7 +13,7 @@
 <head>
     <link href="@Url.Content("~/Content/jquery.lightbox-0.5.css")" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="~/Content/css.css"></link>
-    <link rel="stylesheet" href="~/Content/reportcss"></link>
+    <link rel="stylesheet" href="~/Content/reportcss.css"></link>
     <title>@Shared.title@ViewBag.title</title>
     <link rel="shortcut icon" href="/Content/favicon.ico" type="image/png"/>
     <link rel="icon" href="/Content/favicon.ico" type="image/png"/> 

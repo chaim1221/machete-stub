@@ -5,12 +5,16 @@
     <UserSecretsId>aspnet-Machete.Web-989B45A2-280E-40E5-85C9-2EA24160C6D1</UserSecretsId>
   </PropertyGroup>
 
+<ItemGroup>
+<DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.6.362" />
+</ItemGroup>
   <ItemGroup>
     <None Update="machete.db" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
+    <PackageReference Include="BundlerMinifier.Core" Version="2.8.391" />
     <PackageReference Include="ElmahCore" Version="1.2.0" />
     <PackageReference Include="ElmahCore.Sql" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
