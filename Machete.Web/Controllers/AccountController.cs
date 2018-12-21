@@ -81,7 +81,9 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            if (!User.Identity.IsAuthenticated)
+            var userIdentity = new ClaimsIdentity("Cookies");
+            if (!userIdentity.IsAuthenticated)
+            //if (!User.Identity.IsAuthenticated)
             {
                 var model = new LoginViewModel();
                 model.Action = "ExternalLogin";

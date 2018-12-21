@@ -21,6 +21,8 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System.Security.Claims;
 using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,15 +35,13 @@ namespace Machete.Web.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
+            var userIdentity = new ClaimsIdentity("Cookies");
+            if (!userIdentity.IsAuthenticated) return RedirectToAction("Login", "Account");
+            if (User.IsInRole("Hirer"))
             {
-                if (User.IsInRole("Hirer"))
-                {
-                    return Redirect("/V2/Onlineorders");
-                }
-                return View();
+                return Redirect("/V2/Onlineorders");
             }
-            return RedirectToAction("Login", "Account");
+            return View();
         }
 
         // ???
