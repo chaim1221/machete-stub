@@ -75,10 +75,8 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            var loggedIn = false;
-
             //var userIdentity = new ClaimsIdentity("​​ApplicationCookie");
-            if (!loggedIn)
+            if (!User.Identity.IsAuthenticated)
             {
                 var model = new LoginViewModel();
                 model.Action = "ExternalLogin";
@@ -87,13 +85,12 @@ namespace Machete.Web.Controllers
             }
 
             // Employers could still login to the old page, so redirect
-            //if (User.IsInRole("Hirer")) 
-                return RedirectToLocal("/V2/Onlineorders");
-            //return RedirectToAction("Index", "Home");
-
+            if (!User.IsInRole("Hirer"))
+                return RedirectToAction("Index", "Home");
+            return RedirectToLocal("/V2/Onlineorders");
         }
 
-        // POST: /Account/Login
+        // POST: /Account/LoginPost
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
