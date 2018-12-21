@@ -49,26 +49,22 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Manager, Administrator")]
         public ActionResult Index()
         {
-            // Retrieve users 
-            // Note: Hirer accounts use email addresses as username, so the list filters out usernames that are email addresses
-            // This display is only to modify internal Machete user accounts (not to modify employer accounts)
-            DbSet<MacheteUser> users = _context.Users;
+            // Hirer accounts use email addresses as username, so the list filters out usernames that are
+            // email addresses because this View only exists to modify internal Machete user accounts
+            var users = _context.Users;
             if (users == null)
-            {
-                // TODO: throw alert
-            }
-            IQueryable<UserSettingsViewModel> model = users
-                    .Select(u => new UserSettingsViewModel {
-                            ProviderUserKey = u.Id,
-                            UserName = u.UserName,
-                            Email = u.Email,
-                            IsApproved = u.IsApproved ? "Yes" : "No",
-                            IsLockedOut = u.IsLockedOut ? "Yes" : "No",
-                            IsOnline = DbFunctions.DiffHours(u.LastLoginDate, DateTime.Now) < 1 ? "Yes" : "No",
-                            CreationDate = u.CreateDate,
-                            LastLoginDate = u.LastLoginDate
-                        })
-                        .Where (u => !u.UserName.Contains("@"));
+                throw new ArgumentNullException();
+            var model = users
+                .Select(u => new UserSettingsViewModel {
+                    ProviderUserKey = u.Id,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    IsApproved = u.IsApproved ? "Yes" : "No",
+                    IsLockedOut = u.IsLockedOut ? "Yes" : "No",
+                    IsOnline = DbFunctions.DiffHours(u.LastLoginDate, DateTime.Now) < 1 ? "Yes" : "No",
+                    CreationDate = u.CreateDate,
+                    LastLoginDate = u.LastLoginDate
+                }).Where (u => !u.UserName.Contains("@"));
 
             return View(model);
         }
@@ -79,8 +75,10 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            var userIdentity = new ClaimsIdentity("​​ApplicationCookie");
-            if (!userIdentity.IsAuthenticated)
+            var loggedIn = false;
+
+            //var userIdentity = new ClaimsIdentity("​​ApplicationCookie");
+            if (!loggedIn)
             {
                 var model = new LoginViewModel();
                 model.Action = "ExternalLogin";
@@ -89,9 +87,10 @@ namespace Machete.Web.Controllers
             }
 
             // Employers could still login to the old page, so redirect
-            if (User.IsInRole("Hirer")) return RedirectToLocal("/V2/Onlineorders");
+            //if (User.IsInRole("Hirer")) 
+                return RedirectToLocal("/V2/Onlineorders");
+            //return RedirectToAction("Index", "Home");
 
-            return RedirectToAction("Index", "Home");
         }
 
         // POST: /Account/Login
@@ -100,6 +99,11 @@ namespace Machete.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+//            // these need to go _somewhere, maybe not here?
+//            //read cookie from IHttpContextAccessor  
+//            string cookieValueFromContext = HttpContext.Request.Cookies["key"];  
+//            //read cookie from Request object  
+//            string cookieValueFromReq = Request.Cookies["Key"];  
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByNameAsync(model.UserName);//, model.Password);
@@ -107,7 +111,17 @@ namespace Machete.Web.Controllers
                 {
                     _levent.Level = LogLevel.Info; _levent.Message = "Logon successful";
                     _levent.Properties["username"] = model.UserName; _logger.Log(_levent);
-                    await SignInAsync(user);
+                    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var impersonatedUser = await UserManager.FindByIdAsync(user.Id);
+                    var userPrincipal = await SignInManager.CreateUserPrincipalAsync(impersonatedUser);
+
+                    if (!string.IsNullOrEmpty(currentUserId))
+                        userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
+                    userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
+            
+                    await SignInManager.SignOutAsync();
+
+                    await HttpContext.SignInAsync(userPrincipal);
                     return RedirectToLocal(returnUrl);
                 }
 
@@ -472,22 +486,7 @@ namespace Machete.Web.Controllers
             base.Dispose(disposing);
         }
 
-        #region Helpers
         // Used for XSRF protection when adding external logins
-        private async Task SignInAsync(MacheteUser user)
-        {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var impersonatedUser = await UserManager.FindByIdAsync(user.Id);
-            var userPrincipal = await SignInManager.CreateUserPrincipalAsync(impersonatedUser);
-
-            if (!string.IsNullOrEmpty(currentUserId))
-              userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
-            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
-            
-            await SignInManager.SignOutAsync();
-
-            await HttpContext.SignInAsync(userPrincipal);
-        }
 
         private void AddErrors(IdentityResult result)
         {
@@ -520,7 +519,6 @@ namespace Machete.Web.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-        #endregion
 
         // Change Culture (DEPRECATED)
         public ActionResult ChangeCulture(string lang, string returnUrl)
