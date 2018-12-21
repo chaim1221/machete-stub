@@ -28,6 +28,7 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -75,15 +76,15 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Manager, Administrator, Check-in, Teacher")]
         public ActionResult Index(int dwccardnum, int activityID)
         {
+            // The card just swiped
             var _asi = new ActivitySignin();
-            // Tthe card just swiped
             _asi.dateforsignin = DateTime.Now;
             _asi.activityID = activityID;
-            _asi.dwccardnum = dwccardnum;            
-            //
-            //
+            _asi.dwccardnum = dwccardnum;
             string imageRef = serv.getImageRef(dwccardnum);
-            Worker w = serv.CreateSignin(_asi, this.User.Identity.Name);
+            var userIdentity = new ClaimsIdentity("Cookies");
+
+            Worker w = serv.CreateSignin(_asi, userIdentity.Name);
             //Get picture from checkin, show with next view
 
             return Json(new

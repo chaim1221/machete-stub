@@ -83,7 +83,6 @@ namespace Machete.Web.Controllers
 
             var userIdentity = new ClaimsIdentity("Cookies");
             if (!userIdentity.IsAuthenticated)
-            //if (!User.Identity.IsAuthenticated)
             {
                 var model = new LoginViewModel();
                 model.Action = "ExternalLogin";
@@ -92,6 +91,8 @@ namespace Machete.Web.Controllers
             }
 
             // Employers could still login to the old page, so redirect
+            var roles = userIdentity;
+            
             if (User.IsInRole("Hirer")) return RedirectToLocal("/V2/Onlineorders");
 
             return RedirectToAction("Index", "Home");
@@ -457,144 +458,12 @@ namespace Machete.Web.Controllers
         }
 
         //
-        // POST: /Account/ExternalLogin
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
-        {
-            // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
-        }
-
-        //
-        // GET: /Account/ExternalLoginCallback
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
-        {
-            var loginInfo = await SignInManager.GetExternalLoginInfoAsync();
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Sign in the user with this external login provider if the user already has a login
-            var user = await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
-            if (user != null)
-            {
-                await SignInAsync(user);
-                return RedirectToLocal(returnUrl);
-            }
-
-            // If the user does not have an account, then prompt the user to create an account
-            ViewBag.ReturnUrl = returnUrl;
-            ViewBag.LoginProvider = loginInfo.LoginProvider;
-
-            return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { FirstName = "", LastName = "" });
-        }
-
-        //
-        // POST: /Account/LinkLogin
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> LinkLogin(string provider)
-        {
-            // Request a redirect to the external login provider to link a login for the current user
-            var user = await UserManager.GetUserAsync(HttpContext.User);
-            return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), user.Id);
-        }
-
-        //
-        // GET: /Account/LinkLoginCallback
-        public async Task<ActionResult> LinkLoginCallback()
-        {
-            var user = await UserManager.GetUserAsync(HttpContext.User);
-            var loginInfo = await SignInManager.GetExternalLoginInfoAsync(XsrfKey);
-            if (loginInfo == null)
-            {
-                return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-            }
-
-            var result = await UserManager.AddLoginAsync(user, loginInfo);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Manage");
-            }
-            return RedirectToAction("Manage", new { Message = ManageMessageId.Error });
-        }
-
-        //
-        // POST: /Account/ExternalLoginConfirmation
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Manage");
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Get the information about the user from the external login provider
-                var info = await SignInManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                {
-                    return View("ExternalLoginFailure");
-                }
-                var user = new MacheteUser { UserName = model.FirstName + "." + model.LastName };
-                var result = await UserManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await UserManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        await SignInAsync(user);
-                        return RedirectToLocal(returnUrl);
-                    }
-                }
-                AddErrors(result);
-            }
-
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
-        }
-
-        //
         // GET: /Account/LogOff
         [AllowAnonymous]
         public ActionResult LogOff()
         {
             HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Account");
-        }
-
-        //
-        // GET: /Account/ExternalLoginFailure
-        [AllowAnonymous]
-        public ActionResult ExternalLoginFailure()
-        {
-            return View();
-        }
-
-        //[ChildActionOnly]
-// TODO https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx
-        public async Task<ActionResult> RemoveAccountList()
-        {
-            var user = await UserManager.GetUserAsync(HttpContext.User);
-            ICollection<UserLoginInfo> linkedAccounts = new Collection<UserLoginInfo>
-                (
-                    user.Logins
-                        .Select(x => new UserLoginInfo(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)
-                            {
-                                LoginProvider = x.LoginProvider,
-                                ProviderKey = x.ProviderKey
-                            })
-                        .ToList()
-                );
-            ViewBag.ShowRemoveButton = HasPassword(user) || linkedAccounts.Count > 1;
-            return PartialView("_RemoveAccountPartial", linkedAccounts);
         }
 
         protected override void Dispose(bool disposing)
@@ -609,8 +478,6 @@ namespace Machete.Web.Controllers
 
         #region Helpers
         // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
-
         private async Task SignInAsync(MacheteUser user)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -656,25 +523,6 @@ namespace Machete.Web.Controllers
             }
 
             return RedirectToAction("Index", "Home");
-        }
-
-        private class ChallengeResult : UnauthorizedResult
-        {
-            public string LoginProvider { get; }
-            public string RedirectUri { get; }
-            public string UserId { get; }
-
-            public ChallengeResult(string provider, string redirectUri)
-                : this(provider, redirectUri, null)
-            {
-            }
-
-            public ChallengeResult(string provider, string redirectUri, string userId)
-            {
-                LoginProvider = provider;
-                RedirectUri = redirectUri;
-                UserId = userId;
-            }
         }
         #endregion
 

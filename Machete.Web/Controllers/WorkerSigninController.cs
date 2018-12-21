@@ -28,6 +28,7 @@ using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,7 +69,8 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Manager, Administrator, Check-in")]
         public ActionResult Index(int dwccardnum, DateTime dateforsignin, string userName)
         {
-            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, this.User.Identity.Name);
+            var userIdentity = new ClaimsIdentity("Cookies");
+            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, userIdentity.Name);
             var result = map.Map<WorkerSignin, ViewModel.WorkerSignin>(wsi);
             return Json(result);
 

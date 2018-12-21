@@ -1,14 +1,18 @@
-﻿@using Machete.Web.Helpers
-
+﻿@using System.Security.Claims
+@using Machete.Web.Helpers
 @using Machete.Web.Resources
 
-@if (User.Identity.IsAuthenticated)
+@{
+var userIdentity = new ClaimsIdentity("Cookies");
+}
+
+@if (userIdentity.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
         @Html.AntiForgeryToken()
         <!-- Greeting announcing signed in user -->
-        <text>@ValidationStrings.Welcome <b>@User.Identity.Name</b>
+        <text>@ValidationStrings.Welcome <b>@userIdentity.Name</b>
         [ @if(Html.IsInRole(Html.Role_AM())) 
             { 
                 @* Settings console *@
@@ -24,15 +28,7 @@
                 }
             } ]
 
-@* thought to be entirely unnecessary, but commenting out for now *@
-@*         [ @if(Html.IsInRole(Html.Role_H()))  *@
-@*             { *@
-@*                 @Html.ActionLink(ValidationStrings.LogOff, "LogOff", "HirerAccount") *@
-@*             } *@
-@*             else *@
-@*             { *@
-                @Html.ActionLink(ValidationStrings.LogOff, "LogOff", "Account")
-@*             } ] *@
+            @Html.ActionLink(ValidationStrings.LogOff, "LogOff", "Account")
         </text>
     }
 

@@ -21,6 +21,8 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System.Security.Claims;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -32,13 +34,14 @@ namespace Machete.Web.Helpers
 	{
 	    public override void OnActionExecuting(ActionExecutingContext filterContext)
 	    {
-	        const string Key = "userName";
+	        const string key = "userName";
+	        var userIdentity = new ClaimsIdentity("Cookies");
 	 
-	        if (filterContext.ActionArguments.ContainsKey(Key))
+	        if (filterContext.ActionArguments.ContainsKey(key))
 	        {
-	            if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+	            if (userIdentity.IsAuthenticated)
 	            {
-	                filterContext.ActionArguments[Key] = filterContext.HttpContext.User.Identity.Name;
+	                filterContext.ActionArguments[key] = userIdentity.Name;
 	            }
 	        }	 
 	        base.OnActionExecuting(filterContext);

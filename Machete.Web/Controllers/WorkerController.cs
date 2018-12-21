@@ -21,12 +21,16 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System.IO;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
 using DTO = Machete.Service.DTO;
 using Machete.Web.Helpers;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -126,10 +130,10 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        public ActionResult Create(Domain.Worker worker, string userName, IFormFile imagefile)
+        public async Task<ActionResult> Create(Domain.Worker worker, string userName, IFormFile imagefile)
         {
             UpdateModel(worker);
-            if (imagefile != null) updateImage(worker, imagefile);
+            if (imagefile != null) await updateImage(worker, imagefile);
             Worker newWorker = serv.Create(worker, userName);
             var result = map.Map<Domain.Worker, ViewModel.Worker>(newWorker);
             return Json(new
@@ -163,12 +167,12 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        public ActionResult Edit(int id, Worker _model, string userName, IFormFile imagefile)
+        public async Task<ActionResult> Edit(int id, Worker _model, string userName, IFormFile imagefile)
         {
             Worker worker = serv.Get(id);
             UpdateModel(worker);
             
-            if (imagefile != null) updateImage(worker, imagefile);                
+            if (imagefile != null) await updateImage(worker, imagefile);                
             serv.Save(worker, userName);
             return Json(new
             {
@@ -198,41 +202,43 @@ namespace Machete.Web.Controllers
         /// 
         /// </summary>
         /// <param name="worker"></param>
-        /// <param name="imagefile"></param>
+        /// <param name="imageFile"></param>
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        private void updateImage(Worker worker, IFormFile imagefile)
+        private async Task updateImage(Worker worker, IFormFile imageFile)
         {
-            // TODO: Move this to the business layer
+            var userIdentity = new ClaimsIdentity("Cookies");
             if (worker == null) throw new MacheteNullObjectException("updateImage called with null worker");
-            if (imagefile == null) throw new MacheteNullObjectException("updateImage called with null imagefile");
+            if (imageFile == null) throw new MacheteNullObjectException("updateImage called with null imagefile");
             if (worker.ImageID != null)
             {
-                Image image = imageServ.Get((int)worker.ImageID);
-                image.ImageMimeType = imagefile.ContentType;
+                var image = imageServ.Get((int)worker.ImageID);
+                image.ImageMimeType = imageFile.ContentType;
                 image.parenttable = "Workers";
-                image.filename = imagefile.FileName;
+                image.filename = imageFile.FileName;
                 image.recordkey = worker.ID.ToString();
-                image.ImageData = new byte[imagefile.Length];
-                imagefile.OpenReadStream();
-//                                        (image.ImageData,
-//                                           0,
-//                                           imagefile.ContentLength);
-                // TODO actually read the file
-                imageServ.Save(image, this.User.Identity.Name);
+                image.ImageData = new byte[imageFile.Length];
+
+                using (var memoryStream = new MemoryStream()) {
+                    await imageFile.CopyToAsync(memoryStream);
+                    image.ImageData = memoryStream.ToArray();
+                }
+
+                imageServ.Save(image, userIdentity.Name);
             }
             else
             {
-                Image image = new Image();
-                image.ImageMimeType = imagefile.ContentType;
+                var image = new Image();
+                image.ImageMimeType = imageFile.ContentType;
                 image.parenttable = "Workers";
                 image.recordkey = worker.ID.ToString();
-                image.ImageData = new byte[imagefile.Length];
-                imagefile.OpenReadStream();
-//                                        (image.ImageData,
-//                                           0,
-//                                           imagefile.ContentLength);
-                // TODO actually read the file
-                Image newImage = imageServ.Create(image, this.User.Identity.Name);
+                image.ImageData = new byte[imageFile.Length];
+
+                using (var memoryStream = new MemoryStream()) {
+                    await imageFile.CopyToAsync(memoryStream);
+                    image.ImageData = memoryStream.ToArray();
+                }
+                
+                Image newImage = imageServ.Create(image, userIdentity.Name);
                 worker.ImageID = newImage.ID;
             }
         }

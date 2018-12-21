@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
@@ -89,7 +90,9 @@ namespace Machete.Web.Controllers
             //Get all the records
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            if (!User.Identity.IsAuthenticated) vo.authenticated = false;
+            
+            var userIdentity = new ClaimsIdentity("Cookies");
+            if (!userIdentity.IsAuthenticated) vo.authenticated = false;
             dataTableResult<ActivityList> list = serv.GetIndexView(vo);
             var result = list.query
                 .Select(
