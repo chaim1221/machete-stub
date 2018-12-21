@@ -55,10 +55,10 @@
             }
         }
     </div>
-    @Html.Partial("EventIndex", Model)
+    @Html.PartialAsync("EventIndex", Model)
     @if (Html.IsInRole(Html.Role_T()) && Model.Worker != null)
     {
-        @Html.Partial("ActivityJoinIndex", Model)
+        @Html.PartialAsync("ActivityJoinIndex", Model)
     }
 </div>
 

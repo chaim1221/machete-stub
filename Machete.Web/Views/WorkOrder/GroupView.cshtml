@@ -12,7 +12,7 @@ else
 {
 foreach (Machete.Web.ViewModel.WorkOrder order in Model.orders)
 {
-    @Html.Partial("View", order);
+    @Html.PartialAsync("View", order);
     <div style="page-break-before: always;">
     </div>
 }

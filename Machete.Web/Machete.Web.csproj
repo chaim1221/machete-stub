@@ -10,6 +10,7 @@
 </ItemGroup>
   <ItemGroup>
     <None Update="machete.db" CopyToOutputDirectory="PreserveNewest" />
+    <None Remove="App_Start\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,8 +30,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Start" />
     <Folder Include="ViewModel" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="App_Start\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="App_Start\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="App_Start\**" />
   </ItemGroup>
 
 </Project>

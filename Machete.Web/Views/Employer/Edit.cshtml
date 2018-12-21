@@ -40,7 +40,7 @@
         @Html.HiddenFor(model => model.ID);
     }
 }
-@Html.Partial("WorkOrderIndex", Model)
+@Html.PartialAsync("WorkOrderIndex", Model)
 
 <div id="duplicatesDialog" title="@Shared.DuplicatePersonsTitle">
 </div>

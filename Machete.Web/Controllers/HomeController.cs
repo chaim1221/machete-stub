@@ -81,10 +81,10 @@ namespace Machete.Web.Controllers
 //        {
 //            return PartialView();
 //        }
-        [AllowAnonymous]
-        public ActionResult NotFound()
-        {
-            return PartialView();
-        }
+//        [AllowAnonymous]
+//        public override NotFoundResult NotFound()
+//        {
+//            return PartialView();
+//        }
     }   
 }

@@ -3,8 +3,8 @@
 <h4>Use another service to log in.</h4>
 <hr />
 @{
-    var loginProviders = Context.Authentication.GetAuthenticationSchemes();//.GetExternalAuthenticationTypes();
-    if (loginProviders.Count() == 0)
+    var loginProviders = Context.Authentication.GetAuthenticationSchemes();
+    if (!loginProviders.Any())
     {
         <div>
             <p>

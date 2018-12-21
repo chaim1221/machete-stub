@@ -36,8 +36,7 @@
     }
 }
 
-@Html.Partial("WorkerWAIndex", Model)
-
+@Html.PartialAsync("WorkerWAIndex", Model)
 <script type="text/javascript">
     $(document).ready(function () {
         var personPartsTab = $('#@(parentPrefix)personPartsTabs');

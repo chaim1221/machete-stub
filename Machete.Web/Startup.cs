@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using Machete.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -29,6 +31,11 @@ namespace Machete.Web
         {
             var connString = Configuration.GetConnectionString("DefaultConnection");
 
+            services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -40,7 +47,8 @@ namespace Machete.Web
 
             services.AddMvc()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             
             services.AddDbContext<MacheteContext>(builder => {
                 if (connString == null || connString == "Data Source=machete.db")
@@ -54,14 +62,6 @@ namespace Machete.Web
             services.AddIdentity<MacheteUser, IdentityRole>()
                 .AddEntityFrameworkStores<MacheteContext>()
                 .AddDefaultTokenProviders();
-
-            services.AddMvc()
-                // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-2.1
-//                .AddDataAnnotationsLocalization(options => {
-//                    options.DataAnnotationLocalizerProvider = (type, factory) =>
-//                        factory.Create(typeof(SharedResource));
-//                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,6 +82,8 @@ namespace Machete.Web
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+// To configure external authentication, 
+// see: http://go.microsoft.com/fwlink/?LinkID=532715
             app.UseAuthentication();
 
             app.UseMvc(routes =>
@@ -120,9 +122,7 @@ namespace Machete.Web
                     Path.Combine(Directory.GetCurrentDirectory(), "Content")),
                 RequestPath = "/Content"
             });
-// To configure external authentication, 
-// see: http://go.microsoft.com/fwlink/?LinkID=532715
-            app.UseAuthentication();
+            
             app.UseMvcWithDefaultRoute();
         }
     }

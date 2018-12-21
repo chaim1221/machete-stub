@@ -31,8 +31,8 @@
                 @Html.ActionLink(Shared.hometab, "Index", "Home", null, new { id = "menulinkhome" })
             </div>
             <div id="logindisplay" class="print-off">
-                @Html.Partial("_LogOnPartial")
-                @Html.Partial("_CultureChooser")
+                @Html.PartialAsync("_LogOnPartial")
+                @Html.PartialAsync("_CultureChooser")
             </div>
             <div id="menucontainer" class="print-off">
                 <ul id="menu">

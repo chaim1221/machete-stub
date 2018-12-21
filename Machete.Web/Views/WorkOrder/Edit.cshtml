@@ -68,7 +68,7 @@
         <input type="button" value="@WorkOrders.activatesubmit" class="formButton completeOrderButton" id="activateWorkOrderButton-@(Model.ID)"/>
     </div>
 } 
-@Html.Partial("WorkAssignmentIndex", Model)
+@Html.PartialAsync("WorkAssignmentIndex", Model)
 <div id="@(idPrefix)emailPopup" />
 
 <script type="text/javascript">

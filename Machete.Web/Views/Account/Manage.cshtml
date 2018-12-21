@@ -11,16 +11,16 @@
         <div class="col-md-12">
             @if (ViewBag.HasLocalPassword)
             {
-                @Html.Partial("_ChangePasswordPartial")
+                @Html.PartialAsync("_ChangePasswordPartial")
             }
             else
             {
-                @Html.Partial("_SetPasswordPartial")
+                @Html.PartialAsync("_SetPasswordPartial")
             }
 
             <section id="externalLogins">
                 @Html.ActionLink("Remove Account", "RemoveAccountList");@*.Action("RemoveAccountList")*@
-                @Html.Partial("_ExternalLoginsListPartial")
+                @Html.PartialAsync("_ExternalLoginsListPartial")
             </section>
         </div>
     </div>

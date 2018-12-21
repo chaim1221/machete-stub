@@ -100,23 +100,17 @@ namespace Machete.Web.Controllers
 
     public class MacheteSessionState
     {
-        private IDictionary<string, CultureInfo> salad;
+        private readonly IDictionary<string, CultureInfo> salad = new Dictionary<string, CultureInfo>();
 
         public CultureInfo this[string culture]
         {
-            get { return salad[culture]; }
+            get => salad[culture];
             set => salad[culture] = value;
         }
     }
 
     public static class Helpers
     {
-        public static async Task<string> GetUserId(this IIdentity principal, UserManager<MacheteUser> manager)
-        {
-            var user = await manager.FindByNameAsync(principal.Name);
-            return user.Id;
-        }
-        ////
         //// GET: /GetRootException/
         public static string GetRootException(Exception ex, string prefix)
         {

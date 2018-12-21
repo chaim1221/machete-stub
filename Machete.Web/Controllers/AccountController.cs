@@ -11,8 +11,8 @@ using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.Resources;
 using Machete.Web.ViewModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
@@ -20,19 +20,19 @@ using Microsoft.EntityFrameworkCore;
 using NLog;
 using DbFunctions = Machete.Service.DbFunctions;
 
-
 namespace Machete.Web.Controllers
 {
     [Authorize]
     [ElmahHandleError]
     public class AccountController : MacheteController
     {
-        readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         readonly LogEventInfo _levent = new LogEventInfo(LogLevel.Debug, "AccountController", "");
         private UserManager<MacheteUser> UserManager { get; set; }
-        private SignInManager<MacheteUser> SignInManager { get; set; }
+        private SignInManager<MacheteUser> SignInManager { get; }
         private readonly MacheteContext _context;
         private const int PasswordExpirationInMonths = 6; // this constant represents number of months where users passwords expire 
+        
         private readonly IHtmlLocalizer<AccountController> _localizer;
 
         public AccountController(
@@ -81,19 +81,18 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
-                // Employers could still login to the old page, so redirect
-                if (!User.IsInRole("Hirer"))
-                    return RedirectToAction("Index", "Home");
-                
-                return RedirectToLocal("/V2/Onlineorders");
+                var model = new LoginViewModel();
+                model.Action = "ExternalLogin";
+                model.ReturnUrl = returnUrl;
+                return View(model);
             }
 
-            LoginViewModel model = new LoginViewModel();
-            model.Action = "ExternalLogin";
-            model.ReturnUrl = returnUrl;
-            return View(model);
+            // Employers could still login to the old page, so redirect
+            if (User.IsInRole("Hirer")) return RedirectToLocal("/V2/Onlineorders");
+
+            return RedirectToAction("Index", "Home");
         }
 
         // POST: /Account/Login
@@ -109,7 +108,7 @@ namespace Machete.Web.Controllers
                 {
                     _levent.Level = LogLevel.Info; _levent.Message = "Logon successful";
                     _levent.Properties["username"] = model.UserName; _logger.Log(_levent);
-                    await SignInAsync(user, model.RememberMe);
+                    await SignInAsync(user);
                     return RedirectToLocal(returnUrl);
                 }
 
@@ -120,12 +119,6 @@ namespace Machete.Web.Controllers
             _levent.Level = LogLevel.Info; _levent.Message = "Logon failed for " + model.UserName;
             _logger.Log(_levent);
             return View(model);
-        }
-
-        [AllowAnonymous] // DEPRECATED
-        public async Task<JsonResult> IsPasswordExpiredAsync(string username, string password)
-        {
-            return await IsPasswordExpiredAsync(username);
         }
 
         [AllowAnonymous]
@@ -246,8 +239,8 @@ namespace Machete.Web.Controllers
                 : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
-            var id = await User.Identity.GetUserId(UserManager);
-            var user = _context.Users.First(x => x.Id == id);
+            
+            var user = await UserManager.GetUserAsync(HttpContext.User);
             ViewBag.HasLocalPassword = HasPassword(user);
             ViewBag.ReturnUrl = Url.Action("Manage");
             if (user == null)
@@ -271,8 +264,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk, Check-in, Teacher")]
         public async Task<ActionResult> Manage(ManageUserViewModel model)
         {
-            var id = await User.Identity.GetUserId(UserManager);
-            var user = _context.Users.First(x => x.Id == id);
+            var user = await UserManager.GetUserAsync(HttpContext.User);
             var hasPassword = HasPassword(user);
             ViewBag.HasLocalPassword = hasPassword;
             ViewBag.ReturnUrl = Url.Action("Manage");
@@ -299,7 +291,6 @@ namespace Machete.Web.Controllers
                 state?.Errors.Clear();
 
                 if (!ModelState.IsValid) return View(model);
-                //var user = await User.Identity.GetUserId(UserManager);
                 var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
                 if (result.Succeeded)
                 {
@@ -489,7 +480,7 @@ namespace Machete.Web.Controllers
             var user = await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
             if (user != null)
             {
-                await SignInAsync(user, isPersistent: false);
+                await SignInAsync(user);
                 return RedirectToLocal(returnUrl);
             }
 
@@ -507,16 +498,15 @@ namespace Machete.Web.Controllers
         public async Task<ActionResult> LinkLogin(string provider)
         {
             // Request a redirect to the external login provider to link a login for the current user
-            var userId = await User.Identity.GetUserId(UserManager);
-            return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), userId);
+            var user = await UserManager.GetUserAsync(HttpContext.User);
+            return new ChallengeResult(provider, Url.Action("LinkLoginCallback", "Account"), user.Id);
         }
 
         //
         // GET: /Account/LinkLoginCallback
         public async Task<ActionResult> LinkLoginCallback()
         {
-            var userId = await User.Identity.GetUserId(UserManager);
-            var user = await UserManager.FindByIdAsync(userId);
+            var user = await UserManager.GetUserAsync(HttpContext.User);
             var loginInfo = await SignInManager.GetExternalLoginInfoAsync(XsrfKey);
             if (loginInfo == null)
             {
@@ -558,7 +548,7 @@ namespace Machete.Web.Controllers
                     result = await UserManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
-                        await SignInAsync(user, isPersistent: false);
+                        await SignInAsync(user);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -574,7 +564,7 @@ namespace Machete.Web.Controllers
         [AllowAnonymous]
         public ActionResult LogOff()
         {
-            AuthenticationManager.SignOutAsync(authenticationScheme: "");
+            HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
 
@@ -590,9 +580,7 @@ namespace Machete.Web.Controllers
 // TODO https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx
         public async Task<ActionResult> RemoveAccountList()
         {
-            var db = _context;
-            var id = await User.Identity.GetUserId(UserManager);
-            var user = db.Users.First(x => x.Id == id);
+            var user = await UserManager.GetUserAsync(HttpContext.User);
             ICollection<UserLoginInfo> linkedAccounts = new Collection<UserLoginInfo>
                 (
                     user.Logins
@@ -621,21 +609,19 @@ namespace Machete.Web.Controllers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
-        private AuthenticationManager AuthenticationManager => HttpContext.Authentication;
-
-        private async Task SignInAsync(MacheteUser user, bool isPersistent)
+        private async Task SignInAsync(MacheteUser user)
         {
-            
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var impersonatedUser = await UserManager.FindByIdAsync(user.Id);
             var userPrincipal = await SignInManager.CreateUserPrincipalAsync(impersonatedUser);
-            var currentUserId = await User.Identity.GetUserId(UserManager);
-            
-            userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
+
+            if (!string.IsNullOrEmpty(currentUserId))
+              userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
             userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
             
             await SignInManager.SignOutAsync();
 
-            await HttpContext.Authentication.SignInAsync("", userPrincipal);
+            await HttpContext.SignInAsync(userPrincipal);
         }
 
         private void AddErrors(IdentityResult result)
@@ -644,12 +630,6 @@ namespace Machete.Web.Controllers
             {
                 ModelState.AddModelError(error.Code, error.Description);
             }
-        }
-
-        private bool IsInternalUser(MacheteUser user)
-        {
-            // Return whether user has a password hash
-            return user.UserName.Contains("@");
         }
 
         private bool HasPassword(MacheteUser user)
@@ -678,9 +658,9 @@ namespace Machete.Web.Controllers
 
         private class ChallengeResult : UnauthorizedResult
         {
-            public string LoginProvider { get; set; }
-            public string RedirectUri { get; set; }
-            public string UserId { get; set; }
+            public string LoginProvider { get; }
+            public string RedirectUri { get; }
+            public string UserId { get; }
 
             public ChallengeResult(string provider, string redirectUri)
                 : this(provider, redirectUri, null)
@@ -692,13 +672,6 @@ namespace Machete.Web.Controllers
                 LoginProvider = provider;
                 RedirectUri = redirectUri;
                 UserId = userId;
-            }
-
-            public void ExecuteResult(ControllerContext context)
-            {
-                var dictionary = new Dictionary<string, string> {{XsrfKey, UserId}};
-                var properties = new AuthenticationProperties(dictionary) { RedirectUri = RedirectUri };
-                context.HttpContext.Authentication.ChallengeAsync(LoginProvider, properties);
             }
         }
         #endregion

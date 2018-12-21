@@ -16,10 +16,10 @@
         <li><a href="#activityWrapper" id="activityTab">@Reports.activitiesTab</a> </li>
         @*<li><a href="#ssrsWrapper" id="ssrsTab">@Reports.ssrsTab</a> </li>*@
     </ul>
-        @Html.Partial("Summary")
-        @Html.Partial("Employers")
-        @Html.Partial("Workers")
-        @Html.Partial("Activities")
+        @Html.PartialAsync("Summary")
+        @Html.PartialAsync("Employers")
+        @Html.PartialAsync("Workers")
+        @Html.PartialAsync("Activities")
         @*Html.Partial("SSRS")*@
 </div>
 @Html.AntiForgeryToken()

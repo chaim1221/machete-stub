@@ -193,18 +193,25 @@ namespace Machete.Data
             };
         //
         //
-        public static void Initialize(MacheteContext context) {
-            _cache.ForEach(u => {
+        public static void Initialize(MacheteContext context)
+        {
+            _cache.ForEach(u =>
+            {
                 u.datecreated = DateTime.Now;
                 u.dateupdated = DateTime.Now;
                 u.createdby = "Init T. Script";
                 u.updatedby = "Init T. Script";
-                context.Lookups.Add(u); 
+                context.Lookups.Add(u);
             });
             context.Database.OpenConnection();
-            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups ON");
-            context.SaveChanges();
-            context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups OFF");
+            if (context.Database.GetDbConnection().GetType().Name == "SqlServerConnection")
+            {
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups ON");
+                context.SaveChanges();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups OFF");
+            } else {
+                context.SaveChanges();
+            }
         }
     }    
 }
