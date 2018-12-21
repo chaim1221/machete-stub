@@ -79,7 +79,7 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            var userIdentity = new ClaimsIdentity(System.Security.Claims.Basic);
+            var userIdentity = new ClaimsIdentity("​​ApplicationCookie");
             if (true)//!userIdentity.IsAuthenticated)
             {
                 var model = new LoginViewModel();
