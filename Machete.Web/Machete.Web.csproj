@@ -9,8 +9,8 @@
 <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.6.362" />
 </ItemGroup>
   <ItemGroup>
-    <None Update="machete.db" CopyToOutputDirectory="PreserveNewest" />
     <None Remove="App_Start\**" />
+    <None Remove="machete.db" />
   </ItemGroup>
 
   <ItemGroup>

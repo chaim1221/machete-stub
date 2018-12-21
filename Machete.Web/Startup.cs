@@ -45,11 +45,6 @@ namespace Machete.Web
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-            services.AddMvc()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            
             services.AddDbContext<MacheteContext>(builder => {
                 if (connString == null || connString == "Data Source=machete.db")
                     builder.UseSqlite("Data Source=machete.db", with =>
@@ -62,6 +57,11 @@ namespace Machete.Web
             services.AddIdentity<MacheteUser, IdentityRole>()
                 .AddEntityFrameworkStores<MacheteContext>()
                 .AddDefaultTokenProviders();
+            
+            services.AddMvc()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

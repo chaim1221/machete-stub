@@ -1,7 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -81,8 +79,8 @@ namespace Machete.Web.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
 
-            var userIdentity = new ClaimsIdentity("Cookies");
-            if (!userIdentity.IsAuthenticated)
+            var userIdentity = new ClaimsIdentity(System.Security.Claims.Basic);
+            if (true)//!userIdentity.IsAuthenticated)
             {
                 var model = new LoginViewModel();
                 model.Action = "ExternalLogin";
@@ -91,8 +89,6 @@ namespace Machete.Web.Controllers
             }
 
             // Employers could still login to the old page, so redirect
-            var roles = userIdentity;
-            
             if (User.IsInRole("Hirer")) return RedirectToLocal("/V2/Onlineorders");
 
             return RedirectToAction("Index", "Home");
