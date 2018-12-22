@@ -45,7 +45,13 @@
                                 </div>
                                 <div class="tb-field">
                                     @Html.CheckBoxFor(m => m.RememberMe)
-                                    <input name="logonB" type="submit" value="@ValidationStrings.LogOn" />
+                                    <input 
+                                        onclick="getIsPasswordExpired()" 
+                                        name="logonB" 
+                                        id="logonB" 
+                                        type="submit" 
+                                        value="@ValidationStrings.LogOn" 
+                                     />
                                 </div>
                             </div>
                         </div>
@@ -105,21 +111,18 @@
     function getIsPasswordExpired() {
         $.ajax({
             url: "/Account/IsPasswordExpiredAsync",
-            data: { username: $('#UserName')[0].value, password: $('#Password')[0].value }, //#Password found using inspect element on Log on Machete window
-
-            success: onSuccessIsPasswordExpired,
+            //#Password found using inspect element on Log on Machete window
+            data: { username: $('#UserName')[0].value, password: $('#Password')[0].value }, // ->
+            success: onSuccessIsPasswordExpired, // (callback_value)
             dataType: "json"
         });
     }
 
     function onSuccessIsPasswordExpired(result) {
-        if (result.pwdExpired)
-        {
-            passwordChangeDialog.dialog("open");
-        }
-        else
-        {
+        if (!result.pwdExpired) {
             logon();
+        } else {
+            passwordChangeDialog.dialog("open");
         }
     }
 

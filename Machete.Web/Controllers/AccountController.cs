@@ -29,7 +29,7 @@ namespace Machete.Web.Controllers
         private UserManager<MacheteUser> UserManager { get; set; }
         private SignInManager<MacheteUser> SignInManager { get; }
         private readonly MacheteContext _context;
-        private const int PasswordExpirationInMonths = 6; // this constant represents number of months where users passwords expire 
+        private const int UserPasswordExpirationInMonths = 6;
         
         private readonly IHtmlLocalizer<AccountController> _localizer;
 
@@ -134,17 +134,13 @@ namespace Machete.Web.Controllers
         [AllowAnonymous]
         public async Task<JsonResult> IsPasswordExpiredAsync(string username)
         {
-            var isExpired = false;
-            if (ModelState.IsValid)
-            {
-                var user = await UserManager.FindByNameAsync(username);
-                if (user != null)
-                {
-                    isExpired = user.LastPasswordChangedDate <= DateTime.Today.AddMonths(-PasswordExpirationInMonths);
-                }
-            }
+            var user = await UserManager.FindByNameAsync(username);
+            if (!ModelState.IsValid || user == null) // then let login fail, do not show box
+                return Json(new { pwdExpired = false });
 
-            return Json(new {pwdExpired = isExpired});
+            return Json(new {
+                pwdExpired = user.LastPasswordChangedDate <= DateTime.Today.AddMonths(-UserPasswordExpirationInMonths)
+            });
         }
 
         [AllowAnonymous]
@@ -357,7 +353,7 @@ namespace Machete.Web.Controllers
                         var result = await UserManager.AddPasswordAsync(user, model.NewPassword);
                         if (result.Succeeded)
                         {
-                            user.LastPasswordChangedDate = DateTime.Today.AddMonths(-PasswordExpirationInMonths);
+                            user.LastPasswordChangedDate = DateTime.Today.AddMonths(-UserPasswordExpirationInMonths);
                             ViewBag.Message = "Password successfully updated.";
                         }
                         else
