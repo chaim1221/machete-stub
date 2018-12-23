@@ -1,4 +1,26 @@
-﻿
+﻿#region COPYRIGHT
+// File:     ActivityController.cs
+// Author:   Savage Learning, LLC.
+// Created:  2012/06/17 
+// License:  GPL v3
+// Project:  Machete.Web
+// Contact:  savagelearning
+// 
+// Copyright 2011 Savage Learning, LLC., all rights reserved.
+// 
+// This source file is free software, under either the GPL v3 license or a
+// BSD style license, as supplied with this software.
+// 
+// This source file is distributed in the hope that it will be useful, but 
+// WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+// or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+//  
+// For details please refer to: 
+// http://www.savagelearning.com/ 
+//    or
+// http://www.github.com/jcii/machete/
+// 
+#endregion
 using System;
 using System.Globalization;
 using System.Linq;
@@ -13,7 +35,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using DbFunctions = Machete.Service.DbFunctions;
@@ -30,19 +51,15 @@ namespace Machete.Web.Controllers
         private SignInManager<MacheteUser> SignInManager { get; }
         private readonly MacheteContext _context;
         private const int UserPasswordExpirationInMonths = 6;
-        
-        private readonly IHtmlLocalizer<AccountController> _localizer;
 
         public AccountController(
             UserManager<MacheteUser> userManager,
             SignInManager<MacheteUser> signInManager,
-            IHtmlLocalizer<AccountController> localizer,
             MacheteContext context)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             _context = context;
-            _localizer = localizer;
         }
 
         // URL: /Account/Index
