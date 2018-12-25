@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,17 +33,10 @@ namespace Machete.Web
         {
             var connString = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddAuthentication(options => {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
-            
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)//;
+                .AddCookie(options =>
+                    options.LoginPath = "/Account/Login"
+                );
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -57,8 +52,44 @@ namespace Machete.Web
             services.AddIdentity<MacheteUser, IdentityRole>()
                 .AddEntityFrameworkStores<MacheteContext>()
                 .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings
+//                options.Password.RequireDigit = true;
+//                options.Password.RequiredLength = 8;
+//                options.Password.RequireNonAlphanumeric = false;
+//                options.Password.RequireUppercase = true;
+//                options.Password.RequireLowercase = false;
+//                options.Password.RequiredUniqueChars = 6;
+
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings
+                options.User.RequireUniqueEmail = true;
+            });
             
-            services.AddMvc()
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.Cookie.Expiration = TimeSpan.FromDays(150);
+                // If the LoginPath isn't set, ASP.NET Core defaults 
+                // the path to /Account/Login.
+                options.LoginPath = "/Account/Login";
+                // If the AccessDeniedPath isn't set, ASP.NET Core defaults 
+                // the path to /Account/AccessDenied.
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+            
+            services.AddMvc(//config => {
+//                    config.Filters.Add(new AuthorizeFilter());
+//                }
+)
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -78,27 +109,11 @@ namespace Machete.Web
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-
-// To configure external authentication, 
-// see: http://go.microsoft.com/fwlink/?LinkID=532715
-            app.UseAuthentication();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Account}/{action=Login}/{id?}");
-            });
-            
             var supportedCultures = new[]
             {
                 new CultureInfo("en-US"),
                 new CultureInfo("es"),
             };
-
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en-US"),
@@ -107,7 +122,10 @@ namespace Machete.Web
                 // UI strings that we have localized.
                 SupportedUICultures = supportedCultures
             });
+            
+            app.UseHttpsRedirection();
 
+            app.UseStaticFiles(); // ?
             app.UseStaticFiles("/Content");
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -115,6 +133,17 @@ namespace Machete.Web
                     Path.Combine(Directory.GetCurrentDirectory(), "Content")),
                 RequestPath = "/Content"
             });
+
+            app.UseCookiePolicy();
+
+            app.UseAuthentication();
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Account}/{action=Login}/{id?}");
+            });            
             
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {

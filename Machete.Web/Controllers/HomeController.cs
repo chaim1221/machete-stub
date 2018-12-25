@@ -32,24 +32,19 @@ namespace Machete.Web.Controllers
     [ElmahHandleError]
     public class HomeController : Controller
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
+        [Authorize]
         public ActionResult Index()
         {
-            var userIdentity = new ClaimsIdentity("Cookies");
-            if (!userIdentity.IsAuthenticated) return RedirectToAction("Login", "Account");
+            // this literally does the same thing as[Authorize]
+//            var userIdentity = new ClaimsIdentity("Cookies");
+//            if (!userIdentity.IsAuthenticated) return RedirectToAction("Login", "Account");
             if (User.IsInRole("Hirer"))
             {
                 return Redirect("/V2/Onlineorders");
             }
             return View();
         }
-
-        // ???
-//        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
-//        public ActionResult Changes()
-//        {
-//            return PartialView();
-//        }
 
         [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
         public ActionResult About()
@@ -74,17 +69,5 @@ namespace Machete.Web.Controllers
         {
             return PartialView();
         }
-        
-        // ???
-//        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
-//        public ActionResult Reports()
-//        {
-//            return PartialView();
-//        }
-//        [AllowAnonymous]
-//        public override NotFoundResult NotFound()
-//        {
-//            return PartialView();
-//        }
     }   
 }

@@ -71,5 +71,10 @@ namespace Machete.Web.Helpers
         public static string[] Role_A(this IHtmlHelper html) {return new[]{"Administrator"}; }
         public static string[] Role_T(this IHtmlHelper html) { return new[] { "Teacher" }; }
         public static string[] Role_H(this IHtmlHelper html) { return new[] { "Hirer" }; }
+
+        public static string[] Role_M(this IHtmlHelper html)
+        {
+            return new[] {"Manager"};
+        }
     }  
 }

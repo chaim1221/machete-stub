@@ -96,29 +96,16 @@ namespace Machete.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-//            // these need to go _somewhere, maybe not here?
-//            //read cookie from IHttpContextAccessor  
-//            string cookieValueFromContext = HttpContext.Request.Cookies["key"];  
-//            //read cookie from Request object  
-//            string cookieValueFromReq = Request.Cookies["Key"];  
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByNameAsync(model.UserName);//, model.Password);
-                if (user != null)
+                var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                
+                if (result != null && result.Succeeded)
                 {
-                    _levent.Level = LogLevel.Info; _levent.Message = "Logon successful";
-                    _levent.Properties["username"] = model.UserName; _logger.Log(_levent);
-                    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    var impersonatedUser = await UserManager.FindByIdAsync(user.Id);
-                    var userPrincipal = await SignInManager.CreateUserPrincipalAsync(impersonatedUser);
-
-                    if (!string.IsNullOrEmpty(currentUserId))
-                        userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
-                    userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
-            
-                    await SignInManager.SignOutAsync();
-
-                    await HttpContext.SignInAsync(userPrincipal);
+                    _levent.Level = LogLevel.Info;
+                    _levent.Message = "Logon successful";
+                    _levent.Properties["username"] = model.UserName;
+                    _logger.Log(_levent);
                     return RedirectToLocal(returnUrl);
                 }
 
@@ -126,8 +113,9 @@ namespace Machete.Web.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            _levent.Level = LogLevel.Info; _levent.Message = "Logon failed for " + model.UserName;
-            _logger.Log(_levent);
+            _levent.Level = LogLevel.Info;
+            _levent.Message = "Logon failed for " + model.UserName;
+            _logger.Log(_levent);            
             return View(model);
         }
 
@@ -469,7 +457,7 @@ namespace Machete.Web.Controllers
         [AllowAnonymous]
         public ActionResult LogOff()
         {
-            HttpContext.SignOutAsync();
+            SignInManager.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
 
