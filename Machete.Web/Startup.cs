@@ -1,16 +1,13 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using Machete.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +23,7 @@ namespace Machete.Web
             Configuration = configuration;
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -86,10 +84,7 @@ namespace Machete.Web
                 options.SlidingExpiration = true;
             });
             
-            services.AddMvc(//config => {
-//                    config.Filters.Add(new AuthorizeFilter());
-//                }
-)
+            services.AddMvc(/*config => { config.Filters.Add(new AuthorizeFilter()); }*/)
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

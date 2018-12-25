@@ -32,18 +32,11 @@ namespace Machete.Web.Controllers
     [ElmahHandleError]
     public class HomeController : Controller
     {
-        //[AllowAnonymous]
-        [Authorize]
+        [Authorize] // if unauthenticated, bounce back to login until we figure it out
         public ActionResult Index()
         {
-            // this literally does the same thing as[Authorize]
-//            var userIdentity = new ClaimsIdentity("Cookies");
-//            if (!userIdentity.IsAuthenticated) return RedirectToAction("Login", "Account");
-            if (User.IsInRole("Hirer"))
-            {
-                return Redirect("/V2/Onlineorders");
-            }
-            return View();
+            if (User.IsInRole("Hirer")) return Redirect("/V2/Onlineorders");
+            else return View();
         }
 
         [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
