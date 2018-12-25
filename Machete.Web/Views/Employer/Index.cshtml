@@ -16,7 +16,7 @@
     <ul>
         <li><a href="#employerList" id="employerListTab" class="ListTab">@Employers.listlink</a> </li>
 
-        @if (Html.IsRoleAllowed("Employer.CreateNew.ShowTab"))
+        @if (Html.IsInRole("Administrator", "Manager", "PhoneDesk"))
         {
             <li><a href="/Employer/Create" id="employerCreateTab" class="CreateTab">@Employers.createlink</a></li>
         }

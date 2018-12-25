@@ -22,7 +22,7 @@
                           enctype = "multipart/form-data" }))
 {
     <input type="submit" value="@Configs.editsubmit" class="formButton saveBtn"/>
-    if (Html.IsInRole(Html.Role_A()))
+    if (Html.IsInRole(new[]{"Administrator"}))
     {
         <input id="deleteConfigBtn-@(Model.ID)" type="button" value="@Configs.deletesubmit" 
                 class="formButton deleteButton" />
@@ -32,7 +32,7 @@
     @Html.EditorForModel("Config")
 }
 
-@if (Html.IsInRole(Html.Role_A()))
+@if (Html.IsInRole(new[]{"Administrator"}))
 {
     using (Html.BeginForm("Delete", "Lookup", FormMethod.Post,
                             new { @class = "edittab-form DeletePost", id = "deleteConfigForm-" + Model.ID }))

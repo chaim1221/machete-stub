@@ -45,7 +45,7 @@
             @Html.ValidationMessageFor(model => model.dateEnd)
         </div>
     </div>
-    @if (Html.IsInRole(Html.Role_T()) && !Html.IsInRole(Html.Role_AM()))
+    @if (Html.IsInRole(new[] { "Teacher" }) && !Html.IsInRole(new[] { "Administrator", "Manager" }))
     {
         Model.recurring = false;
     }

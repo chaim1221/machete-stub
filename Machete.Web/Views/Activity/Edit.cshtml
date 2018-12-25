@@ -11,18 +11,18 @@
     var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);    
     var recType = "activity";
 }
-@if (Html.IsInRole(Html.Role_AMPCU()) || Html.IsInRole(Html.Role_T()))
+@if (Html.IsInRole("Administrator", "Manager", "PhoneDesk", "Check-in", "User", "Teacher"))
 {
     using (Html.BeginForm("Edit", "Activity", FormMethod.Post,
                             new { @class = "edittab-form EditPost", id = "ActivityTab-" + Model.ID }))
     {
         <input type="submit" value="@Activities.editsubmit" class="formButton saveBtn"/>
-        if (Html.IsInRole(Html.Role_AM()) || Html.IsInRole(Html.Role_T()))
+        if (Html.IsInRole("Administrator", "Manager") || Html.IsInRole("Teacher"))
         {
             <input id="deleteActivityButton-@Model.ID" type="button" value="@Activities.deletesubmit" 
                     class="formButton deleteButton" />
         }
-        if (Html.IsInRole(Html.Role_AM()) && Model.recurring)
+        if (Html.IsInRole("Administrator", "Manager") && Model.recurring)
         {
             <input id="deleteAllActivityButton-@Model.firstID" type="button" value="@Activities.deleteallsubmit" 
                     class="formButton deleteButton" />
@@ -32,7 +32,7 @@
         @Html.EditorForModel()
 
     }
-    if (Html.IsInRole(Html.Role_AM()) || Html.IsInRole(Html.Role_T()))
+    if (Html.IsInRole("Administrator", "Manager", "Teacher"))
     {
         using (Html.BeginForm("Delete", "Activity", FormMethod.Post,
                                 new { @class = "edittab-form DeletePost", id = "DeleteActivity-" + Model.ID }))
@@ -40,7 +40,7 @@
             @Html.HiddenFor(model => model.ID);
         }
     }
-    if (Html.IsInRole(Html.Role_AM()))
+    if (Html.IsInRole("Administrator", "Manager"))
     {
         using (Html.BeginForm("DeleteMany", "Activity", FormMethod.Post,
                                 new { @class = "edittab-form DeletePost", id = "DeleteManyActivity-" + Model.ID }))
@@ -59,7 +59,7 @@
         $('#activityName').focus();
 
         //Checks Html.Role_AM() == true
-        if (@(Html.IsInRole(Html.Role_AM())) || @(Html.IsInRole(Html.Role_T()))) {
+        if (@Html.IsInRole("Administrator", "Manager", "Teacher")) {
 
             //
             // machete UI detect changes on forms in tabs   
@@ -83,15 +83,16 @@
         
             //
             // edit form submit
-            $('#ActivityTab-@Model.ID').mUI('tabFormSubmit', {
-                create: false,
-                selectTab: 0,
-                formLevel: 1,
-                callback: function() { $('#activityTable').dataTable().fnDraw(); }
-            });
+            $('#ActivityTab-@Model.ID').mUI('tabFormSubmit',
+                {
+                    create: false,
+                    selectTab: 0,
+                    formLevel: 1,
+                    callback: function() { $('#activityTable').dataTable().fnDraw(); }
+                });
         }
-        
-        if (@(Html.IsInRole(Html.Role_AM()))) {
+
+        if (@Html.IsInRole("Administrator", "Manager")) {
             $("#deleteAllActivityButton-@Model.firstID").mUI('formClickDelete', {
                 ok: "@(Activities.deleteallsubmit)",
                 confirm: '@(Activities.deleteallconfirmation)',

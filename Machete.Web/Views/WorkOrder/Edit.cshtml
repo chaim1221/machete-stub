@@ -15,7 +15,7 @@
     string idPrefix = recType + Model.ID + "-";
     string empPrefix = empRecType + Model.EmployerID + "-";
     int editDisable = 0;
-    if (!Html.IsInRole(Html.Role_AM()) && Html.IsInRole(Html.Role_AMP()) && Model.dateTimeofWork < DateTime.Today)
+    if (!Html.IsInRole(new[] { "Administrator", "Manager" }) && Html.IsInRole(new[]{"Administrator", "Manager", "PhoneDesk"}) && Model.dateTimeofWork < DateTime.Today)
     {
         editDisable = 1;
     }
@@ -26,18 +26,18 @@
     <input type="button" value="@WorkOrders.printlink" class="formButton" id="viewWorkOrder-@(Model.ID)" />
     //
     // Phonedesk can save changes if work order is today or in the future
-    if (Html.IsInRole(Html.Role_AMP()) && Model.dateTimeofWork >= DateTime.Today || Html.IsInRole(Html.Role_AM()))
+    if (Html.IsInRole(new[]{"Administrator", "Manager", "PhoneDesk"}) && Model.dateTimeofWork >= DateTime.Today || Html.IsInRole(new[] { "Administrator", "Manager" }))
     {
     <input type="submit" value="@WorkOrders.editsubmit" class="formButton saveBtn" id="@(idPrefix)SaveBtn"/>
     }
     <input type="button" id="@(idPrefix)printMap" class="formButton" value="@WorkOrders.mapbutton"/>
     <input type="button" id="@(idPrefix)emailConfirm" class="formButton" value="@Emails.btnEmailWO" />
 
-    if (Html.IsInRole(Html.Role_AM()))
+    if (Html.IsInRole(new[] { "Administrator", "Manager" }))
     {
         <input type="button" id="@(idPrefix)changeEmployerBtn" value="@WorkOrders.changeemployer" class="formButton"/>
     }
-    if (Html.IsInRole(Html.Role_AM()))
+    if (Html.IsInRole(new[] { "Administrator", "Manager" }))
     {
         <input id="deleteWorkOrderButton-@(Model.ID)" type="button" value="@WorkOrders.deletesubmit" class="formButton deleteButton" />
     }
@@ -53,7 +53,7 @@
     @Html.HiddenFor(model => model.ID);
 }
 
-@if (Html.IsInRole(Html.Role_AM()))
+@if (Html.IsInRole(new[] { "Administrator", "Manager" }))
 {
     using (Html.BeginForm("Delete", "WorkOrder", FormMethod.Post,
                             new { @class = "edittab-form DeletePost", @id = "DeleteWorkOrder-" + Model.ID }))

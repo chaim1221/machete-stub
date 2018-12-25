@@ -42,7 +42,7 @@
 
     }
     <div id="buttonDivider">
-        @if (Html.IsInRole(Html.Role_AM()))
+        @if (Html.IsInRole(new[] { "Administrator", "Manager" }))
         {
             <div class="radio">
                 <input type="button" id="bOpenLottery" class="formButton dispatchButton" value="@(WorkAssignments.lottery)" />

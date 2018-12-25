@@ -22,7 +22,7 @@
         <div class="tb-label">
             @Html.Label(Emails.emailStatus)
         </div>
-        @if (Html.IsInRole(Html.Role_AM()) && Model.editable)
+        @if (Html.IsInRole(new[] { "Administrator", "Manager" }) && Model.editable)
         {
             @Html.mUIDropDownListFor(model => model.statusID, Model.def.getSelectList(LCategory.emailstatus), new { id = Model.idPrefix + "status" })
         }

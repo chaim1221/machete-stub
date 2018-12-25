@@ -108,7 +108,7 @@
         </div>
     </div>
 </div>
-@if (Html.IsInRole(Html.Role_AM()))
+@if (Html.IsInRole(new[] { "Administrator", "Manager" }))
 {
 <div class="Accordion" id="dispatchAccordion">
     <h3><a href="#">@WorkAssignment.dispatchinfo</a></h3>

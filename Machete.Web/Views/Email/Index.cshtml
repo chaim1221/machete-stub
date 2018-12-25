@@ -13,7 +13,7 @@
 <div id="emailTabs" class="ExclusiveTab">
     <ul>
         <li><a href="#emailList" id="emailListTab" class="ListTab">@Emails.listlink</a> </li>
-        @if (Html.IsInRole(Html.Role_AM()))
+        @if (Html.IsInRole(new[] { "Administrator", "Manager" }))
         {
             <li><a href="/Email/Create" id="emailCreateTab" class="CreateTab">@Emails.createlink</a></li>
         }
