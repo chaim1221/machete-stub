@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.IO;
 using Machete.Data;
+using Machete.Service;
+using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -75,11 +77,8 @@ namespace Machete.Web
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
                 options.Cookie.Expiration = TimeSpan.FromDays(150);
-                // If the LoginPath isn't set, ASP.NET Core defaults 
-                // the path to /Account/Login.
+                // these paths are the default, declared explicitly
                 options.LoginPath = "/Account/Login";
-                // If the AccessDeniedPath isn't set, ASP.NET Core defaults 
-                // the path to /Account/AccessDenied.
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
@@ -88,6 +87,45 @@ namespace Machete.Web
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<IEmailConfig, EmailConfig>();
+            services.AddTransient<IPersonRepository, PersonRepository>();
+            services.AddTransient<IWorkerSigninRepository, WorkerSigninRepository>();
+            services.AddTransient<IWorkerRepository, WorkerRepository>();
+            services.AddTransient<IWorkerRequestRepository, WorkerRequestRepository>();
+            services.AddTransient<IImageRepository, ImageRepository>();
+            services.AddTransient<IEmployerRepository, EmployerRepository>();
+            services.AddTransient<IEmailRepository, EmailRepository>();
+            services.AddTransient<IWorkOrderRepository, WorkOrderRepository>();
+            services.AddTransient<IWorkAssignmentRepository, WorkAssignmentRepository>();
+            services.AddTransient<ILookupRepository, LookupRepository>();
+            services.AddTransient<IReportsRepository, ReportsRepository>();
+            services.AddTransient<IEventRepository, EventRepository>();
+            services.AddTransient<IActivityRepository, ActivityRepository>();
+            services.AddTransient<IConfigRepository, ConfigRepository>();
+            services.AddTransient<IActivitySigninRepository, ActivitySigninRepository>();
+            services.AddSingleton<ITransportProvidersRepository, TransportProvidersRepository>();
+            services.AddSingleton<ITransportProvidersAvailabilityRepository, TransportProvidersAvailabilityRepository>();
+            
+            services.AddTransient<IConfigService, ConfigService>();
+            services.AddTransient<ILookupService, LookupService>();
+            services.AddTransient<IActivitySigninService, ActivitySigninService>();
+            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IPersonService, PersonService>();
+            services.AddTransient<IWorkerSigninService, WorkerSigninService>();
+            services.AddTransient<IWorkerService, WorkerService>();
+            services.AddTransient<IWorkerRequestService, WorkerRequestService>();
+            services.AddTransient<IEmployerService, EmployerService>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IWorkOrderService, WorkOrderService>();
+            services.AddTransient<IWorkAssignmentService, WorkAssignmentService>();
+            services.AddTransient<IImageService, ImageService>();
+            services.AddTransient<IReportService, ReportService>();
+            services.AddTransient<IReportsV2Service, ReportsV2Service>();
+            services.AddSingleton<ITransportProvidersService, TransportProvidersService>();
+            services.AddSingleton<ITransportProvidersAvailabilityService, TransportProvidersAvailabilityService>();
+
+            services.AddSingleton<IDefaults, Defaults>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
