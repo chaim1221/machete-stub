@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
     <PackageReference Include="BundlerMinifier.Core" Version="2.8.391" />
     <PackageReference Include="ElmahCore" Version="1.2.0" />

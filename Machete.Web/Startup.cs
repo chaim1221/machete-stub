@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
 using System.IO;
+using AutoMapper;
 using Machete.Data;
+using Machete.Data.Infrastructure;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -82,12 +84,16 @@ namespace Machete.Web
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
-            
+
+            services.AddAutoMapper();
             services.AddMvc(/*config => { config.Filters.Add(new AuthorizeFilter()); }*/)
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddTransient<IDatabaseFactory, DatabaseFactory>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            
             services.AddTransient<IEmailConfig, EmailConfig>();
             services.AddTransient<IPersonRepository, PersonRepository>();
             services.AddTransient<IWorkerSigninRepository, WorkerSigninRepository>();
@@ -104,8 +110,8 @@ namespace Machete.Web
             services.AddTransient<IActivityRepository, ActivityRepository>();
             services.AddTransient<IConfigRepository, ConfigRepository>();
             services.AddTransient<IActivitySigninRepository, ActivitySigninRepository>();
-            services.AddSingleton<ITransportProvidersRepository, TransportProvidersRepository>();
-            services.AddSingleton<ITransportProvidersAvailabilityRepository, TransportProvidersAvailabilityRepository>();
+            services.AddTransient<ITransportProvidersRepository, TransportProvidersRepository>();
+            services.AddTransient<ITransportProvidersAvailabilityRepository, TransportProvidersAvailabilityRepository>();
             
             services.AddTransient<IConfigService, ConfigService>();
             services.AddTransient<ILookupService, LookupService>();
@@ -122,10 +128,10 @@ namespace Machete.Web
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IReportService, ReportService>();
             services.AddTransient<IReportsV2Service, ReportsV2Service>();
-            services.AddSingleton<ITransportProvidersService, TransportProvidersService>();
-            services.AddSingleton<ITransportProvidersAvailabilityService, TransportProvidersAvailabilityService>();
+            services.AddTransient<ITransportProvidersService, TransportProvidersService>();
+            services.AddTransient<ITransportProvidersAvailabilityService, TransportProvidersAvailabilityService>();
 
-            services.AddSingleton<IDefaults, Defaults>();
+            services.AddTransient<IDefaults, Defaults>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
