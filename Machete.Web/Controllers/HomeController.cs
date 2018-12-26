@@ -1,69 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Machete.Domain;
+﻿#region COPYRIGHT
+// File:     HomeController.cs
+// Author:   Savage Learning, LLC.
+// Created:  2012/06/17 
+// License:  GPL v3
+// Project:  Machete.Web
+// Contact:  savagelearning
+// 
+// Copyright 2011 Savage Learning, LLC., all rights reserved.
+// 
+// This source file is free software, under either the GPL v3 license or a
+// BSD style license, as supplied with this software.
+// 
+// This source file is distributed in the hope that it will be useful, but 
+// WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+// or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+//  
+// For details please refer to: 
+// http://www.savagelearning.com/ 
+//    or
+// http://www.github.com/jcii/machete/
+// 
+#endregion
+
+using System.Security.Claims;
+using Machete.Web.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Machete.Web.Models;
-using Activity = System.Diagnostics.Activity;
 
 namespace Machete.Web.Controllers
 {
+    [ElmahHandleError]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        [Authorize] // if unauthenticated, bounce back to login until we figure it out
+        public ActionResult Index()
         {
-//            var db = new Data.Infrastructure.DatabaseFactory();
-//            var context = db.Get();
-//            var employer = context.Employers.Add(new Employer
-//            {
-//                active = true,
-//                address1 = "124 any street",
-//                address2 = "",
-//                blogparticipate = false,
-//                business = true,
-//                businessname = "adfs",
-//                cellphone = "206-123-1231",
-//                phone = "206-123-1231",
-//                city = "Houston",
-//                zipcode = "77018",
-//                createdby = "asdf",
-//                datecreated = DateTime.Now,
-//                dateupdated = DateTime.Now,
-//                email = "president@whitehouse.gov",
-//                fax = "",
-//                licenseplate = "123-DEF",
-//                name = "Jaime Elias",
-//                state = "TX",
-//                updatedby = "asdf"
-//            });
-//            context.SaveChanges();
-            return View(); //model: employer);
+            if (User.IsInRole("Hirer")) return Redirect("/V2/Onlineorders");
+            else return View();
         }
 
-        public IActionResult About()
+        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+        public ActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            return PartialView();
         }
 
-        public IActionResult Contact()
+        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+        public ActionResult Issues()
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            return PartialView();
         }
 
-        public IActionResult Privacy()
+        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+        public ActionResult Wiki()
         {
-            return View();
+            return PartialView();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]
+        public ActionResult Docs()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return PartialView();
         }
-    }
+    }   
 }

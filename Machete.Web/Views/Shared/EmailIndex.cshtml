@@ -1,0 +1,73 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+
+@using Machete.Web.Resources
+
+@{
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
+    string recType = "email";
+}
+<div id="emailList"> @* This div is the ui.panel  *@
+    <table id="emailTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>LABEL</th>
+                <th>@Emails.emailID</th>
+                <th>@Emails.emailTo</th>
+                <th>@Emails.subject</th>
+                <th>@Emails.emailStatus</th>
+                <th>@Emails.hasAttachment</th>
+                <th>@Emails.attempts</th>
+                <th>@Emails.lastAttempt</th>
+                <th>@Record.dateupdated</th>
+                <th>@Record.updatedby</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {        
+        //
+        // Create Email table
+        jqrfyTable({
+            table: $('#emailTable'), 
+            tab: $('#emailTabs'),
+            options: {
+                "bPaginate": true,
+                "bLengthChange": true,
+                "aaSorting": [[8, 'desc']],
+                "bFilter": true,
+                "bSort": true,
+                "bInfo": true,
+                "bAutoWidth": false,
+                "bServerSide": true,
+                "sAjaxSource": "/Email/AjaxHandler",
+                "bProcessing": true,
+                "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
+                "aoColumns": [                           //dataTable column definition
+                                { "mDataProp": "tabref",  "bSearchable": false, "bSortable": false, "bVisible": false },
+                                { "mDataProp": "tablabel",  "bSearchable": false, "bSortable": false, "bVisible": false },
+                                { "mDataProp": "recordid" },
+                                { "mDataProp": "emailTo" },
+                                { "mDataProp": "subject" },
+                                { "mDataProp": "status" },
+                                { "mDataProp": "hasAttachment", "bSortable": false, "bVisible": true },
+                                { "mDataProp": "transmitAttempts" },
+                                { "mDataProp": "lastAttempt" },
+                                { "mDataProp": "dateupdated", "bVisible": true },
+                                { "mDataProp": "updatedby", "bSortable": false, "bVisible": true }
+                            ]             
+            }, 
+            dblClickEvent: null, 
+            tabLabel: "@(recType)",
+            maxTabs: 2
+            });
+
+    });
+</script>
+

@@ -1,0 +1,69 @@
+﻿@using Machete.Web.Resources
+
+@model Machete.Web.ViewModel.RegisterViewModel
+@{
+    ViewBag.Title = ValidationStrings.RegisterTitle;
+}
+<div class="account-background">
+    <h2>@ValidationStrings.RegisterSubTitle</h2>
+    <p>
+        @ValidationStrings.RegisterInstructions
+    </p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, @Machete.Web.Resources.ValidationStrings.RegisterValSummary)
+        <div>
+            <fieldset>
+                <legend>@Machete.Web.Resources.ValidationStrings.AccountInfoLegend</legend>
+                <div class="tb-table">
+                    <div class="tb-row">
+                        <div class="tb-label">
+                            @Html.LabelFor(m => m.FirstName)
+                        </div>
+                        <div class="tb-field">
+                            @Html.TextBoxFor(m => m.FirstName)
+                            @Html.ValidationMessageFor(m => m.FirstName)
+                        </div>
+                        <div class="tb-label">
+                            @Html.LabelFor(m => m.LastName)
+                        </div>
+                        <div class="tb-field">
+                            @Html.TextBoxFor(m => m.LastName)
+                            @Html.ValidationMessageFor(m => m.LastName)
+                        </div>
+                    </div>
+                    <div class="tb-row">
+                        <div class="tb-label">
+                            @Html.LabelFor(m => m.Email)
+                        </div>
+                        <div class="tb-field">
+                            @Html.TextBoxFor(m => m.Email)
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                    </div>
+                    <div class="tb-row">
+                        <div class="tb-label">
+                            @Html.LabelFor(m => m.Password)
+                        </div>
+                        <div class="tb-field">
+                            @Html.PasswordFor(m => m.Password)
+                            @Html.ValidationMessageFor(m => m.Password)
+                        </div>
+                        <div class="tb-label">
+                            @Html.LabelFor(m => m.ConfirmPassword)
+                        </div>
+                        <div class="tb-field">
+                            @Html.PasswordFor(m => m.ConfirmPassword)
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <input type="submit" value="@ValidationStrings.Register" />
+                </p>
+            </fieldset>
+        </div>
+    }
+</div>

@@ -1,0 +1,141 @@
+﻿@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@model Machete.Web.ViewModel.Employer
+
+@using Machete.Web.Resources
+
+@{
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
+    string recType = "WO";
+    string idPrefix = recType + Model.ID + "-";
+}
+
+<div id="workOrderTabs_@(Model.ID)" >
+    <ul>
+        <li><a href="#@(idPrefix)workOrderList" id="workOrderListTab_@(Model.ID)" class="ListTab">@WorkOrders.listlink</a> </li>
+        <li><a href="/WorkOrder/Create?EmployerID=@(Model.ID)" id="workOrderCreateTab_@(Model.ID)" class="CreateTab">@WorkOrders.createlink</a></li>        
+    </ul>
+    <div id="@(idPrefix)workOrderList">
+        <table id="workOrderTable_@(Model.ID)" class="display">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>LABEL</th>
+                    <th>EmployerID</th>
+                    <th>@WorkOrder.workorderID</th>
+                    <th>@WorkOrder.dateTimeofWork</th>
+                    <th>@WorkOrder.statusShort</th>
+                    <th>@WorkOrders.assigncount</th>
+                    <th>@WorkOrder.contactName</th>
+                    <th>@WorkOrder.workSiteAddress1</th>
+                    <th>@Record.dateupdated</th>
+                    <th>@Record.updatedby</th>
+                </tr>
+            </thead>
+        </table>        
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+                $('#employerSelectDialog').hide();
+        $('#employerSelectTable').hide();
+
+        ////////////////////////////////////////////////////////////////
+        //
+        // Setup work order Tabs
+        //       
+        $('#workOrderTabs_@(Model.ID)').mUI('createTabs', {
+            prefix: "ui-tabs-workorder-e_@(Model.ID)-",
+            formLevel: 2,
+            changeConfirm: "@Shared.changeConfirm",
+            changeTitle: "@Shared.changeTitle",
+            updateDatatable: true
+        });
+        ////////////////////////////////////////////////////////////////
+        //
+        // Setup workorder Table
+        //
+        var oWOTable = jqrfyTable({
+            table: $('#workOrderTable_@(Model.ID)'), 
+            tab: $('#workOrderTabs_@(Model.ID)'),
+            options: {
+                "bPaginate": true,
+                "bLengthChange": true,
+                "aaSorting": [[7, 'desc']],
+                "bFilter": true,
+                "bSort": true,
+                "bInfo": true,
+                "bAutoWidth": false,
+                "bServerSide": true,
+                "sAjaxSource": "/WorkOrder/AjaxHandler",
+                "bProcessing": true,
+                "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
+                "aoColumns": [
+                                { "mDataProp": "tabref", "bSearchable": false, "bSortable": false, "bVisible": false },
+                                { "mDataProp": "tablabel", "bSearchable": false, "bSortable": false, "bVisible": false },
+                                { "mDataProp": "EID", "bSearchable": false, "bSortable": false, "bVisible": false },
+                                { "mDataProp": "WOID" },
+                                { "mDataProp": "dateTimeofWork" },
+                                { "mDataProp": "status" },
+                                { "mDataProp": "WAcount" },
+                                { "mDataProp": "contactName" },
+                                { "mDataProp": "workSiteAddress1" },
+                                { "mDataProp": "dateupdated" },
+                                { "mDataProp": "updatedby" }
+                ],
+                "aoSearchCols" :  [null, null, { "sSearch": "@(Model.ID)" }, null, null, null, null, null, null],
+                "fnServerDataExtra": function() { return [{ name: "showOrdersWorkers", value: true }]},
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData['workers'] != null && aData['WAcount'] > 0) {                    
+                        $('td:eq(3)', nRow).prepend('<img src="/Content/dataTables/details_open.png">');
+                    }                
+                    return nRow;
+                }   
+            
+            }, 
+            dblClickEvent: null, 
+            tabLabel: "@(recType)" 
+        });
+        $('#workOrderTable_@(Model.ID) tbody td img').live('click', function () {
+            var nTr = $(this).parents('tr')[0];
+
+            if ( oWOTable.fnIsOpen(nTr) )
+            {
+                /* This row is already open - close it */
+                this.src = "/Content/dataTables/details_open.png";
+                oWOTable.fnClose( nTr );
+            } else {
+                /* Open this row */
+                this.src = "/Content/dataTables/details_close.png";
+                oWOTable.fnOpen( nTr, fnFormatDetails(oWOTable, nTr), 'details' );
+            }
+        });
+
+
+        function fnFormatDetails ( oTable, nTr )
+        {
+            var aData = oTable.fnGetData( nTr );
+            var wkrList = aData['workers'];
+            var sOut = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+            sOut += '<thead><tr><th>@Worker.dwccardnum</th>';
+            sOut += '<th>@WorkAssignments.fullname</th>';
+            sOut += '<th>@WorkAssignments.skills</th>';
+            sOut += '<th>@WorkAssignments.hours</th>';
+            sOut += '<th>@WorkAssignment.hourlyWage</th>';
+            sOut += '</tr></thead>';
+            sOut += '<tbody>';
+            for (var i in wkrList)
+            {
+                var wkr = wkrList[i];
+                sOut += '<tr><td>'+wkr.WID+'</td><td>'+wkr.name+'</td><td>'+wkr.skill+'</td><td>'+wkr.hours+'</td><td>'+wkr.wage+'</td></tr>';
+            }
+            sOut += '</tbody></table>';     
+            return sOut;
+        }
+    });
+</script>

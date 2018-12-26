@@ -1,0 +1,166 @@
+﻿@using Machete.Web.Helpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Localization
+@model Machete.Web.ViewModel.Employer
+
+@using Machete.Web.Resources;
+
+@{
+    var httpContext = ViewContext.HttpContext;
+    var currentCulture = httpContext.Features.Get<IRequestCultureFeature>().RequestCulture.UICulture;
+    var currentUrl = UriHelper.BuildRelative(httpContext.Request.PathBase, httpContext.Request.Path, httpContext.Request.QueryString);
+
+    string recType = "employer";
+}
+
+@using (Html.BeginForm("Edit", "Employer", FormMethod.Post, 
+                        new { @class = "edittab-form EditPost", id="EmployerTab-" + Model.ID }))
+{
+    @*<input type="button" value="@Employers.viewlink" class="formButton" id="viewEmployer-@Model.ID" />*@
+    <input type="button" onclick="FindEmployerDuplicate()" value="@Employers.editsubmit" class="formButton saveBtn"/>
+    if (Html.IsInRole(new[] { "Administrator", "Manager" }))
+    {
+        <input id="deleteEmployerButton-@Model.ID" type="button" value="@Employers.deletesubmit" 
+                class="formButton deleteButton" />
+    }
+    <br />    
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+
+}
+@if (Html.IsInRole(new[] { "Administrator", "Manager" }))
+{
+    //
+    // Only Managers can delete employer records
+    // The phonedesk can edit and save
+    //
+    using (Html.BeginForm("Delete", "Employer", FormMethod.Post, 
+                            new { @class = "edittab-form DeletePost", id = "DeleteEmployer-" + Model.ID }))
+    {
+        @Html.HiddenFor(model => model.ID);
+    }
+}
+@Html.PartialAsync("WorkOrderIndex", Model)
+
+<div id="duplicatesDialog" title="@Shared.DuplicatePersonsTitle">
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var employerEditForm = $('#EmployerTab-@(Model.ID)');
+        $('.formButton').button();
+        $('#employerName').focus();
+        //
+        // machete UI detect changes on forms in tabs
+        $("#EmployerTab-@(Model.ID)").mUI('formDetectChanges', {
+            recType: "@(recType)",
+            formLevel: 1,
+            changeConfirm: "@Shared.changeConfirm",
+            changeTitle: "@Shared.changeTitle"
+            });
+        //
+        // validation for elements added after page load
+        $.validator.unobtrusive.parseDynamicContent($('#EmployerTab-@Model.ID'));
+        //
+        // delete button confirmation
+        $("#deleteEmployerButton-@Model.ID").mUI('formClickDelete', {
+            ok: "@Employers.deletesubmit",
+            confirm: '@Employers.deleteconfirmation',
+            title: '@Employers.deletetitle',
+            form: $('#DeleteEmployer-@Model.ID')
+        });
+        //
+        // edit form submit
+        $('#EmployerTab-@Model.ID').mUI('tabFormSubmit', {
+            create: false,
+            selectTab: 0,
+            formLevel: 1,
+            callback: function () { $('#employerTable').dataTable().fnDraw(); }
+        });
+    });
+
+    var duplicatesDialog = $("#duplicatesDialog").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 650,
+        modal: true,
+        closeOnEscape: false,
+        buttons: {
+            "Cancel": function () { $(this).dialog("close"); },
+            "Save": {
+                text: "@Employers.editsubmit",
+                id: 'duplicateSaveBtn',
+                click: function () {
+                    $(this).dialog("close");
+                    saveEmployer();
+                }
+            }
+        }
+    });
+
+    function FindEmployerDuplicate() {
+
+        var form = $('#EmployerTab-@(Model.ID)');
+        if (form.valid()) {
+            $.ajax({
+                url: "/Employer/GetDuplicates",
+                data: {
+                    name: $('#employer@(Model.ID)-name')[0].value,
+                    address: $('#employer@(Model.ID)-address1')[0].value,
+                    phone: $('#employer@(Model.ID)-phone')[0].value,
+                    city: $('#employer@(Model.ID)-city')[0].value,
+                    zipcode: $('#employer@(Model.ID)-zipcode')[0].value
+                },
+                success: onSuccessFindEmployerDuplicate,
+                dataType: "json"
+            });
+        }
+        else {
+            saveEmployer();
+        }
+    }
+
+
+    function CreateHtmlText(duplicates) {
+        var dialogHtmlText = '<p>@Shared.DuplicateEmployerMessage</p>'
+            + '<table class="duplicateEmployers" style="width:100%" border="1" cellpadding="2">'
+            + '<tr>'
+            + '<th>@Employer.name</th>'
+            + '<th>@Employer.address1</th>'
+            + '<th>@Employer.phone</th>'
+            + '<th>@Employer.city</th>'
+            + '<th>@Employer.zipcode</th>'
+            + '</tr>';
+        for (var i = 0; i < duplicates.length; i++) {
+            if (duplicates[i].ID == '@Model.ID') { continue; }
+            dialogHtmlText += '<tr>'
+                + '<td>' + duplicates[i]["Name"] + '</td>'
+                + '<td>' + duplicates[i]["Address"] + '</td>'
+                + '<td>' + duplicates[i]["Phone"] + '</td>'
+                + '<td>' + duplicates[i]["City"] + '</td>'
+                + '<td>' + duplicates[i]["ZipCode"] + '</td>'
+                + '</tr>';
+        }
+
+        dialogHtmlText += '</table> <p></p> <p></p>@Shared.SaveMessageDuplicatePersons</p>';
+
+        return dialogHtmlText;
+    }
+
+    function onSuccessFindEmployerDuplicate(result) {
+        if (result.duplicates.length > 1) {
+
+            duplicatesDialog.dialog("open");
+            duplicatesDialog.html(CreateHtmlText(result.duplicates));
+        }
+        else {
+            saveEmployer();
+        }
+    }
+
+    function saveEmployer() {
+        var form = $('#EmployerTab-@(Model.ID)');
+        if (form.valid()) {
+            form.submit();
+        }
+    }
+</script>
