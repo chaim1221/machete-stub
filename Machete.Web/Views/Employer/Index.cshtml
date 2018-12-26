@@ -1,4 +1,4 @@
-﻿@using Machete.Web.Helpers
+@using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 
@@ -64,7 +64,7 @@
         </thead>
     </table>
 </div>
-@Html.PartialAsync("WorkerIndex")
+@await Html.PartialAsync("WorkerIndex")
 <script type="text/javascript">
     $(document).ready(function () {
         $('.formButton').button();

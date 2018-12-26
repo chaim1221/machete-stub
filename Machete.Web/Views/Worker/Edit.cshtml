@@ -1,4 +1,4 @@
-﻿@model Machete.Web.ViewModel.Worker
+@model Machete.Web.ViewModel.Worker
 @using Machete.Web.Resources
 @using Machete.Web.Helpers
 
@@ -36,7 +36,7 @@
     }
 }
 
-@Html.PartialAsync("WorkerWAIndex", Model)
+@await Html.PartialAsync("WorkerWAIndex", Model)
 <script type="text/javascript">
     $(document).ready(function () {
         var personPartsTab = $('#@(parentPrefix)personPartsTabs');

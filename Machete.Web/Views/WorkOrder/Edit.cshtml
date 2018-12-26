@@ -1,4 +1,4 @@
-﻿@model Machete.Web.ViewModel.WorkOrder
+@model Machete.Web.ViewModel.WorkOrder
 @using Machete.Web.Helpers
 @using Machete.Web.Resources
 @using Machete.Service
@@ -68,7 +68,7 @@
         <input type="button" value="@WorkOrders.activatesubmit" class="formButton completeOrderButton" id="activateWorkOrderButton-@(Model.ID)"/>
     </div>
 } 
-@Html.PartialAsync("WorkAssignmentIndex", Model)
+@await Html.PartialAsync("WorkAssignmentIndex", Model)
 <div id="@(idPrefix)emailPopup" />
 
 <script type="text/javascript">

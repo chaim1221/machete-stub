@@ -1,4 +1,4 @@
-﻿using Machete.Data.Infrastructure;
+using Machete.Data.Infrastructure;
 using Machete.Domain;
 using System;
 using Microsoft.EntityFrameworkCore;

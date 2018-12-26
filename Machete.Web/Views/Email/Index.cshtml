@@ -1,4 +1,4 @@
-﻿@using Machete.Web.Helpers
+@using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 
@@ -18,7 +18,7 @@
             <li><a href="/Email/Create" id="emailCreateTab" class="CreateTab">@Emails.createlink</a></li>
         }
     </ul>
-    @Html.PartialAsync("EmailIndex")
+    @await Html.PartialAsync("EmailIndex")
 </div>
 
 <script type="text/javascript">

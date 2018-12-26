@@ -1,4 +1,4 @@
-﻿@using Machete.Web.Resources
+@using Machete.Web.Resources
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 <script src="Content/reports.js"></script>
@@ -16,10 +16,10 @@
         <li><a href="#activityWrapper" id="activityTab">@Reports.activitiesTab</a> </li>
         @*<li><a href="#ssrsWrapper" id="ssrsTab">@Reports.ssrsTab</a> </li>*@
     </ul>
-        @Html.PartialAsync("Summary")
-        @Html.PartialAsync("Employers")
-        @Html.PartialAsync("Workers")
-        @Html.PartialAsync("Activities")
+        @await Html.PartialAsync("Summary")
+        @await Html.PartialAsync("Employers")
+        @await Html.PartialAsync("Workers")
+        @await Html.PartialAsync("Activities")
         @*Html.Partial("SSRS")*@
 </div>
 @Html.AntiForgeryToken()

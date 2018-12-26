@@ -1,4 +1,4 @@
-﻿using Machete.Data;
+using Machete.Data;
 using Machete.Domain;
 using System;
 using System.Collections.Generic;

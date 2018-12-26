@@ -1,4 +1,4 @@
-﻿@model Machete.Web.ViewModel.Person
+@model Machete.Web.ViewModel.Person
 @using Machete.Web.Resources
 @using Machete.Web.Helpers
 @{
@@ -55,10 +55,10 @@
             }
         }
     </div>
-    @Html.PartialAsync("EventIndex", Model)
+    @await Html.PartialAsync("EventIndex", Model)
     @if (Html.IsInRole("Teacher") && Model.Worker != null)
     {
-        @Html.PartialAsync("/Users/celiyah/Code/machete/machete-stub/Machete.Web/Views/Shared/ActivityJoinIndex", Model)
+        @await Html.PartialAsync("/Users/celiyah/Code/machete/machete-stub/Machete.Web/Views/Shared/ActivityJoinIndex", Model)
     }
 </div>
 

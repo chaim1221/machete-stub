@@ -1,4 +1,4 @@
-﻿@using Machete.Web.Helpers
+@using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 @model Machete.Web.ViewModel.Employer
@@ -40,7 +40,7 @@
         @Html.HiddenFor(model => model.ID);
     }
 }
-@Html.PartialAsync("WorkOrderIndex", Model)
+@await Html.PartialAsync("WorkOrderIndex", Model)
 
 <div id="duplicatesDialog" title="@Shared.DuplicatePersonsTitle">
 </div>

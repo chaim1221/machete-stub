@@ -1,4 +1,4 @@
-﻿@model Machete.Web.ViewModel.WorkAssignmentIndex
+@model Machete.Web.ViewModel.WorkAssignmentIndex
 @using Machete.Web.Helpers
 @using Machete.Web.Resources
 
@@ -128,7 +128,7 @@
             </thead>
         </table>
     </div>
-    @Html.PartialAsync("WorkerIndex")
+    @await Html.PartialAsync("WorkerIndex")
 </div>
 <script type="text/javascript">
     //@@ sourceURL=WorkAssignment_inline.js

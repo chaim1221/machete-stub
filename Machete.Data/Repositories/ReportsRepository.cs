@@ -1,4 +1,4 @@
-﻿using Machete.Data.Helpers;
+using Machete.Data.Helpers;
 using Machete.Data.Infrastructure;
 using Machete.Domain;
 using Newtonsoft.Json;

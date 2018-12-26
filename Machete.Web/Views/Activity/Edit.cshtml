@@ -1,4 +1,4 @@
-﻿@using Machete.Web.Helpers
+@using Machete.Web.Helpers
 @using Machete.Web.Resources
 @using Machete.Web.ViewModel
 @using Microsoft.AspNetCore.Http.Extensions
@@ -49,7 +49,7 @@
         }
     }
 }
-@Html.PartialAsync("ActivitySigninIndex", new ActivitySignin { activityID = Model.ID})
+@await Html.PartialAsync("ActivitySigninIndex", new ActivitySignin { activityID = Model.ID})
 <script type="text/javascript">
     $(document).ready(function () {
         $('#viewActivity-@Model.ID').click(function () {

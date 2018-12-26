@@ -1,4 +1,4 @@
-﻿using Machete.Data;
+using Machete.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
