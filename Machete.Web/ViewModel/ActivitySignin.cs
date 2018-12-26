@@ -1,4 +1,4 @@
-﻿using Machete.Web.Helpers;
+using Machete.Web.Helpers;
 
 namespace Machete.Web.ViewModel
 {

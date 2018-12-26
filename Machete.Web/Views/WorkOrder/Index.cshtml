@@ -1,4 +1,4 @@
-﻿@using Machete.Domain
+@using Machete.Domain
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 @using WorkOrder = Machete.Web.Resources.WorkOrder
@@ -72,7 +72,7 @@
         </table>        
     </div>
 </div>
-@Html.PartialAsync("WorkerIndex")
+@await Html.PartialAsync("WorkerIndex")
 <script type="text/javascript">
     var oTableDefaults = {
             "bPaginate": true,

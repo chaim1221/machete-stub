@@ -1,4 +1,4 @@
-﻿@using Machete.Domain
+@using Machete.Domain
 @using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
@@ -119,7 +119,7 @@
 </div>
 }
 <div style="clear: left;">
-@Html.PartialAsync("ManagerInfo")
+@await Html.PartialAsync("ManagerInfo")
 
 </div>    
 <script type="text/javascript">

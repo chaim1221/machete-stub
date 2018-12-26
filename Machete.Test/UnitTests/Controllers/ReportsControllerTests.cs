@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Machete.Api;
 using Machete.Api.Controllers;
 using Machete.Service;

@@ -1,4 +1,4 @@
-﻿using Machete.Service;
+using Machete.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;

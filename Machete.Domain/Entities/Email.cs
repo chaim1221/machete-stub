@@ -1,4 +1,4 @@
-﻿#region COPYRIGHT
+#region COPYRIGHT
 // File:     Email.cs
 // Author:   Savage Learning, LLC.
 // Created:  2013/05/02

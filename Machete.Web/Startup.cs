@@ -91,47 +91,48 @@ namespace Machete.Web
                 .AddDataAnnotationsLocalization()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddTransient<IDatabaseFactory, DatabaseFactory>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDatabaseFactory, DatabaseFactory>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             
-            services.AddTransient<IEmailConfig, EmailConfig>();
-            services.AddTransient<IPersonRepository, PersonRepository>();
-            services.AddTransient<IWorkerSigninRepository, WorkerSigninRepository>();
-            services.AddTransient<IWorkerRepository, WorkerRepository>();
-            services.AddTransient<IWorkerRequestRepository, WorkerRequestRepository>();
-            services.AddTransient<IImageRepository, ImageRepository>();
-            services.AddTransient<IEmployerRepository, EmployerRepository>();
-            services.AddTransient<IEmailRepository, EmailRepository>();
-            services.AddTransient<IWorkOrderRepository, WorkOrderRepository>();
-            services.AddTransient<IWorkAssignmentRepository, WorkAssignmentRepository>();
-            services.AddTransient<ILookupRepository, LookupRepository>();
-            services.AddTransient<IReportsRepository, ReportsRepository>();
-            services.AddTransient<IEventRepository, EventRepository>();
-            services.AddTransient<IActivityRepository, ActivityRepository>();
-            services.AddTransient<IConfigRepository, ConfigRepository>();
-            services.AddTransient<IActivitySigninRepository, ActivitySigninRepository>();
-            services.AddTransient<ITransportProvidersRepository, TransportProvidersRepository>();
-            services.AddTransient<ITransportProvidersAvailabilityRepository, TransportProvidersAvailabilityRepository>();
+            services.AddScoped<IEmailConfig, EmailConfig>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IWorkerSigninRepository, WorkerSigninRepository>();
+            services.AddScoped<IWorkerRepository, WorkerRepository>();
+            services.AddScoped<IWorkerRequestRepository, WorkerRequestRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
+            services.AddScoped<IEmployerRepository, EmployerRepository>();
+            services.AddScoped<IEmailRepository, EmailRepository>();
+            services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
+            services.AddScoped<IWorkAssignmentRepository, WorkAssignmentRepository>();
+            services.AddScoped<ILookupRepository, LookupRepository>();
+            services.AddScoped<IReportsRepository, ReportsRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IConfigRepository, ConfigRepository>();
+            services.AddScoped<IActivitySigninRepository, ActivitySigninRepository>();
+            services.AddScoped<ITransportProvidersRepository, TransportProvidersRepository>();
+            services.AddScoped<ITransportProvidersAvailabilityRepository, TransportProvidersAvailabilityRepository>();
             
-            services.AddTransient<IConfigService, ConfigService>();
-            services.AddTransient<ILookupService, LookupService>();
-            services.AddTransient<IActivitySigninService, ActivitySigninService>();
-            services.AddTransient<IEventService, EventService>();
-            services.AddTransient<IPersonService, PersonService>();
-            services.AddTransient<IWorkerSigninService, WorkerSigninService>();
-            services.AddTransient<IWorkerService, WorkerService>();
-            services.AddTransient<IWorkerRequestService, WorkerRequestService>();
-            services.AddTransient<IEmployerService, EmployerService>();
-            services.AddTransient<IEmailService, EmailService>();
-            services.AddTransient<IWorkOrderService, WorkOrderService>();
-            services.AddTransient<IWorkAssignmentService, WorkAssignmentService>();
-            services.AddTransient<IImageService, ImageService>();
-            services.AddTransient<IReportService, ReportService>();
-            services.AddTransient<IReportsV2Service, ReportsV2Service>();
-            services.AddTransient<ITransportProvidersService, TransportProvidersService>();
-            services.AddTransient<ITransportProvidersAvailabilityService, TransportProvidersAvailabilityService>();
+            services.AddScoped<IConfigService, ConfigService>();
+            services.AddScoped<ILookupService, LookupService>();
+            services.AddScoped<IActivitySigninService, ActivitySigninService>();
+            services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<IWorkerSigninService, WorkerSigninService>();
+            services.AddScoped<IWorkerService, WorkerService>();
+            services.AddScoped<IWorkerRequestService, WorkerRequestService>();
+            services.AddScoped<IEmployerService, EmployerService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IWorkOrderService, WorkOrderService>();
+            services.AddScoped<IWorkAssignmentService, WorkAssignmentService>();
+            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IReportsV2Service, ReportsV2Service>();
+            services.AddScoped<ITransportProvidersService, TransportProvidersService>();
+            services.AddScoped<ITransportProvidersAvailabilityService, TransportProvidersAvailabilityService>();
 
-            services.AddTransient<IDefaults, Defaults>();
+            services.AddScoped<IDefaults, Defaults>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

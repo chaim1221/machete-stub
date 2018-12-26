@@ -1,4 +1,4 @@
-﻿@using Machete.Domain
+@using Machete.Domain
 @using Machete.Web.Helpers
 @model Machete.Web.ViewModel.EmailView
 
@@ -70,7 +70,7 @@
 </div>
 
 <div style="clear: left;"></div>
-@Html.PartialAsync("ManagerInfo", Model)
+@await Html.PartialAsync("ManagerInfo", Model)
 
 
 <script type="text/javascript">

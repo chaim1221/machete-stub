@@ -1,4 +1,4 @@
-﻿@using Machete.Domain
+@using Machete.Domain
 @using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
@@ -110,7 +110,7 @@
 </div>
 
 <!-- LOAD MANAGER INFO PARTIAL FORM -->
-@Html.PartialAsync("ManagerInfo")
+@await Html.PartialAsync("ManagerInfo")
 <!-- LOAD ADMINISTRATOR INFO PARTIAL FORM -->
 
 
