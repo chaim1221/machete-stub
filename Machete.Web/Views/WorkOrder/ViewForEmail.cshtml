@@ -450,9 +450,9 @@ else
                     <h3>@WorkOrders.workername</h3>
                 </div>
                 <div class="tb-field">
-                    @if (item.workerAssigned != null)
+                    @if (item.isWorkerAssigned)
                     {
-                        <h3>@Html.Encode(item.workerAssigned.Person.fullName)</h3>
+                        <h3>@Html.Encode(item.assignedWorkerFullname)</h3>
                     }
                     else
                     {

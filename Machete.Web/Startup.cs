@@ -6,6 +6,7 @@ using Machete.Data;
 using Machete.Data.Infrastructure;
 using Machete.Service;
 using Machete.Web.Helpers;
+using Machete.Web.Maps;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -85,7 +86,12 @@ namespace Machete.Web
                 options.SlidingExpiration = true;
             });
 
-            services.AddAutoMapper();
+            var mapperConfig = new MapperConfiguration(config => {
+                config.AddProfile(new MapperConfig());
+            });
+            var mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            
             services.AddMvc(/*config => { config.Filters.Add(new AuthorizeFilter()); }*/)
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization()
