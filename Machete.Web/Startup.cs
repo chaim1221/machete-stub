@@ -165,7 +165,7 @@ namespace Machete.Web
             
             app.UseHttpsRedirection();
 
-            app.UseStaticFiles(); // ?
+            //app.UseStaticFiles(); // ?
             app.UseStaticFiles("/Content");
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -178,12 +178,16 @@ namespace Machete.Web
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
+            app.UseMvc(routes => {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Account}/{action=Login}/{id?}");
-            });            
+                routes.MapRoute(
+                    name: "V2",
+                    template: "V2/{*url}",
+                    defaults: new { controller = "V2", action = "Index" }
+                );
+            });
             
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {

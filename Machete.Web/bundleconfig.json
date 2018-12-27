@@ -1,12 +1,36 @@
 [
   {
-    "outputFileName": "Content/css.css",
+    "outputFileName": "Content/Machete.css",
     "inputFiles": [
       "Content/Site.css",
       "Content/confirm/jquery.alerts.css",
       "Content/dataTables/demo_table_jui.css",
       "Content/jquery-ui-1.8.6.custom.css"
     ]
+  },
+  {
+    "outputFileName": "Content/bundles/angular-css.js",
+    "inputFiles": [
+      "Content/bundles/styles.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": true
+  },
+  {
+    "outputFileName": "Content/bundles/angular.js",
+    "inputFiles": [
+      "Content/bundles/runtime.js",
+      "Content/bundles/polyfills.js",
+      "Content/bundles/scripts.js",
+      "Content/bundles/vendor.js",
+      "Content/bundles/main.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "sourceMap": true
   },
   {
     "outputFileName": "Content/reportcss.css",
