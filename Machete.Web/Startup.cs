@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-using AutoMapper;
 using Machete.Data;
 using Machete.Data.Infrastructure;
 using Machete.Service;
@@ -86,9 +85,7 @@ namespace Machete.Web
                 options.SlidingExpiration = true;
             });
 
-            var mapperConfig = new MapperConfiguration(config => {
-                config.AddProfile(new MapperConfig());
-            });
+            var mapperConfig = new MapperConfigurationFactory().Config;
             var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
             

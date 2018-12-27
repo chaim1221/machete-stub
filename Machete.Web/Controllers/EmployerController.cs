@@ -81,9 +81,16 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public JsonResult AjaxHandler(jQueryDataTableParam param)
         {
-            var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
-            vo.CI = CI;
-            dataTableResult<EmployersList> list = serv.GetIndexView(vo);
+            dataTableResult<EmployersList> list;
+
+            try {
+                var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
+                vo.CI = CI;
+                list = serv.GetIndexView(vo);
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
             //return what's left to datatables
             var result = list.query
                 .Select(e => map.Map<EmployersList, EmployerList>(e))
@@ -170,7 +177,7 @@ namespace Machete.Web.Controllers
         /// 
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="UserName"></param>
+        /// <param name="userName"></param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator")]
