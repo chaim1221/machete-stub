@@ -9,9 +9,7 @@ namespace Machete.Web.Controllers
         // GET: V2
         public ActionResult Index()
         {
-            //return View("Index","_angularLayout", new { });
             return View("_angularLayout", new { });
-
         }
     }
 }

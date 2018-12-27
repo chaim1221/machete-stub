@@ -15,7 +15,10 @@
 
     <link id="theme-css" rel="stylesheet" type="text/css" href="/Content/bundles/assets/theme/theme-dark-blue.css">
     <link id="layout-css" rel="stylesheet" type="text/css" href="/Content/bundles/assets/layout/css/layout-dark-blue.css">
-    <link rel="stylesheet" href="~/bundles/angular-css">
+    <script type="text/javascript" src="~/Content/bundles/angular-css.js"></script>
+    <script type="text/javascript" src="~/Content/bundles/angular.js"></script>
 </head>
-@RenderBody()
+@{
+    Layout = null;
+}
 </html>
