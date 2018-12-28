@@ -1,5 +1,6 @@
-@using Machete.Web.Resources
 @model Machete.Web.ViewModel.Employer
+
+@using Machete.Web.Resources
 
 @{  
     string recType = "employer";
@@ -15,8 +16,8 @@
         <input type="button" onclick="setFormData(true)" id="@(idPrefix)ClearBtn" class="formButton saveBtn"
                value="@Employers.createclear" tabindex="9" />
     </div>
-    @Html.ValidationSummary(true)
-    @Html.EditorForModel()
+     @Html.ValidationSummary(true)
+     @Html.EditorForModel()
 }
 
 <div id="duplicatesDialog" title="@Shared.DuplicateEmployerTitle">
@@ -117,9 +118,15 @@
     });
 
     function FindEmployerDuplicate() {
-
         var form = $('#employerCreateForm');
         if (form.valid()) {
+            
+            /* * * FOR DEBUGGING * * */
+//            alert($('#employer0-name')[0].value);
+//            alert($('#employer0-address1')[0].value);
+//            alert($('#employer0-phone')[0].value);
+//            alert($('#employer0-city')[0].value);
+//            alert($('#employer0-zipcode')[0].value);
             $.ajax({
                 url: "/Employer/GetDuplicates",
                 data: {
@@ -129,14 +136,23 @@
                     city: $('#employer0-city')[0].value,
                     zipcode: $('#employer0-zipcode')[0].value
                 },
-                success: onSuccessFindEmployerDuplicate,
+                success: (result) => {
+                    if (result.duplicates.length > 0) {
+                        duplicatesDialog.dialog("open");
+                        duplicatesDialog.html(CreateHtmlText(result.duplicates));
+                    } else {
+                        saveEmployer();
+                    }
+                },
+                error: (req, status, error) => {
+                    alert("Error: " + status + " " + error);
+                },
                 dataType: "json"
             });
         } else {
             saveEmployer();
         }
     }
-
 
     function CreateHtmlText(duplicates) {
         var dialogHtmlText = '<p>@Shared.DuplicateEmployerMessage</p>' +
@@ -171,16 +187,6 @@
         dialogHtmlText += '</table> <p></p> <p></p>@Shared.SaveMessageDuplicatePersons</p>';
 
         return dialogHtmlText;
-    }
-
-    function onSuccessFindEmployerDuplicate(result) {
-        if (result.duplicates.length > 0) {
-
-            duplicatesDialog.dialog("open");
-            duplicatesDialog.html(CreateHtmlText(result.duplicates));
-        } else {
-            saveEmployer();
-        }
     }
 
     function saveEmployer() {

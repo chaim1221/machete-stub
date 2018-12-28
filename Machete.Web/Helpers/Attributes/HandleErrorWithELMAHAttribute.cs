@@ -36,6 +36,7 @@ namespace Machete.Web.Helpers
     //public class HandleErrorWithELMAHAttribute : HandleErrorAttribute
     public class ElmahHandleErrorAttribute : ExceptionFilterAttribute
     {
+        // DO NOT MODIFY this class, it's been taken apart to make MVC Core work
         public override void OnException(ExceptionContext context)
         {
             base.OnException(context);
