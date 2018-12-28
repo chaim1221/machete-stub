@@ -80,9 +80,11 @@
 </div><!--tb-table main workorder table-->
 
 <div class="tb-table">
-    <!-- TODO: investigate why this row (englishnoterow) doesn't appear on the table -->
+    <!-- TODO: investigate why this row (englishNoteRow) doesn't appear on the table -->
     <div class="tb-row englishNoteRow" id="@(idPrefix)englishRequiredNoteRow">
-        @Html.mUITableDescLabelFor(model => model.englishRequiredNote)
+        <div class="tb-label desc-label">
+            @Html.LabelFor(model => model.englishRequiredNote)
+        </div>
         <div class="tb-field">
             @Html.TextAreaFor(model => model.englishRequiredNote, new { tabindex = "21", @class = "desc-field", id = idPrefix + "englishRequiredNote" })
             @Html.ValidationMessageFor(model => model.englishRequiredNote)
@@ -100,8 +102,9 @@
         <div class="tb-field desc-field">
             @Html.ListBox("workerRequests2", new SelectList(ViewBag.workerRequests, "Value", "Text"), new { id = "workerRequests2_WO-"+ Model.ID, tabindex = "22", style="min-width: 16em;"})
         </div>
-
-        @Html.mUITableDescLabelFor(model => model.description)
+        <div class="tb-label desc-label">
+            @Html.LabelFor(model => model.description)
+        </div>
         <div class="tb-field desc-field">
             @Html.TextAreaFor(model => model.description, new { tabindex = "23", @class = "desc-field", id = idPrefix + "description" })
             @Html.ValidationMessageFor(model => model.description)
@@ -195,16 +198,11 @@
                 );
           $('a.ui-dialog-titlebar-close').click();
         });
-        //////////////////////////////////////////////////
-        //
-        //
+
         $('#workerDialog-@(Model.ID)').hide();
         $('#workerTable-@(Model.ID)').hide();
         //$("#wophone").mask("999-999-9999", { placeholder: " " });
 
-        //////////////////////////////////////////////////
-        //
-        //
         $('#addRequestBtn-@(Model.ID)').click(function () {
             $('#workerTable-@(Model.ID)').dataTable().fnDraw();
             $('#workerTable-@(Model.ID)').show();
@@ -223,9 +221,7 @@
             
             $('#workerDialog-@(Model.ID)').show();
         });
-        //////////////////////////////////////////////////
-        //
-        //
+
         $('#removeRequestBtn-@(Model.ID)').click(function () {
             $('#workerRequests2_WO-@(Model.ID)').find('option:selected').remove();
         });
