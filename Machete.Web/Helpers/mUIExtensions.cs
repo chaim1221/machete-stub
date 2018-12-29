@@ -38,10 +38,14 @@ namespace Machete.Web.Helpers
         public static HtmlString mUIDropDownYesNoFor<TModel, TBool>(this IHtmlHelper<TModel> Html,
             Expression<Func<TModel, TBool>> expression, List<SelectListItem> yesNo, object attribs)
         {
+//<div class="tb-field">
+//    @Html.DropDownListFor(model => model.business, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), Shared.choose, new { tabindex = "2", id = idPrefix + "business" })
+//    @Html.ValidationMessageFor(model => model.business)
+//</div>
             var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
-            var validationMessage = Html.ValidationMessageFor(expression);
             var selectListItems = new SelectList(yesNo, "Value", "Text", metadata.Model);
             var dropDownList = Html.DropDownListFor(expression, selectListItems, Shared.choose, attribs);
+            var validationMessage = Html.ValidationMessageFor(expression);
             var result = new HtmlString($"<div class=\"tb-field\">{dropDownList}{validationMessage}</div>");
             return result;
         }

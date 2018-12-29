@@ -153,7 +153,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
         public JsonResult Edit(int id, FormCollection collection, string userName)
         {
-            Employer employer = serv.Get(id);
+            var employer = serv.Get(id);
             UpdateModel(employer);
             serv.Save(employer, userName);                            
             return Json(new
