@@ -167,11 +167,22 @@ namespace Machete.Data
         public void Configure(EntityTypeBuilder<Person> builder)
         {
             builder.HasKey(k => k.ID);
-            builder.HasOne(p => p.Worker)
-                .WithOne(w => w.Person)//.IsRequired(false)
+            builder.Property(p => p.ID)
+                .ValueGeneratedOnAdd();
+            
+//// Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'FOREIGN KEY constraint failed'.
+//            builder.HasOne(p => p.Worker)
+//                .WithOne(w => w.Person)
 //                .HasForeignKey<Worker>(w => w.ID) //main.Persons.FK_Persons_Workers_ID
-//                .HasForeignKey<Person>(p => p.ID) //main.Persons.FK_Persons_Workers_ID
-                .OnDelete(DeleteBehavior.Cascade);
+//                .OnDelete(DeleteBehavior.Cascade);
+
+//// The child/dependent side could not be determined for the one-to-one relationship ...configure the foreign key property.
+//            builder.HasOne(p => p.Worker)
+//                .WithOne(w => w.Person)
+////                .IsRequired(false) // same
+////              .HasForeignKey<Worker>(w => w.ID) //main.Persons.FK_Persons_Workers_ID
+//                .OnDelete(DeleteBehavior.Cascade);
+            
             //builder.ToTable("Persons");
         }
     }
@@ -180,11 +191,12 @@ namespace Machete.Data
     {
         public void Configure(EntityTypeBuilder<Worker> builder)
         {
-            builder.HasKey(k => k.ID);
-//            builder.HasOne(w => w.Person)
-//                .WithOne(p => p.Worker)
-              //.HasForeignKey<Person>(p => p.ID); //main.Persons.FK_Persons_Workers_ID
-//                .HasForeignKey<Worker>(w => w.ID); //main.Persons.FK_Persons_Workers_ID
+//            builder.HasKey(k => k.ID);
+
+// FOREIGN KEY constraint failed
+            builder.HasOne(w => w.Person)
+                .WithOne(p => p.Worker)//.IsRequired(false);
+                .HasForeignKey<Person>(p => p.ID); //main.Persons.FK_Persons_Workers_ID
             builder.HasMany(s => s.workersignins)
                 .WithOne(s => s.worker).IsRequired(false)
                 .HasForeignKey(s => s.WorkerID);
