@@ -170,11 +170,11 @@ namespace Machete.Data
             builder.Property(p => p.ID)
                 .ValueGeneratedOnAdd();
             
-//// Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'FOREIGN KEY constraint failed'.
-//            builder.HasOne(p => p.Worker)
-//                .WithOne(w => w.Person)
-//                .HasForeignKey<Worker>(w => w.ID) //main.Persons.FK_Persons_Workers_ID
-//                .OnDelete(DeleteBehavior.Cascade);
+// Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 19: 'FOREIGN KEY constraint failed'.
+            builder.HasOne(p => p.Worker)
+                .WithOne(w => w.Person)
+                .HasForeignKey<Worker>(w => w.ID) //main.Persons.FK_Persons_Workers_ID (wrong)
+                .OnDelete(DeleteBehavior.Cascade);
 
 //// The child/dependent side could not be determined for the one-to-one relationship ...configure the foreign key property.
 //            builder.HasOne(p => p.Worker)
@@ -193,10 +193,10 @@ namespace Machete.Data
         {
 //            builder.HasKey(k => k.ID);
 
-// FOREIGN KEY constraint failed
-            builder.HasOne(w => w.Person)
-                .WithOne(p => p.Worker)//.IsRequired(false);
-                .HasForeignKey<Person>(p => p.ID); //main.Persons.FK_Persons_Workers_ID
+//// FOREIGN KEY constraint failed
+//            builder.HasOne(w => w.Person)
+//                .WithOne(p => p.Worker)//.IsRequired(false);
+//                .HasForeignKey<Person>(p => p.ID); //main.Persons.FK_Persons_Workers_ID
             builder.HasMany(s => s.workersignins)
                 .WithOne(s => s.worker).IsRequired(false)
                 .HasForeignKey(s => s.WorkerID);

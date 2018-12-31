@@ -22,7 +22,6 @@
 // 
 #endregion
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,7 +30,6 @@ using Moq;
 using Machete.Data.Infrastructure;
 using Machete.Service;
 using Machete.Domain;
-using Machete.Test;
 using AutoMapper;
 
 namespace Machete.Test.Unit.Service

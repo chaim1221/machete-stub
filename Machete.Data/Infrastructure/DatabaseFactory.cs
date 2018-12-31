@@ -23,9 +23,7 @@
 #endregion
 using System;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
 
 namespace Machete.Data.Infrastructure
@@ -53,12 +51,17 @@ namespace Machete.Data.Infrastructure
         {
             var caller = Assembly.GetCallingAssembly();
 
-            if (!string.Equals(caller.FullName, "Machete.Test.Integration"))
+            if (!caller.FullName.StartsWith("Machete.Test"))
             {
                 throw new UnauthorizedAccessException("This constructor can no longer retrieve a context for any class but the test class.");
             }
             
             typeof(SqlConnection).GetField("ObjectID", BindFlags);
+            
+            var builder = new DbContextOptionsBuilder<MacheteContext>();
+            builder.UseSqlite("Data Source=machete.db", with =>
+                with.MigrationsAssembly("Machete.Data"));
+            this.options = builder.Options;
         }
 
         public DatabaseFactory(DbContextOptions<MacheteContext> options)
