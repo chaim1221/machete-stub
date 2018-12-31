@@ -64,10 +64,14 @@ namespace Machete.Web.Helpers
         public static HtmlString mUITableDropDownListFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
             Expression<Func<TModel, TSelect>> expression, SelectList list, object attribs)
         {
+            //<div class="tb-field">
+            //    @Html.DropDownListFor(expression, new SelectList(list, "Value", "Text", Model), Shared.choose, attribs);
+            //    @Html.ValidationMessageFor(expression)
+            //</div>
             var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
-            var validationMessage = Html.ValidationMessageFor(expression);
             var selectListItems = new SelectList(list,"Value","Text", metadata.Model);
             var dropDownList = Html.DropDownListFor(expression, selectListItems, Shared.choose, attribs);
+            var validationMessage = Html.ValidationMessageFor(expression);
             var result = new HtmlString($"<div class=\"tb-field\">{dropDownList}{validationMessage}</div>");
             return result;
         }
@@ -117,6 +121,10 @@ namespace Machete.Web.Helpers
         public static HtmlString mUITableDateTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
             Expression<Func<TModel, TSelect>> expression, object attribs)
         {
+            //<div class="tb-field">
+            //    @Html.TextBox(propertyName, shortDateString, attribs)
+            //    @Html.ValidationMessageFor(expression)
+            //</div>
             var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
             var model = metadata.Model;
             var value = "";
@@ -129,6 +137,15 @@ namespace Machete.Web.Helpers
             var validationMessage = Html.ValidationMessageFor(expression);
             var result = new HtmlString($"<div class=\"tb-field\">{htmlContent}{validationMessage}</div>");
             return result;
+        }
+        
+        public static string ToShortTextBoxDateString(this DateTime source)
+        {            
+            return source == DateTime.MinValue ? "" : source.ToShortDateString();
+        }
+        public static string ToShortTextBoxDateString(this DateTime? source)
+        {
+            return source == null || source == DateTime.MinValue ? "" : source.Value.ToShortDateString();
         }
     }
 }

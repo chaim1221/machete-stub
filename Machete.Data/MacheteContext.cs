@@ -26,13 +26,9 @@ using Machete.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Activity = Machete.Domain.Activity;
 // ReSharper disable RedundantArgumentDefaultValue
 
@@ -124,8 +120,8 @@ namespace Machete.Data
             base.OnModelCreating(modelBuilder); // call the other builders (below):
             
             // ENTITIES //
-            modelBuilder.Configurations<Person>().Add(typeof(PersonBuilder));
-            modelBuilder.Configurations<Worker>().Add(typeof(WorkerBuilder));
+            modelBuilder.ApplyConfiguration(new PersonBuilder());
+            modelBuilder.ApplyConfiguration(new WorkerBuilder());
             modelBuilder.Configurations<WorkerSignin>().Add(typeof(WorkerSigninBuilder));
             modelBuilder.Configurations<Event>().Add(typeof(EventBuilder));
             modelBuilder.Configurations<JoinEventImage>().Add(typeof(JoinEventImageBuilder));
@@ -166,31 +162,36 @@ namespace Machete.Data
         }
     }
 
-    public class PersonBuilder
+    public class PersonBuilder : IEntityTypeConfiguration<Person>
     {
-        public PersonBuilder(EntityTypeBuilder<Person> entity)
+        public void Configure(EntityTypeBuilder<Person> builder)
         {
-            entity.ToTable("Persons");
-            entity.HasKey(k => k.ID);
-            entity.HasOne(p => p.Worker)
-                .WithOne(p => p.Person)
-                .HasForeignKey<Person>(p => p.ID) //?
-                //.IsRequired(false)
+            builder.HasKey(k => k.ID);
+            builder.HasOne(p => p.Worker)
+                .WithOne(w => w.Person)//.IsRequired(false)
+//                .HasForeignKey<Worker>(w => w.ID) //main.Persons.FK_Persons_Workers_ID
+//                .HasForeignKey<Person>(p => p.ID) //main.Persons.FK_Persons_Workers_ID
                 .OnDelete(DeleteBehavior.Cascade);
+            //builder.ToTable("Persons");
         }
     }
 
-    public class WorkerBuilder
+    public class WorkerBuilder : IEntityTypeConfiguration<Worker>
     {
-        public WorkerBuilder(EntityTypeBuilder<Worker> entity)
+        public void Configure(EntityTypeBuilder<Worker> builder)
         {
-            entity.HasKey(k => k.ID);
-            entity.HasMany(s => s.workersignins)
+            builder.HasKey(k => k.ID);
+//            builder.HasOne(w => w.Person)
+//                .WithOne(p => p.Worker)
+              //.HasForeignKey<Person>(p => p.ID); //main.Persons.FK_Persons_Workers_ID
+//                .HasForeignKey<Worker>(w => w.ID); //main.Persons.FK_Persons_Workers_ID
+            builder.HasMany(s => s.workersignins)
                 .WithOne(s => s.worker).IsRequired(false)
                 .HasForeignKey(s => s.WorkerID);
-            entity.HasMany(a => a.workAssignments)
+            builder.HasMany(a => a.workAssignments)
                 .WithOne(a => a.workerAssigned).IsRequired(false)
                 .HasForeignKey(a => a.workerAssignedID);
+            //builder.ToTable("Workers");
         }
     }
 
@@ -232,7 +233,7 @@ namespace Machete.Data
             entity.HasKey(e => e.ID); //being explicit for EF
             entity.HasMany(e => e.WorkOrders) //define the parent
                 .WithOne(w => w.Employer).IsRequired(true) //Virtual property definition
-                .HasForeignKey(w => w.EmployerID) //DB foreign key definition
+                .HasForeignKey(wo => wo.EmployerID) //DB foreign key definition
                 .OnDelete(DeleteBehavior.Cascade);
             entity.ToTable("Employers");
         }

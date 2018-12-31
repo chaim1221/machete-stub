@@ -59,10 +59,8 @@ namespace Machete.Web.Controllers
             base.Initialize(requestContext);
             CI = (CultureInfo)Session["Culture"];
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        
+        // GET /Person/Index
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
         public ActionResult Index()
         {
@@ -86,10 +84,8 @@ namespace Machete.Web.Controllers
                 aaData = result
             });
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+
+        // GET /Person/Create
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")] 
         public ActionResult Create()
         {
@@ -101,12 +97,8 @@ namespace Machete.Web.Controllers
             p.def = def;
             return PartialView("Create", p);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="person"></param>
-        /// <param name="userName"></param>
-        /// <returns></returns>
+        
+        // POST /Person/Create
         [HttpPost, UserNameFilter]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]

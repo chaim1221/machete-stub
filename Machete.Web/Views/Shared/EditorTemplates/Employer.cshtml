@@ -1,9 +1,9 @@
+@model Machete.Web.ViewModel.Employer
+
 @using Machete.Domain
-@using Machete.Web.Helpers
 @using Machete.Web.Resources
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
-@model Machete.Web.ViewModel.Employer
 
 @{
     var httpContext = ViewContext.HttpContext;
@@ -13,6 +13,7 @@
     var recType = "employer";
     var idPrefix = recType + Model.ID + "-";
 }
+
 @Html.HiddenFor(model => model.ID, new { @class="hiddenRecID", id=idPrefix + "ID"})
 <div class="tb-table" style="float: left; clear: left;">
     <div class="tb-row">
@@ -215,16 +216,16 @@
     $(document).ready(function () {
         //$("#phone").mask("999-999-9999", { placeholder: "" });
         //$("#cellphone").mask("999-999-9999", { placeholder: "" });
-        var bizname = $('#hidebusinessname');
-        bizname.hide();
+        var businessName = $('#hidebusinessname');
+        businessName.hide();
         $('#@(idPrefix)business').change(function () {
-            if (!bizname.is(":visible"))
+            if (!businessName.is(":visible"))
             {
-                bizname.show();
+                businessName.show();
             }
             else
             {
-                bizname.hide();
+                businessName.hide();
             }
         });
     });
