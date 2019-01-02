@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using AutoMapper;
 using Machete.Data;
 using Machete.Data.Infrastructure;
@@ -7,31 +8,34 @@ using Machete.Service;
 using Machete.Web.Maps;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Machete.Test.Integration.DotNetCore
 {
     [TestClass]
     public class PersonTests
     {
+        const string connString = "Server=localhost,1433; Database=machete_db; User=SA; Password=passw0rD!;";
+
         public PersonTests(){
-            var databaseFactory = new DatabaseFactory(string.Empty);
+            var databaseFactory = new DatabaseFactory(connString);
             var personRepository = new PersonRepository(databaseFactory);
             var unitOfWork = new UnitOfWork(databaseFactory);
             var lookupRepository = new LookupRepository(databaseFactory);
             var mapper = new Mapper(new MapperConfigurationFactory().Config);
             personService = new PersonService(personRepository, unitOfWork, lookupRepository, mapper);
             
-            context = databaseFactory.Get();
-            context.Database.Migrate();
-//            var services = new Mock<IServiceProvider>();
-//            var options = new DbContextOptions<MacheteContext>();
-//            services
-//                .Setup(x => x.GetService(typeof(MacheteContext)))
-//                .Returns(new MacheteContext(options));
-//            MacheteConfiguration.Seed(context, services.Object);
+
+            var options = new DbContextOptionsBuilder<MacheteContext>()
+                .UseSqlServer(connString, with =>
+                    with.MigrationsAssembly("Machete.Data"))
+                .Options;
+            
+            var services = new Mock<IServiceProvider>();
+            services.Setup(request => request.GetService(typeof(MacheteContext)))
+                    .Returns(new MacheteContext(options));
         }
 
-        private MacheteContext context { get; }
         private PersonService personService { get; }
 
         [TestMethod]

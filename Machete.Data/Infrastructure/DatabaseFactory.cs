@@ -59,9 +59,13 @@ namespace Machete.Data.Infrastructure
             typeof(SqlConnection).GetField("ObjectID", BindFlags);
             
             var builder = new DbContextOptionsBuilder<MacheteContext>();
-            builder.UseSqlite("Data Source=machete.db", with =>
-                with.MigrationsAssembly("Machete.Data"));
-            this.options = builder.Options;
+            if (string.IsNullOrEmpty(connString) || connString == "Data Source=machete.db")
+                builder.UseSqlite("Data Source=machete.db", with =>
+                    with.MigrationsAssembly("Machete.Data"));
+            else
+                builder.UseSqlServer(connString, with =>
+                    with.MigrationsAssembly("Machete.Data"));
+            options = builder.Options;
         }
 
         public DatabaseFactory(DbContextOptions<MacheteContext> options)
