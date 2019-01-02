@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Machete.Data.Migrations
 {
     [DbContext(typeof(MacheteContext))]
-    [Migration("20190102013728_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190102014640_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
