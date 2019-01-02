@@ -103,7 +103,8 @@ namespace Machete.Data.Infrastructure
         //              compile-time type of the instance determines implem. to invoke             
         public virtual T Add(T entity)
         {
-            return _dbset.Add(entity) as T; // added `as` during conversion to .NET Core           
+            var poofball = _dbset.Add(entity).Entity;
+            return poofball;
         }
       
         public virtual void Delete(T entity)
