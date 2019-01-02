@@ -32,14 +32,8 @@ namespace Machete.Data
     {
         public static void Seed(MacheteContext db, IServiceProvider services)
         {
-            if (db.Lookups.Count() == 0)
-            {
-                MacheteLookup.Initialize(db);
-            }
-            if (db.TransportProviders.Count() == 0 || db.TransportProvidersAvailability.Count() == 0)
-            {
-                MacheteTransports.Initialize(db);
-            }
+            if (db.Lookups.Count() == 0) MacheteLookup.Initialize(db);
+            if (db.TransportProviders.Count() == 0 || db.TransportProvidersAvailability.Count() == 0) MacheteTransports.Initialize(db);
             if (db.Users.Count() == 0) MacheteUsers.Initialize(services);
             // MacheteConfigs.Initialize assumes Configs table has been populated by script
             if (db.Configs.Count() == 0) MacheteConfigs.Initialize(db);
