@@ -39,8 +39,8 @@ namespace Machete.Web.Helpers
             Expression<Func<TModel, TBool>> expression, List<SelectListItem> yesNo, object attribs)
         {
 //<div class="tb-field">
-//    @Html.DropDownListFor(model => model.business, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), Shared.choose, new { tabindex = "2", id = idPrefix + "business" })
-//    @Html.ValidationMessageFor(model => model.business)
+//    @Html.DropDownListFor(expression, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), Shared.choose, attribs)
+//    @Html.ValidationMessageFor(expression)
 //</div>
             var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
             var selectListItems = new SelectList(yesNo, "Value", "Text", metadata.Model);
@@ -53,23 +53,12 @@ namespace Machete.Web.Helpers
         public static HtmlString mUIDropDownListFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
             Expression<Func<TModel, TSelect>> expression, SelectList list, object attribs)
         {
-            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
-            var validationMessage = Html.ValidationMessageFor(expression);
-            var selectListItems = new SelectList(list, "Value", "Text", metadata.Model);
-            var dropDownList = Html.DropDownListFor(expression, selectListItems, Shared.choose, attribs);
-            var result = new HtmlString($"<div class=\"tb-field\">{dropDownList}{validationMessage}</div>");
-            return result;
-        }
-
-        public static HtmlString mUITableDropDownListFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
-            Expression<Func<TModel, TSelect>> expression, SelectList list, object attribs)
-        {
             //<div class="tb-field">
-            //    @Html.DropDownListFor(expression, new SelectList(list, "Value", "Text", Model), Shared.choose, attribs);
-            //    @Html.ValidationMessageFor(expression)
+            //    @Html.DropDownListFor(expression, new SelectList(Model.def.getSelectList(), "Value", "Text", Model), Shared.choose, attribs)
+            //    @Html.ValidationMessageFor(expression);
             //</div>
             var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
-            var selectListItems = new SelectList(list,"Value","Text", metadata.Model);
+            var selectListItems = new SelectList(list, "Value", "Text", metadata.Model);
             var dropDownList = Html.DropDownListFor(expression, selectListItems, Shared.choose, attribs);
             var validationMessage = Html.ValidationMessageFor(expression);
             var result = new HtmlString($"<div class=\"tb-field\">{dropDownList}{validationMessage}</div>");
@@ -86,18 +75,6 @@ namespace Machete.Web.Helpers
         }
 
         //11 usages in editor Worker.cshtml
-        public static HtmlString mUITableTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
-            Expression<Func<TModel, TSelect>> expression, object attribs)
-        {
-            //<div class="tb-field">
-            //    @Html.TextBoxFor(expression, attribs)
-            //    @Html.ValidationMessageFor(expression)
-            //</div>
-            var textBox = Html.TextBoxFor(expression, attribs);
-            var validationMessage = Html.ValidationMessageFor(expression);
-            var result = new HtmlString($"<div class=\"tb-field\">{textBox}{validationMessage}</div>");
-            return result;
-        }
 
         public static HtmlString mUITableLabelAndTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
             Expression<Func<TModel, TSelect>> expression, object attribs)
@@ -118,27 +95,6 @@ namespace Machete.Web.Helpers
         }
 
 
-        public static HtmlString mUITableDateTextBoxFor<TModel, TSelect>(this IHtmlHelper<TModel> Html,
-            Expression<Func<TModel, TSelect>> expression, object attribs)
-        {
-            //<div class="tb-field">
-            //    @Html.TextBox(propertyName, shortDateString, attribs)
-            //    @Html.ValidationMessageFor(expression)
-            //</div>
-            var metadata = ExpressionMetadataProvider.FromLambdaExpression(expression, Html.ViewData, Html.MetadataProvider);
-            var model = metadata.Model;
-            var value = "";
-
-            if ((DateTime?) model != DateTime.MinValue)
-                value = model == null ? "" : ((DateTime) model).ToShortDateString();
-
-            var htmlContent = Html.TextBox(metadata.Metadata.PropertyName, Html.Encode(value), attribs);
-
-            var validationMessage = Html.ValidationMessageFor(expression);
-            var result = new HtmlString($"<div class=\"tb-field\">{htmlContent}{validationMessage}</div>");
-            return result;
-        }
-        
         public static string ToShortTextBoxDateString(this DateTime source)
         {            
             return source == DateTime.MinValue ? "" : source.ToShortDateString();

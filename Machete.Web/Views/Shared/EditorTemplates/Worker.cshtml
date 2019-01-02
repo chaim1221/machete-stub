@@ -46,7 +46,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.memberStatusID)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.memberStatusID, Model.def.getSelectList(LCategory.memberstatus), new { tabindex = "2", @class = "workerEditor", id = idPrefix + "memberStatusID" })*@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.memberStatusID,
                     new SelectList(Model.def.getSelectList(LCategory.memberstatus), "Value",
@@ -67,7 +66,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.englishlevelID)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.englishlevelID, Model.def.skillLevels(), new { tabindex = "3", @class = "workerEditor", id = idPrefix + "englishlevelID" }) *@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.memberStatusID, new SelectList(Model.def.skillLevels(),
                     "Value", "Text", Model), Shared.choose,
@@ -105,8 +103,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.ownTools)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.ownTools, Model.def.yesnoSelectList(),
-                new { tabindex = "5", @class = "workerEditor", id = idPrefix + "ownTools" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.ownTools, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "5", @class = "workerEditor", id = idPrefix + "ownTools" })
+                @Html.ValidationMessageFor(model => model.ownTools)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.introToCenter)
             </div>
@@ -121,7 +123,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.typeOfWorkID)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.typeOfWorkID, Model.def.getSelectList(LCategory.worktype), new { tabindex = "6", @class = "workerEditor", id = idPrefix + "typeOfWorkID" }) *@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.typeOfWorkID,
                     new SelectList(Model.def.getSelectList(LCategory.worktype), "Value",
@@ -139,7 +140,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.RaceID)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.RaceID, Model.def.getSelectList(LCategory.race), new { tabindex = "10", @class = "workerEditor", id = idPrefix + "RaceID" }) *@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.RaceID, new SelectList(Model.def.getSelectList(LCategory.race), "Value", "Text", Model), Shared.choose, new { tabindex = "10", @class = "workerEditor", id = idPrefix + "RaceID" });
                 @Html.ValidationMessageFor(model => model.RaceID)
@@ -185,7 +185,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.neighborhoodID)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.neighborhoodID, Model.def.getSelectList(LCategory.neighborhood), new { tabindex = "20", @class = "workerEditor", id = idPrefix + "neighborhoodID" }) *@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.neighborhoodID,
                     new SelectList(Model.def.getSelectList(LCategory.neighborhood),
@@ -196,7 +195,6 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.housingType)
             </div>
-            @* @Html.mUITableDropDownListFor(model => model.housingType, Model.def.getSelectList(LCategory.housingType), new { tabindex = "22", @class = "workerEditor", id = idPrefix + "housingType" }) *@
             <div class="tb-field">
                 @Html.DropDownListFor(model => model.housingType,
                     new SelectList(Model.def.getSelectList(LCategory.housingType),
@@ -209,7 +207,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.homeless)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.homeless, Model.def.yesnoSelectList(), new { tabindex = "21", @class = "workerEditor", id = idPrefix + "homeless" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.homeless, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "21", @class = "workerEditor", id = idPrefix + "homeless" })
+                @Html.ValidationMessageFor(model => model.homeless)
+            </div>
         </div>
         <div class="tb-row">
             <h4>Background</h4>
@@ -218,7 +221,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.recentarrival)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.recentarrival, Model.def.yesnoSelectList(), new { tabindex = "30", @class = "workerEditor", id = idPrefix + "recentarrival" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.recentarrival, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "30", @class = "workerEditor", id = idPrefix + "recentarrival" })
+                @Html.ValidationMessageFor(model => model.recentarrival)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.dateinUSA)
             </div>
@@ -231,8 +239,10 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.countryoforiginID)
             </div>
-            @Html.mUIDropDownListFor(model => model.countryoforiginID, Model.def.getSelectList(LCategory.countryoforigin),
-                        new { tabindex = "31", @class = "workerEditor", id = idPrefix + "countryoforiginID" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.countryoforiginID, new SelectList(Model.def.getSelectList(LCategory.countryoforigin), "Value", "Text", Model), Shared.choose, new { tabindex = "31", @class = "workerEditor", id = idPrefix + "countryoforiginID" })
+                @Html.ValidationMessageFor(model => model.countryoforiginID);
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.dateinseattle)
             </div>
@@ -245,7 +255,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.immigrantrefugee)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.immigrantrefugee, Model.def.yesnoSelectList(), new { tabindex = "32", @class = "workerEditor", id = idPrefix + "immigrantrefugee" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.immigrantrefugee, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "32", @class = "workerEditor", id = idPrefix + "immigrantrefugee" })
+                @Html.ValidationMessageFor(model => model.immigrantrefugee)
+            </div>
         </div>
         <div class="tb-row">
             <h4>Skill Background</h4>
@@ -254,13 +269,23 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.educationLevel)
             </div>
-            @Html.mUIDropDownListFor(model => model.educationLevel, Model.def.getSelectList(LCategory.educationLevel),
-                        new { tabindex = "40", @class = "workerEditor", id = idPrefix + "educationLevel" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.educationLevel,
+                    new SelectList(Model.def.getSelectList(LCategory.educationLevel),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "40", @class = "workerEditor", id = idPrefix + "educationLevel" })
+                @Html.ValidationMessageFor(model => model.educationLevel);
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.farmLaborCharacteristics)
             </div>
-            @Html.mUIDropDownListFor(model => model.farmLaborCharacteristics, Model.def.getSelectList(LCategory.farmLabor),
-                        new { tabindex = "41", @class = "workerEditor", id = idPrefix + "farmLaborCharacteristics" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.farmLaborCharacteristics,
+                    new SelectList(Model.def.getSelectList(LCategory.farmLabor),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "41", @class = "workerEditor", id = idPrefix + "farmLaborCharacteristics" })
+                @Html.ValidationMessageFor(model => model.farmLaborCharacteristics);
+            </div>
         </div>
         <div class="tb-row">
             <h4>Household</h4>
@@ -269,19 +294,35 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.maritalstatus)
             </div>
-            @Html.mUIDropDownListFor(model => model.maritalstatus, Model.def.getSelectList(LCategory.maritalstatus),
-                                        new { tabindex = "50", @class = "workerEditor", id = idPrefix + "maritalstatus" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.maritalstatus,
+                    new SelectList(Model.def.getSelectList(LCategory.maritalstatus),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "50", @class = "workerEditor", id = idPrefix + "maritalstatus" })
+                @Html.ValidationMessageFor(model => model.maritalstatus);
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.americanBornChildren)
             </div>
-            @Html.mUIDropDownListFor(model => model.americanBornChildren, Model.def.getSelectList(LCategory.usBornChildren),
-                                        new { tabindex = "55", @class = "workerEditor", id = idPrefix + "maritalstatus" })
+
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.americanBornChildren,
+                    new SelectList(Model.def.getSelectList(LCategory.usBornChildren),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "55", @class = "workerEditor", id = idPrefix + "maritalstatus" })
+                @Html.ValidationMessageFor(model => model.americanBornChildren);
+            </div>
         </div>
         <div class="tb-row">
             <div class="tb-label">
                 @Html.LabelFor(model => model.liveWithSpouse)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.liveWithSpouse, Model.def.yesnoSelectList(), new { tabindex = "51", @class = "workerEditor", id = idPrefix + "liveWithSpouse" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.liveWithSpouse, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "51", @class = "workerEditor", id = idPrefix + "liveWithSpouse" })
+                @Html.ValidationMessageFor(model => model.liveWithSpouse)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.numofchildren)
             </div>
@@ -294,7 +335,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.livewithchildren)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.livewithchildren, Model.def.yesnoSelectList(), new { tabindex = "52", @class = "workerEditor", id = idPrefix + "livewithchildren" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.livewithchildren, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "52", @class = "workerEditor", id = idPrefix + "livewithchildren" })
+                @Html.ValidationMessageFor(model => model.livewithchildren))
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.numChildrenUnder18)
             </div>
@@ -308,12 +354,22 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.livealone)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.livealone, Model.def.yesnoSelectList(), new { tabindex = "53", @class = "workerEditor", id = idPrefix + "livealone" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.livealone, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "53", @class = "workerEditor", id = idPrefix + "livealone" })
+                @Html.ValidationMessageFor(model => model.livealone)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.incomeID)
             </div>
-            @Html.mUIDropDownListFor(model => model.incomeID, Model.def.getSelectList(LCategory.income),
-                                        new { tabindex = "58", @class = "workerEditor", id = idPrefix + "incomeID" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.incomeID,
+                    new SelectList(Model.def.getSelectList(LCategory.income),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "58", @class = "workerEditor", id = idPrefix + "incomeID" })
+                @Html.ValidationMessageFor(model => model.incomeID);
+            </div>
         </div>
         <div class="tb-row">
             <div class="tb-label">
@@ -326,8 +382,13 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.incomeSourceID)
             </div>
-            @Html.mUIDropDownListFor(model => model.incomeSourceID, Model.def.getSelectList(LCategory.incomeSourceID),
-                                        new { tabindex = "59", @class = "workerEditor", id = idPrefix + "incomeSourceID" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.incomeSourceID,
+                    new SelectList(Model.def.getSelectList(LCategory.incomeSourceID),
+                        "Value", "Text", Model), Shared.choose, 
+                    new { tabindex = "59", @class = "workerEditor", id = idPrefix + "incomeSourceID" })
+                @Html.ValidationMessageFor(model => model.incomeSourceID);
+            </div>
         </div>
         <div class="tb-row">
             <h4>Vehicle</h4>
@@ -336,7 +397,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.driverslicense)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.driverslicense, Model.def.yesnoSelectList(), new { tabindex = "60", @class = "workerEditor", id = idPrefix + "driverslicense" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.driverslicense, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "60", @class = "workerEditor", id = idPrefix + "driverslicense" })
+                @Html.ValidationMessageFor(model => model.driverslicense)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.licenseexpirationdate)
             </div>
@@ -350,7 +416,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.carinsurance)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.carinsurance, Model.def.yesnoSelectList(), new { tabindex = "61", @class = "workerEditor", id = idPrefix + "carinsurance" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.carinsurance, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "61", @class = "workerEditor", id = idPrefix + "carinsurance" })
+                @Html.ValidationMessageFor(model => model.carinsurance)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.insuranceexpiration)
             </div>
@@ -363,8 +434,13 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.vehicleTypeID)
             </div>
-            @Html.mUIDropDownListFor(model => model.vehicleTypeID, Model.def.getSelectList(LCategory.vehicleTypeID),
-                                        new { tabindex = "62", @class = "workerEditor", id = idPrefix + "vehicleTypeID" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.vehicleTypeID,
+                    new SelectList(Model.def.getSelectList(LCategory.vehicleTypeID),
+                        "Value", "Text", Model), Shared.choose,
+                    new { tabindex = "62", @class = "workerEditor", id = idPrefix + "vehicleTypeID" }))
+                @Html.ValidationMessageFor(model => model.vehicleTypeID);
+            </div>
         </div>
         <div class="tb-row">
             <h4>Wage Theft</h4>
@@ -373,7 +449,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.wageTheftVictim)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.wageTheftVictim, Model.def.yesnoSelectList(), new { tabindex = "70", @class = "workerEditor", id = idPrefix + "wageTheftVictim" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.wageTheftVictim, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "70", @class = "workerEditor", id = idPrefix + "wageTheftVictim" })
+                @Html.ValidationMessageFor(model => model.wageTheftVictim)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.wageTheftRecoveryAmount)
             </div>
@@ -389,7 +470,12 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.disabled)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.disabled, Model.def.yesnoSelectList(), new { tabindex = "71", @class = "workerEditor", id = idPrefix + "disabled" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.disabled, new SelectList(Model.def.yesnoSelectList(),
+                    "Value", "Text", Model),
+                    new { tabindex = "71", @class = "workerEditor", id = idPrefix + "disabled" })
+                @Html.ValidationMessageFor(model => model.disabled)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.disabilitydesc)
             </div>
@@ -402,11 +488,17 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.usVeteran)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.usVeteran, Model.def.yesnoSelectList(), new { tabindex = "72", @class = "workerEditor", id = idPrefix + "usVeteran" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.usVeteran, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), new { tabindex = "72", @class = "workerEditor", id = idPrefix + "usVeteran" })
+                @Html.ValidationMessageFor(model => model.usVeteran)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.lgbtq)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.lgbtq, Model.def.yesnoSelectList(), new { tabindex = "75", @class = "workerEditor", id = idPrefix + "lgbtq" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.lgbtq, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), new { tabindex = "75", @class = "workerEditor", id = idPrefix + "lgbtq" })
+                @Html.ValidationMessageFor(model => model.lgbtq)
+            </div>
         </div>
         <div class="tb-row">
             <h4>Health Insurance</h4>
@@ -415,7 +507,10 @@
             <div class="tb-label">
                 @Html.LabelFor(model => model.healthInsurance)
             </div>
-            @Html.mUIDropDownYesNoFor(model => model.healthInsurance, Model.def.yesnoSelectList(), new { tabindex = "80", @class = "workerEditor", id = idPrefix + "healthInsurance" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.healthInsurance, new SelectList(Model.def.yesnoSelectList(), "Value", "Text", Model), new { tabindex = "80", @class = "workerEditor", id = idPrefix + "healthInsurance" })
+                @Html.ValidationMessageFor(model => model.healthInsurance)
+            </div>
             <div class="tb-label">
                 @Html.LabelFor(model => model.healthInsuranceDate)
             </div>
