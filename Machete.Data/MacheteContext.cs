@@ -153,15 +153,6 @@ namespace Machete.Data
         }
     }
 
-    public class ConfigBuilder
-    {
-        public ConfigBuilder(EntityTypeBuilder<Config> entity)
-        {
-            entity.ToTable("Configs");
-            entity.HasKey(k => k.ID);
-        }
-    }
-
     public class PersonBuilder : IEntityTypeConfiguration<Person>
     {
         public void Configure(EntityTypeBuilder<Person> builder)

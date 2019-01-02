@@ -23,8 +23,8 @@
 #endregion
 
 using System;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Machete.Data.Initialize;
 
 namespace Machete.Data
 {

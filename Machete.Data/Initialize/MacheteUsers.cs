@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Machete.Data
+namespace Machete.Data.Initialize
 {
     public static class MacheteUsers
     {
