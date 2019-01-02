@@ -65,12 +65,11 @@ namespace Machete.Web.Controllers
         }
         //
         // POST: /WorkerSignin/Index -- records a signin
-        [HttpPost]
+        [HttpPost, UserNameFilter]
         [Authorize(Roles = "Manager, Administrator, Check-in")]
         public ActionResult Index(int dwccardnum, DateTime dateforsignin, string userName)
         {
-            var userIdentity = new ClaimsIdentity("Cookies");
-            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, userIdentity.Name);
+            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, userName);
             var result = map.Map<WorkerSignin, ViewModel.WorkerSignin>(wsi);
             return Json(result);
 
