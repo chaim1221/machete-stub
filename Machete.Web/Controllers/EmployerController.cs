@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
@@ -33,10 +34,8 @@ using Machete.Service.DTO;
 using Machete.Web.Helpers;
 using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Employer = Machete.Domain.Employer;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -84,7 +83,7 @@ namespace Machete.Web.Controllers
                 list = serv.GetIndexView(vo);
             }
             catch (Exception ex) {
-                throw ex;
+                throw ex; // TODO Chaim plz
             }
             //return what's left to datatables
             var result = list.query
@@ -116,17 +115,19 @@ namespace Machete.Web.Controllers
         // POST: /Employer/Create
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public JsonResult Create(Employer employer, string userName)
+        public async Task<JsonResult> Create(Employer employer, string userName)
         {
-            UpdateModel(employer);
-            var result = map.Map<Employer, ViewModel.Employer>(serv.Create(employer, userName));
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,    
-                iNewID = result.ID,
-                jobSuccess = true
-            });
+            if (await TryUpdateModelAsync(employer)) {
+                var result = map.Map<Employer, ViewModel.Employer>(serv.Create(employer, userName));
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID,
+                    jobSuccess = true
+                });
+            } else {
+                return Json(new { jobSuccess = false });
+            }
         }
 
         /// <summary>
@@ -142,24 +143,24 @@ namespace Machete.Web.Controllers
             m.def = def;
             return PartialView("Edit", m);
         }
+
         /// <summary>
         /// POST: /Employer/Edit/5
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="collection"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public JsonResult Edit(int id, FormCollection collection, string userName)
+        public async Task<JsonResult> Edit(int id, string userName)
         {
             var employer = serv.Get(id);
-            UpdateModel(employer);
-            serv.Save(employer, userName);                            
-            return Json(new
-            {
-                jobSuccess = true
-            });            
+            if (await TryUpdateModelAsync(employer)) {
+                serv.Save(employer, userName);
+                return Json(new { jobSuccess = true });
+            } else {
+                return Json(new { jobSuccess = false });
+            }
         }
         /// <summary>
         /// 

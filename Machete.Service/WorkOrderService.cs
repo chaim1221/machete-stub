@@ -159,7 +159,7 @@ namespace Machete.Service
             if (o.onlineSource == true) IndexViewBase.filterOnlineSource(o, ref q);
             if (!string.IsNullOrEmpty(o.sSearch)) IndexViewBase.search(o, ref q);
             //
-            IndexViewBase.sortOnColName(o.sortColName, o.orderDescending, o.CI.TwoLetterISOLanguageName, ref q);
+            IndexViewBase.sortOnColName(o.sortColName, o.orderDescending, /*o.CI.TwoLetterISOLanguageName*/"en", ref q);
             //
             result.filteredCount = q.Count();
             result.query = q.ProjectTo<DTO.WorkOrdersList>(map.ConfigurationProvider)
