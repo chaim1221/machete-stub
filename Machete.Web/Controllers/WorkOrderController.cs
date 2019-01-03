@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
@@ -37,7 +38,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using WorkerRequest = Machete.Domain.WorkerRequest;
 using WorkOrder = Machete.Domain.WorkOrder;
 using WorkOrdersList = Machete.Service.DTO.WorkOrdersList;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -155,7 +155,7 @@ namespace Machete.Web.Controllers
             });
         }
         /// <summary>
-        /// HTTP GET /WorkOrder/Create
+        /// GET: /WorkOrder/Create
         /// </summary>
         /// <param name="employerId">Employer ID associated with Work Order (Parent Object)</param>
         /// <returns>MVC Action Result</returns>
@@ -183,19 +183,19 @@ namespace Machete.Web.Controllers
         /// <returns>JSON Object representing new Work Order</returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Create(WorkOrder wo, string userName)
+        public async Task<ActionResult> Create(WorkOrder wo, string userName)
         {
-            UpdateModel(wo);
-            var workOrder = woServ.Create(wo, userName);           
+            if (await TryUpdateModelAsync(wo)) {
+                var workOrder = woServ.Create(wo, userName);
 
-            // JSON object with new work order data
-            var result = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
-            return Json(new 
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID
-            });
+                // JSON object with new work order data
+                var result = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID
+                });
+            } else { return Json(new { status = "Not OK" }); } // TODO Chaim plz
         }
         /// <summary>
         /// GET: /WorkOrder/Edit/ID
@@ -231,10 +231,10 @@ namespace Machete.Web.Controllers
         //[Bind(Exclude = "workerRequests")]
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Edit(int id, string userName, List<WorkerRequest> workerRequestList)
+        public async Task<ActionResult> Edit(int id, string userName, List<WorkerRequest> workerRequestList)
         {
             WorkOrder workOrder = woServ.Get(id);
-            UpdateModel(workOrder);
+            if (await TryUpdateModelAsync(workOrder)) {
 
             woServ.Save(workOrder, workerRequestList, userName);
             return Json(new
@@ -242,6 +242,7 @@ namespace Machete.Web.Controllers
                 status = "OK",
                 editedID = id
             });
+            } else { return Json(new { status = "Not OK" }); } // TODO Chaim plz
         }
         /// <summary>
         /// GET: /WorkOrder/View/ID

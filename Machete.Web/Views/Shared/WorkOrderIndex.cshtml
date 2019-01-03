@@ -42,7 +42,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-                $('#employerSelectDialog').hide();
+        $('#employerSelectDialog').hide();
         $('#employerSelectTable').hide();
 
         ////////////////////////////////////////////////////////////////
@@ -76,17 +76,17 @@
                 "bProcessing": true,
                 "oLanguage": datatable_lang_@(currentCulture.TwoLetterISOLanguageName),
                 "aoColumns": [
-                                { "mDataProp": "tabref", "bSearchable": false, "bSortable": false, "bVisible": false },
-                                { "mDataProp": "tablabel", "bSearchable": false, "bSortable": false, "bVisible": false },
-                                { "mDataProp": "EID", "bSearchable": false, "bSortable": false, "bVisible": false },
-                                { "mDataProp": "WOID" },
-                                { "mDataProp": "dateTimeofWork" },
-                                { "mDataProp": "status" },
-                                { "mDataProp": "WAcount" },
-                                { "mDataProp": "contactName" },
-                                { "mDataProp": "workSiteAddress1" },
-                                { "mDataProp": "dateupdated" },
-                                { "mDataProp": "updatedby" }
+                    { "mDataProp": "tabref", "bSearchable": false, "bSortable": false, "bVisible": false },
+                    { "mDataProp": "tablabel", "bSearchable": false, "bSortable": false, "bVisible": false },
+                    { "mDataProp": "EID", "bSearchable": false, "bSortable": false, "bVisible": false },
+                    { "mDataProp": "WOID" },
+                    { "mDataProp": "dateTimeofWork" },
+                    { "mDataProp": "status" },
+                    { "mDataProp": "WAcount" },
+                    { "mDataProp": "contactName" },
+                    { "mDataProp": "workSiteAddress1" },
+                    { "mDataProp": "dateupdated" },
+                    { "mDataProp": "updatedby" }
                 ],
                 "aoSearchCols" :  [null, null, { "sSearch": "@(Model.ID)" }, null, null, null, null, null, null],
                 "fnServerDataExtra": function() { return [{ name: "showOrdersWorkers", value: true }]},
