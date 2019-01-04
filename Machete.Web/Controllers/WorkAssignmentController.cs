@@ -197,6 +197,10 @@ namespace Machete.Web.Controllers
         public async Task<ActionResult> Edit(int id, int? workerAssignedID, string userName)
         {
             var workAssignment = waServ.Get(id);
+            
+            // hack, I think the entities might be configured wrong TODO
+            workAssignment.workOrder = woServ.Get(workAssignment.workOrderID);
+            
             if (await TryUpdateModelAsync(workAssignment)) {
                 waServ.Save(workAssignment, workerAssignedID, userName);
                 return Json(new {jobSuccess = true});
