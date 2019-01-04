@@ -26,6 +26,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
+// ReSharper disable once CheckNamespace
 namespace Machete.Web.Helpers
 {
     //From http://stackoverflow.com/questions/766610/

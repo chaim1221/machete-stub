@@ -209,14 +209,17 @@ namespace Machete.Web.Controllers
             WorkOrder workOrder = woServ.Get(id);
             
             // Retrieve Worker Requests associated with Work Order
-            ViewBag.workerRequests = workOrder.workerRequests.Select(a => 
+            var workerRequests = workOrder.workerRequests;
+            var selectListItems = workerRequests?.Select(a => 
                 new SelectListItem
-                { 
+                {
                     Value = a.WorkerID.ToString(), 
                     Text = a.workerRequested.dwccardnum.ToString() + ' ' + 
-                    a.workerRequested.Person.firstname1 + ' ' + 
-                    a.workerRequested.Person.lastname1 
+                           a.workerRequested.Person.firstname1 + ' ' + 
+                           a.workerRequested.Person.lastname1 
                 });
+            ViewBag.workerRequests = selectListItems;
+            
             var m = map.Map<WorkOrder, ViewModel.WorkOrder>(workOrder);
             m.def = def;
             return PartialView("Edit", m);
