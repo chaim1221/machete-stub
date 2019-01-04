@@ -21,19 +21,14 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using ElmahCore;
-using ElmahCore.Sql;
+
 using System;
-using System.Web;
-using System.Web.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Machete.Web.Helpers
 {
     //From http://stackoverflow.com/questions/766610/
-    //public class HandleErrorWithELMAHAttribute : HandleErrorAttribute
     public class ElmahHandleErrorAttribute : ExceptionFilterAttribute
     {
         // DO NOT MODIFY this class, it's been taken apart to make MVC Core work

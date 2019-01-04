@@ -21,16 +21,14 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
 using Machete.Domain;
 using Machete.Service;
 using Machete.Web.Helpers;
-using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -42,7 +40,7 @@ namespace Machete.Web.Controllers
         // GET: /Image/
         public ImageController(IImageService imageService)
         {
-            this.serv = imageService;
+            serv = imageService;
         }
         protected override void Initialize(ActionContext requestContext)
         {
@@ -64,10 +62,8 @@ namespace Machete.Web.Controllers
                 Image image = serv.Get(ID);
                 return File(image.ImageData, image.ImageMimeType, image.filename);
             }
-            else
-            {
-                return null; //File(new byte [1], "");
-            }
+
+            return null; //File(new byte [1], "");
         }
     }
 }

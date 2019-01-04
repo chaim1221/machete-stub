@@ -22,7 +22,6 @@
 // 
 #endregion
 
-using System.Security.Claims;
 using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +35,7 @@ namespace Machete.Web.Controllers
         public ActionResult Index()
         {
             if (User.IsInRole("Hirer")) return Redirect("/V2/Onlineorders");
-            else return View();
+            return View();
         }
 
         [Authorize(Roles = "Manager, Administrator, PhoneDesk, User, Teacher, Check-in")]

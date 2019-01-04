@@ -25,6 +25,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
@@ -33,7 +34,6 @@ using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -60,7 +60,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         //
         //
@@ -86,13 +86,13 @@ namespace Machete.Web.Controllers
         //
         // GET: /Event/Create
         [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult Create(int PersonID)
+        public ActionResult Create(int personID)
         {
             var m = map.Map<Event, ViewModel.Event>(new Event
             {
                 dateFrom = DateTime.Today,
                 dateTo = DateTime.Today,
-                PersonID = PersonID
+                PersonID = personID
             });
             m.def = def;
             return PartialView("Create", m);
@@ -102,18 +102,18 @@ namespace Machete.Web.Controllers
         // POST: /Event/Create
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Manager, Administrator")]
-        public ActionResult Create(Event evnt, string userName)
+        public async Task<ActionResult> Create(Event evnt, string userName)
         {
-            UpdateModel(evnt);
-            Event newEvent = serv.Create(evnt, userName);
-            var result = map.Map<Event, ViewModel.Event>(newEvent);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = newEvent.ID,
-                jobSuccess = true
-            });
+            if (await TryUpdateModelAsync(evnt)) {
+                var newEvent = serv.Create(evnt, userName);
+                var result = map.Map<Event, ViewModel.Event>(newEvent);
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = newEvent.ID,
+                    jobSuccess = true
+                });
+            } else { return Json(new { jobSuccess = false }); }
         }
 
         //
@@ -131,13 +131,13 @@ namespace Machete.Web.Controllers
 
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult Edit(int id, string userName)
+        public async Task<ActionResult> Edit(int id, string userName)
         {
-            Event evnt = serv.Get(id);
-            UpdateModel(evnt);
-            serv.Save(evnt, userName);
-  
-            return Json(new { status = "OK" });
+            var evnt = serv.Get(id);
+            if (await TryUpdateModelAsync(evnt)) {
+                serv.Save(evnt, userName);
+                return Json(new {status = "OK"});
+            } else { return Json(new { status = "Not OK" }); } // TODO Chaim plz
         }
         //
         // AddImage
@@ -146,10 +146,10 @@ namespace Machete.Web.Controllers
         public ActionResult AddImage(int id, string userName, IFormFile imagefile)
         {
             if (imagefile == null) throw new MacheteNullObjectException("AddImage called with null imagefile");
-            JoinEventImage joiner = new JoinEventImage();
-            Event evnt = serv.Get(id);
+            var joiner = new JoinEventImage();
+            var evnt = serv.Get(id);
             // TODO:The following code should be in the Service layer
-            Image image = new Image();
+            var image = new Image();
             image.ImageMimeType = imagefile.ContentType;
             image.parenttable = "Events";
             image.filename = imagefile.FileName;
@@ -177,7 +177,7 @@ namespace Machete.Web.Controllers
                 status = "OK"                
             });
         }
-        //
+
         // GET: /Event/Delete/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
@@ -195,17 +195,16 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult DeleteImage(int evntID, int jeviID, string user)
         {
-            int deletedJEVI = 0;
-            Event evnt = serv.Get(evntID);
-            JoinEventImage jevi = evnt.JoinEventImages.Single(e => e.ID == jeviID);
-            deletedJEVI = jevi.ID;
-            iServ.Delete(jevi.ImageID, user);
-            evnt.JoinEventImages.Remove(jevi);
+            var evnt = serv.Get(evntID);
+            var joinEventImage = evnt.JoinEventImages.Single(e => e.ID == jeviID);
+            var deletedImageId = joinEventImage.ID;
+            iServ.Delete(joinEventImage.ImageID, user);
+            evnt.JoinEventImages.Remove(joinEventImage);
 
             return Json(new
             {
                 status = "OK",
-                deletedID = deletedJEVI
+                deletedID = deletedImageId
             });
         }
     }

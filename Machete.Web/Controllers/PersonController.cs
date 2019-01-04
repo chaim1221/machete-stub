@@ -21,35 +21,36 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using AutoMapper;
-using Machete.Domain;
-using Machete.Service;
-using DTO = Machete.Service.DTO;
-using Machete.Web.Helpers;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Machete.Domain;
+using Machete.Service;
+using Machete.Service.DTO;
+using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
     [ElmahHandleError]
     public class PersonController : MacheteController
-    { 
+    {
         private readonly IPersonService serv;
         private readonly IMapper map;
         private readonly IDefaults def;
         CultureInfo CI;
 
         public PersonController(
-            IPersonService pServ, 
+            IPersonService pServ,
             IDefaults def,
             IMapper map)
         {
-            this.serv = pServ;
+            serv = pServ;
             this.map = map;
             this.def = def;
         }
@@ -57,28 +58,28 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
-        
+
         // GET /Person/Index
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
         public ActionResult Index()
         {
             return View();
         }
+
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
         public ActionResult AjaxHandler(jQueryDataTableParam param)
         {
             //Get all the records            
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<DTO.PersonList> list = serv.GetIndexView(vo);
+            dataTableResult<PersonList> list = serv.GetIndexView(vo);
             var result = list.query
-                .Select(e => map.Map<DTO.PersonList, ViewModel.PersonList>(e))
+                .Select(e => map.Map<PersonList, ViewModel.PersonList>(e))
                 .AsEnumerable();
-            return Json(new
-            {
-                sEcho = param.sEcho,
+            return Json(new {
+                param.sEcho,
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
@@ -86,34 +87,36 @@ namespace Machete.Web.Controllers
         }
 
         // GET /Person/Create
-        [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")] 
+        [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
         public ActionResult Create()
         {
-            var p = map.Map<Domain.Person, ViewModel.Person>(new Domain.Person()
-            {
+            var p = map.Map<Person, ViewModel.Person>(new Person {
                 gender = def.getDefaultID(LCategory.gender),
                 active = true
             });
             p.def = def;
             return PartialView("Create", p);
         }
-        
+
         // POST /Person/Create
         [HttpPost, UserNameFilter]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
-        public ActionResult Create(Person person, string userName)
+        public async Task<ActionResult> Create(Person person, string userName)
         {
-            UpdateModel(person);
-            var newperson = serv.Create(person, userName);
-            var result = map.Map<Domain.Person, ViewModel.Person>(newperson);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID
-            });
+            if (await TryUpdateModelAsync(person)) {
+                var newperson = serv.Create(person, userName);
+                var result = map.Map<Person, ViewModel.Person>(newperson);
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID
+                });
+            } else {
+                return Json(new { status = "Not OK" }); // TODO Chaim plz
+            }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -123,10 +126,11 @@ namespace Machete.Web.Controllers
         public ActionResult Edit(int id)
         {
             var p = serv.Get(id);
-            var m = map.Map<Domain.Person, ViewModel.Person>(p);
+            var m = map.Map<Person, ViewModel.Person>(p);
             m.def = def;
             return PartialView("Edit", m);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -134,17 +138,20 @@ namespace Machete.Web.Controllers
         /// <param name="userName"></param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
-        [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")] 
-        public ActionResult Edit(int id, string userName)
+        [Authorize(Roles = "Administrator, Manager, Teacher, PhoneDesk")]
+        public async Task<ActionResult> Edit(int id, string userName)
         {
-            Person person = serv.Get(id);          
-            UpdateModel(person);
-            serv.Save(person, userName);
-            return Json(new
-            {
-                status = "OK"
-            });
+            var person = serv.Get(id);
+            if (await TryUpdateModelAsync(person)) {
+                serv.Save(person, userName);
+                return Json(new {
+                    status = "OK"
+                });
+            } else {
+                return Json(new {status = "not OK"});
+            }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -154,7 +161,7 @@ namespace Machete.Web.Controllers
         public ActionResult View(int id)
         {
             Person person = serv.Get(id);
-            var m = map.Map<Domain.Person, ViewModel.Person>(person);
+            var m = map.Map<Person, ViewModel.Person>(person);
             m.def = def;
             return View(m);
         }
@@ -190,16 +197,16 @@ namespace Machete.Web.Controllers
  
             foreach (var person in list)
             {
-                var person_FirstName = person.firstname1.Replace(" ", "");
-                var person_LastName = person.lastname1.Replace(" ", "");
-                var person_Phone = string.IsNullOrEmpty(person.phone) ? "y" : person.phone;
+                var personFirstName = person.firstname1.Replace(" ", "");
+                var personLastName = person.lastname1.Replace(" ", "");
+                var personPhone = string.IsNullOrEmpty(person.phone) ? "y" : person.phone;
 
                //checking if person already exists in dbase
-                if ((person_FirstName.Equals(firstname, StringComparison.CurrentCultureIgnoreCase)
-                    && person_LastName.Equals(lastname, StringComparison.CurrentCultureIgnoreCase))
-                    || (person_FirstName.Equals(firstname, StringComparison.CurrentCultureIgnoreCase)
+                if ((personFirstName.Equals(firstname, StringComparison.CurrentCultureIgnoreCase)
+                    && personLastName.Equals(lastname, StringComparison.CurrentCultureIgnoreCase))
+                    || (personFirstName.Equals(firstname, StringComparison.CurrentCultureIgnoreCase)
                         && person.phone == phone)
-                    || (person_LastName.Equals(lastname, StringComparison.CurrentCultureIgnoreCase)
+                    || (personLastName.Equals(lastname, StringComparison.CurrentCultureIgnoreCase)
                         && person.phone == phone))
                 {
                     var personFound = new Dictionary<string, string>();

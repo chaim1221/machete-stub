@@ -2,14 +2,12 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Machete.Data;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.Resources;
 using Machete.Web.ViewModel;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

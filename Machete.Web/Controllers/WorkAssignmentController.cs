@@ -25,6 +25,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
@@ -33,8 +34,6 @@ using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static Machete.Web.Controllers.Helpers;
-using String = System.String;
 using WorkAssignment = Machete.Domain.WorkAssignment;
 using WorkAssignmentsList = Machete.Service.DTO.WorkAssignmentsList;
 using WorkerSignin = Machete.Domain.WorkerSignin;
@@ -68,20 +67,16 @@ namespace Machete.Web.Controllers
             base.Initialize(requestContext);
             CI = Session["Culture"];
         }
-        #region Index
-        //
+
         // GET: /WorkAssignment/
-        //
         [Authorize(Roles = "Administrator, Manager, PhoneDesk, Check-in")]
         public ActionResult Index()
         {
-            WorkAssignmentIndex wai = new WorkAssignmentIndex();
-            wai.todaysdate = String.Format("{0:MM/dd/yyyy}", DateTime.Today);
-            wai.def = def;
-            return View(wai);
+            var workAssignmentIndex = new WorkAssignmentIndex();
+            workAssignmentIndex.todaysdate = $"{DateTime.Today:MM/dd/yyyy}";
+            workAssignmentIndex.def = def;
+            return View(workAssignmentIndex);
         }
-
-        #endregion
 
         [Authorize(Roles = "Administrator, Manager, PhoneDesk, Check-in")]
         public ActionResult AjaxHandler(jQueryDataTableParam param)
@@ -101,56 +96,48 @@ namespace Machete.Web.Controllers
                 aaData = result
             });
         }          
-        //
+        
         // GET: /WorkAssignment/Create
-        //
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        #region Create
-        public ActionResult Create(int WorkOrderID, string _description)
+        public ActionResult Create(int workOrderID, string description)
         {
             var wa = map.Map<WorkAssignment, ViewModel.WorkAssignment>(new WorkAssignment
             {
                 active = true,
-                workOrderID = WorkOrderID,
+                workOrderID = workOrderID,
                 skillID = def.getDefaultID(LCategory.skill),
                 hours = def.hoursDefault,
                 days = def.daysDefault,
                 hourlyWage = def.hourlyWageDefault,
-                description = _description
+                description = description
             });
             wa.def = def;
-        return PartialView("Create", wa);
-    }
-
-    //
-    // POST: /WorkAssignment/Create
-    //
-    [HttpPost, UserNameFilter]
-        [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Create(WorkAssignment assignment, string userName)
-        {
-            UpdateModel(assignment);
-            assignment.workOrder = woServ.Get(assignment.workOrderID);
-            var newAssignment = waServ.Create(assignment, userName);
-            var result = map.Map<WorkAssignment, ViewModel.WorkAssignment>(newAssignment);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID
-            });
+            return PartialView("Create", wa);
         }
-        #endregion
+    
+        // POST: /WorkAssignment/Create
+        [HttpPost, UserNameFilter]
+        [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
+        public async Task<ActionResult> Create(WorkAssignment assignment, string userName)
+        {
+            if (await TryUpdateModelAsync(assignment)) {
+                assignment.workOrder = woServ.Get(assignment.workOrderID);
+                var newAssignment = waServ.Create(assignment, userName);
+                var result = map.Map<WorkAssignment, ViewModel.WorkAssignment>(newAssignment);
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID
+                });
+            } else { return Json(new { status = "Not OK"}); } // TODO Chaim plz
+        }
 
-        
-        //
+
         // POST: /WorkAssignment/Edit/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        #region Duplicate
         public ActionResult Duplicate(int id, string userName)
         {
-            //
             // TODO: Move duplication functionality to the service layer
             WorkAssignment _assignment = waServ.Get(id);
             WorkAssignment duplicate = _assignment;
@@ -168,11 +155,9 @@ namespace Machete.Web.Controllers
             });
 
         }
-        #endregion
 
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        #region Assign
         public ActionResult Assign(int waid, int wsiid, string userName)
         {
             WorkerSignin signin = wsiServ.Get(wsiid);
@@ -195,12 +180,9 @@ namespace Machete.Web.Controllers
                 jobSuccess = true
             });
         }
-        #endregion
-        //
+
         // GET: /WorkAssignment/Edit/5
-        //
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        #region Edit
         public ActionResult Edit(int id)
         {
             WorkAssignment wa = waServ.Get(id);
@@ -208,35 +190,27 @@ namespace Machete.Web.Controllers
             m.def = def;
             return PartialView("Edit", m);
         }
-        //
+
         // POST: /WorkAssignment/Edit/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        public ActionResult Edit(int id, int? workerAssignedID, string userName)
+        public async Task<ActionResult> Edit(int id, int? workerAssignedID, string userName)
         {
-            WorkAssignment asmt = waServ.Get(id);    
-            //Update from HTML attributes
-            UpdateModel(asmt);
-            waServ.Save(asmt, workerAssignedID, userName);
-                
-            return Json(new { jobSuccess = true });
+            var workAssignment = waServ.Get(id);
+            if (await TryUpdateModelAsync(workAssignment)) {
+                waServ.Save(workAssignment, workerAssignedID, userName);
+                return Json(new {jobSuccess = true});
+            } else { return Json(new { jobSuccess = false }); }
         }
-        #endregion      
-        //
-        //GET: /WorkAssignment/View/5
-        //
-        [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
-        #region View
+
+//        //GET: /WorkAssignment/View/5
+//        [Authorize(Roles = "Administrator, Manager, PhoneDesk")]
 //        public ActionResult View(int id)
 //        {
-//            WorkAssignment workAssignment = waServ.Get(id);
-//            
-////            var m = map.Map<Domain.WorkAssignment, ViewModel.WorkAssignment>(wa);
-////            m.def = def;
-//            return View("~/Views/???", m);
+//            var workAssignment = waServ.Get(id);
+//            return View(workAssignment);
 //        }
-        #endregion
-        #region Delete
+
         //
         // POST: /WorkAssignment/Delete/5
         [HttpPost, UserNameFilter]
@@ -252,8 +226,5 @@ namespace Machete.Web.Controllers
                 deletedID = id
             });
         }
-        #endregion
     }
-
-
 }

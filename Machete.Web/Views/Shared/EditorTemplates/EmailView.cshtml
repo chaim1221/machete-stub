@@ -14,17 +14,18 @@
     <input type="button" id="@(Model.idPrefix)viewWO" class="formButton" value="@Emails.viewWO" />
 </div>
 <div class="tb-table" style="float: left; clear: left;">
-    @*    <div class="tb-row">
-        @Html.mUITableLabelAndTextBoxFor(model => model.emailFrom, 
-            new {tabindex = "1", id=idPrefix + "emailFrom", @class="emailField email"})
-    </div>*@
     <div class="tb-row">
         <div class="tb-label">
             @Html.Label(Emails.emailStatus)
         </div>
-        @if (Html.IsInRole(new[] { "Administrator", "Manager" }) && Model.editable)
+        @if (Html.IsInRole("Administrator", "Manager") && Model.editable)
         {
-            @Html.mUIDropDownListFor(model => model.statusID, Model.def.getSelectList(LCategory.emailstatus), new { id = Model.idPrefix + "status" })
+            <div class="tb-field">
+                @Html.DropDownListFor(model => model.statusID,
+                    new SelectList(Model.def.getSelectList(LCategory.emailstatus), "Value", "Text", Model),
+                    Shared.choose, new { id = Model.idPrefix + "status" })
+                @Html.ValidationMessageFor(model => model.statusID);
+            </div>
         }
         else
         { 
@@ -55,13 +56,25 @@
         @Html.HiddenFor(m => m.attachment, new { id = Model.idPrefix + "attachment" })
     </div>
     <div class="tb-row">
-        @Html.mUITableLabelAndTextBoxFor(model => model.emailTo,
-            new { tabindex = "1", id = Model.idPrefix + "emailTo", @class = "emailField" })
+        <div class="tb-label">
+            @Html.LabelFor(model => model.emailTo)
+        </div>
+        <div class="tb-field">
+            @Html.TextBoxFor(model => model.emailTo,
+                new { tabindex = "1", id = Model.idPrefix + "emailTo", @class = "emailField" })
+            @Html.ValidationMessageFor(model => model.emailTo)
+        </div>
     </div>
     <!--tb-row-->
     <div class="tb-row">
-        @Html.mUITableLabelAndTextBoxFor(m => m.subject,
-            new { tabindex = "1", id = Model.idPrefix + "subject", @class = "emailField" })
+        <div class="tb-label">
+            @Html.LabelFor(m => m.subject)
+        </div>
+        <div class="tb-field">
+            @Html.TextBoxFor(m => m.subject,
+                new { tabindex = "1", id = Model.idPrefix + "subject", @class = "emailField" })
+            @Html.ValidationMessageFor(m => m.subject)
+        </div>
     </div>
     <div class="tb-row">
         <div class="tb-label desc-label">
