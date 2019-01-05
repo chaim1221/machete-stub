@@ -24,16 +24,6 @@ namespace Machete.Test.Integration.DotNetCore
             var lookupRepository = new LookupRepository(databaseFactory);
             var mapper = new Mapper(new MapperConfigurationFactory().Config);
             personService = new PersonService(personRepository, unitOfWork, lookupRepository, mapper);
-            
-
-            var options = new DbContextOptionsBuilder<MacheteContext>()
-                .UseSqlServer(connString, with =>
-                    with.MigrationsAssembly("Machete.Data"))
-                .Options;
-            
-            var services = new Mock<IServiceProvider>();
-            services.Setup(request => request.GetService(typeof(MacheteContext)))
-                    .Returns(new MacheteContext(options));
         }
 
         private PersonService personService { get; }
