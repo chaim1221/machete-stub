@@ -1,7 +1,7 @@
 #region COPYRIGHT
-// File:     IsInRole.cs
+// File:     mUIExtensions.cs
 // Author:   Savage Learning, LLC.
-// Created:  2012/06/17 
+// Created:  2012/06/25 
 // License:  GPL v3
 // Project:  Machete.Web
 // Contact:  savagelearning
@@ -22,18 +22,29 @@
 // 
 #endregion
 
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Machete.Web.Helpers
 {
-    //http://stackoverflow.com/questions/4649795/hiding-column-in-table-based-on-role-in-mvc
-    public static class IsInRoleHelper
+    public static class HelperExtensions
     {
+        public static string ToShortTextBoxDateString(this DateTime source)
+        {            
+            return source == DateTime.MinValue ? "" : source.ToShortDateString();
+        }
+        public static string ToShortTextBoxDateString(this DateTime? source)
+        {
+            return source == null || source == DateTime.MinValue ? "" : source.Value.ToShortDateString();
+        }
+        
+        //http://stackoverflow.com/questions/4649795/hiding-column-in-table-based-on-role-in-mvc
         public static bool IsInRole(this IHtmlHelper instance, params string[] roles)
         {
             var user = instance.ViewContext.HttpContext.User;
             return roles.Any(role => user.IsInRole(role));
         }
+
     }
 }

@@ -21,20 +21,21 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
-using DTO = Machete.Service.DTO;
+using Machete.Service.DTO;
 using Machete.Web.Helpers;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using static Machete.Web.Controllers.Helpers;
-using Attribute = System.Attribute;
 
 namespace Machete.Web.Controllers
 {
@@ -44,7 +45,7 @@ namespace Machete.Web.Controllers
         private readonly ILookupService serv;
         private readonly IMapper map;
         private readonly IDefaults def;
-        System.Globalization.CultureInfo CI;
+        CultureInfo CI;
         public LookupController(ILookupService serv,
             IDefaults def,
             IMapper map)
@@ -74,14 +75,14 @@ namespace Machete.Web.Controllers
             //Get all the records
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            IEnumerable<DTO.LookupList> list = serv.GetIndexView(vo);
+            IEnumerable<LookupList> list = serv.GetIndexView(vo);
             var result = list
                 .Select(
-                    e => map.Map<DTO.LookupList, ViewModel.LookupList>(e)
+                    e => map.Map<LookupList, ViewModel.LookupList>(e)
                 ).AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = serv.TotalCount(),
                 iTotalDisplayRecords = serv.TotalCount(),
                 aaData = result
@@ -94,33 +95,35 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Create()
         {
-            var m = map.Map<Domain.Lookup, ViewModel.Lookup>(new Lookup());
+            var m = map.Map<Lookup, ViewModel.Lookup>(new Lookup());
             m.def = def;
             return PartialView("~/Views/Config/Create.cshtml", m);
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="person"></param>
-        /// <param name="userName"></param>
+        /// <param name="lookup">The model being created.</param>
+        /// <param name="userName">Automatically generated.</param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult Create(Lookup lookup, string userName)
+        public async Task<ActionResult> Create(Lookup lookup, string userName)
         {
             //Lookup lookup = null;
-            UpdateModel(lookup);
-            lookup = serv.Create(lookup, userName);
-            var result = map.Map<Domain.Lookup, ViewModel.Lookup>(lookup);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID,
-                jobSuccess = true
-            });
+            if(await TryUpdateModelAsync(lookup)) {
+                lookup = serv.Create(lookup, userName);
+                var result = map.Map<Lookup, ViewModel.Lookup>(lookup);
+                return Json(new
+                {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID,
+                    jobSuccess = true
+                });
+            } else {
+                return Json(new { jobSuccess = false });
+            }
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -129,7 +132,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult Edit(int id)
         {
-            var m = map.Map<Domain.Lookup, ViewModel.Lookup>(serv.Get(id));
+            var m = map.Map<Lookup, ViewModel.Lookup>(serv.Get(id));
             m.def = def;
             return PartialView("~/Views/Config/Edit.cshtml", m);
         }
@@ -141,15 +144,18 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        public ActionResult Edit(int id, string userName)
+        public async Task<ActionResult> Edit(int id, string userName)
         {
-            Lookup lookup = serv.Get(id);
-            UpdateModel(lookup);
-            serv.Save(lookup, userName);
-            return Json(new
-            {
-                status = "OK"
-            });
+            var lookup = serv.Get(id);
+            if (await TryUpdateModelAsync(lookup)) {
+                serv.Save(lookup, userName);
+                return Json(new
+                {
+                     status = "OK"
+                });
+            } else {
+                return Json(new { status = "Not OK" }); // TODO Chaim plz
+            }
         }
         /// <summary>
         /// 
@@ -159,7 +165,7 @@ namespace Machete.Web.Controllers
         [Authorize(Roles = "Administrator, Manager")]
         public ActionResult View(int id)
         {
-            var m = map.Map<Domain.Lookup, ViewModel.Lookup>(serv.Get(id));
+            var m = map.Map<Lookup, ViewModel.Lookup>(serv.Get(id));
             m.def = def;
             return PartialView("~/Views/Config/Edit.cshtml", m);
         }

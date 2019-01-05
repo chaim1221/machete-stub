@@ -21,14 +21,15 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System;
+using System.Globalization;
+using System.Linq;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
-using DTO = Machete.Service.DTO;
+using Machete.Service.DTO;
 using Machete.Web.Helpers;
-using System;
-using System.Linq;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,12 +41,12 @@ namespace Machete.Web.Controllers
         private readonly IWorkerSigninService serv;
         private readonly IMapper map;
         private readonly IDefaults def;
-        private System.Globalization.CultureInfo CI;        
+        private CultureInfo CI;        
         public WorkerSigninController(IWorkerSigninService workerSigninService, 
             IDefaults def,
             IMapper map)
         {
-            this.serv = workerSigninService;
+            serv = workerSigninService;
             this.map = map;
             this.def = def;
         }
@@ -65,12 +66,11 @@ namespace Machete.Web.Controllers
         }
         //
         // POST: /WorkerSignin/Index -- records a signin
-        [HttpPost]
+        [HttpPost, UserNameFilter]
         [Authorize(Roles = "Manager, Administrator, Check-in")]
         public ActionResult Index(int dwccardnum, DateTime dateforsignin, string userName)
         {
-            var userIdentity = new ClaimsIdentity("Cookies");
-            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, userIdentity.Name);
+            var wsi = serv.CreateSignin(dwccardnum, dateforsignin, userName);
             var result = map.Map<WorkerSignin, ViewModel.WorkerSignin>(wsi);
             return Json(result);
 
@@ -139,16 +139,14 @@ namespace Machete.Web.Controllers
                         rtnMessage = "You cannot delete a signin that has been associated with an Assignment. Disassociate the sigin with the assignment first."
                     });
             }
-            else
-            { 
-                serv.Delete(id, userName);            
-                return Json(new
-                {
-                    jobSuccess = true,
-                    status = "OK",
-                    deletedID = id
-                });
-            }
+
+            serv.Delete(id, userName);            
+            return Json(new
+            {
+                jobSuccess = true,
+                status = "OK",
+                deletedID = id
+            });
         }
 
         [Authorize(Roles = "Administrator, Manager, Check-in")]
@@ -156,13 +154,13 @@ namespace Machete.Web.Controllers
         {
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<Service.DTO.WorkerSigninList> was = serv.GetIndexView(vo);
+            dataTableResult<WorkerSigninList> was = serv.GetIndexView(vo);
             var result = was.query
-                .Select(e => map.Map<DTO.WorkerSigninList, ViewModel.WorkerSigninList>(e))
+                .Select(e => map.Map<WorkerSigninList, ViewModel.WorkerSigninList>(e))
                 .AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = was.totalCount,
                 iTotalDisplayRecords = was.filteredCount,
                 aaData = result

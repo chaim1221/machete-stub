@@ -27,17 +27,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
 using Machete.Web.Helpers;
 using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Activity = Machete.Domain.Activity;
 using ActivityList = Machete.Service.DTO.ActivityList;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -62,7 +61,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
         }
         /// <summary>
         /// 
@@ -75,7 +74,7 @@ namespace Machete.Web.Controllers
             if (User.IsInRole("Administrator") || User.IsInRole("Manager"))
                 model.authenticated = 1;
             else model.authenticated = 0;
-            model.CI = (CultureInfo)Session["Culture"];
+            model.CI = Session["Culture"];
             return View(model);
         }
 
@@ -130,42 +129,43 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
-        public JsonResult Create(Activity activ, string userName)
+        public async Task<JsonResult> Create(Activity activ, string userName)
         {
-            UpdateModel(activ);
-            activ.firstID = activ.ID;
-
-            if (activ.nameID == 0)
-            {
-                if (activ.typeID == def.byKeys(LCategory.activityType, LActType.Assembly))
-                    activ.nameID = def.byKeys(LCategory.activityName, LActName.Assembly);
-                else if (activ.typeID == def.byKeys(LCategory.activityType, LActType.OrgMtg))
-                    activ.nameID = def.byKeys(LCategory.activityName, LActName.OrgMtg);
-                else
-                    throw new MacheteIntegrityException("Something went wrong with Activity Types.");
+            if (await TryUpdateModelAsync(activ, "")) {
+                activ.firstID = activ.ID;
+    
+                if (activ.nameID == 0)
+                {
+                    if (activ.typeID == def.byKeys(LCategory.activityType, LActType.Assembly))
+                        activ.nameID = def.byKeys(LCategory.activityName, LActName.Assembly);
+                    else if (activ.typeID == def.byKeys(LCategory.activityType, LActType.OrgMtg))
+                        activ.nameID = def.byKeys(LCategory.activityName, LActName.OrgMtg);
+                    else
+                        throw new MacheteIntegrityException("Something went wrong with Activity Types.");
+                }
+    
+                if (activ.dateEnd < activ.dateStart)
+                    return Json(new { jobSuccess = false, rtnMessage = "End date must be greater than start date." });
+    
+                Activity firstAct = serv.Create(activ, userName);
+                var result = map.Map<Activity, ViewModel.Activity>(firstAct);
+    
+                if (activ.recurring)
+                {
+                    result.tablabel = "Recurring event with " + firstAct.teacher;
+                    result.tabref = "/Activity/CreateMany/" + Convert.ToString(firstAct.ID);
+                }
+    
+                return Json(new
+                {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID,
+                    jobSuccess = true
+                });
+            } else {
+                return Json(new { jobSuccess = false });
             }
-
-            if (activ.dateEnd < activ.dateStart)
-                return Json(new { jobSuccess = false, rtnMessage = "End date must be greater than start date." });
-
-            Activity firstAct = serv.Create(activ, userName);
-            var result = map.Map<Activity, ViewModel.Activity>(firstAct);
-
-            if (activ.recurring)
-            {
-                result.tablabel = "Recurring event with " + firstAct.teacher;
-                result.tabref = "/Activity/CreateMany/" + Convert.ToString(firstAct.ID);
-            }
-
-
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID,
-                jobSuccess = true
-            });
-           
         }
 
         [Authorize(Roles = "Administrator, Manager")]
@@ -179,47 +179,49 @@ namespace Machete.Web.Controllers
 
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
-        public JsonResult CreateMany(ActivitySchedule actSched, string userName)
+        public async Task<JsonResult> CreateMany(ActivitySchedule actSched, string userName)
         {
-            UpdateModel(actSched); // copy values from form to object. why this is necessary if the object is being passed as arg, I don't know.
-            var firstActivity = serv.Get(actSched.firstID);
-            var instances = actSched.stopDate.Subtract(actSched.dateStart).Days;
-            var length = actSched.dateEnd.Subtract(actSched.dateStart).TotalMinutes;
+            if (await TryUpdateModelAsync(actSched)) {
+                var firstActivity = serv.Get(actSched.firstID);
+                var instances = actSched.stopDate.Subtract(actSched.dateStart).Days;
+                var length = actSched.dateEnd.Subtract(actSched.dateStart).TotalMinutes;
+                
+                for (var i = 0; i <= instances; ++i) // This should skip right over firstAct.
+                {
+                    var date = actSched.dateStart.AddDays(i);
+                    var day = (int)date.DayOfWeek;
 
-            for (var i = 0; i <= instances; ++i) // This should skip right over firstAct.
-            {
-                var date = actSched.dateStart.AddDays(i);
-                var day = (int)date.DayOfWeek;
+                    if (day == 0 && !actSched.sunday) continue;
+                    if (day == 1 && !actSched.monday) continue;
+                    if (day == 2 && !actSched.tuesday) continue;
+                    if (day == 3 && !actSched.wednesday) continue;
+                    if (day == 4 && !actSched.thursday) continue;
+                    if (day == 5 && !actSched.friday) continue;
+                    if (day == 6 && !actSched.saturday) continue;
+                    var activ = new Activity();
+                    activ.nameID = actSched.name;
+                    activ.typeID = actSched.type;
+                    activ.dateStart = date;
+                    activ.dateEnd = date.AddMinutes(length);
+                    activ.recurring = true;
+                    activ.firstID = firstActivity.ID;
+                    activ.teacher = actSched.teacher;
+                    activ.notes = actSched.notes;
 
-                if (day == 0 && !actSched.sunday) continue;
-                if (day == 1 && !actSched.monday) continue;
-                if (day == 2 && !actSched.tuesday) continue;
-                if (day == 3 && !actSched.wednesday) continue;
-                if (day == 4 && !actSched.thursday) continue;
-                if (day == 5 && !actSched.friday) continue;
-                if (day == 6 && !actSched.saturday) continue;
-                var activ = new Activity();
-                activ.nameID = actSched.name;
-                activ.typeID = actSched.type;
-                activ.dateStart = date;
-                activ.dateEnd = date.AddMinutes(length);
-                activ.recurring = true;
-                activ.firstID = firstActivity.ID;
-                activ.teacher = actSched.teacher;
-                activ.notes = actSched.notes;
-
-                var act = serv.Create(activ, userName);
+                    serv.Create(activ, userName);
+                }
+                var result = map.Map<Activity, ViewModel.Activity>(firstActivity);
+                return Json(new
+                {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = firstActivity.ID,
+                    jobSuccess = true
+                });
+            } else {
+                return Json(new { jobSuccess = false });
             }
-            var result = map.Map<Activity, ViewModel.Activity>(firstActivity);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = firstActivity.ID,
-                jobSuccess = true
-            });
         }
-
         /// <summary>
         /// GET: /Activity/Edit/5
         /// </summary>
@@ -236,26 +238,26 @@ namespace Machete.Web.Controllers
         /// POST: /Activity/Edit/5
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="collection"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
-        public JsonResult Edit(int id, FormCollection collection, string userName)
+        public async Task<JsonResult> Edit(int id, string userName)
         {
-            Activity activity = serv.Get(id);
-            UpdateModel(activity);
-            serv.Save(activity, userName);
-            return Json(new
-            {
-                jobSuccess = true
-            });
+            var activity = serv.Get(id);
+            
+            if (await TryUpdateModelAsync(activity)) {
+                serv.Save(activity, userName);
+                return Json(new { jobSuccess = true });
+            }
+            
+            return Json(new { jobSuccess = false });
         }
         /// <summary>
-        /// 
+        /// POST /Activity/Delete/5
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="UserName"></param>s
+        /// <param name="userName">Automatically populated by UserNameFilter.</param>
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
@@ -270,7 +272,7 @@ namespace Machete.Web.Controllers
                 deletedID = id
             });
         }
-
+        // POST /Activity/DeleteMany/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager")]
         public JsonResult DeleteMany(int id, string userName)
@@ -292,8 +294,7 @@ namespace Machete.Web.Controllers
                 deletedID = id
             });
         }
-        //
-        //
+        // POST /Activity/Assign/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
         public JsonResult Assign(int personID, List<int> actList, string userName)
@@ -307,8 +308,7 @@ namespace Machete.Web.Controllers
                 jobSuccess = true
             });
         }
-        //
-        //
+        // POST /Activity/Unassign/5
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
         public JsonResult Unassign(int personID, List<int> actList, string userName)

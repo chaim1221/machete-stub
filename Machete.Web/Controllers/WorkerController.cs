@@ -22,19 +22,19 @@
 // 
 #endregion
 
+using System.Globalization;
 using System.IO;
-using AutoMapper;
-using Machete.Domain;
-using Machete.Service;
-using DTO = Machete.Service.DTO;
-using Machete.Web.Helpers;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
+using Machete.Domain;
+using Machete.Service;
+using Machete.Service.DTO;
+using Machete.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static Machete.Web.Controllers.Helpers;
 
 namespace Machete.Web.Controllers
 {
@@ -45,7 +45,7 @@ namespace Machete.Web.Controllers
         private readonly IImageService imageServ;
         private readonly IMapper map;
         private readonly IDefaults def;
-        System.Globalization.CultureInfo CI;
+        CultureInfo CI;
 
         public WorkerController(IWorkerService workerService, 
                                 IPersonService personService,
@@ -53,7 +53,7 @@ namespace Machete.Web.Controllers
             IDefaults def,
             IMapper map)
         {
-            this.serv = workerService;
+            serv = workerService;
             this.imageServ = imageServ;
             this.map = map;
             this.def = def;
@@ -61,7 +61,7 @@ namespace Machete.Web.Controllers
         protected override void Initialize(ActionContext requestContext)
         {
             base.Initialize(requestContext);
-            CI = (System.Globalization.CultureInfo)Session["Culture"];
+            CI = Session["Culture"];
             // TODO this needs to be scheduled elsewhere
             //serv.ExpireMembers();
             //serv.ReactivateMembers();
@@ -85,14 +85,14 @@ namespace Machete.Web.Controllers
         {
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<DTO.WorkerList> list = serv.GetIndexView(vo);
+            dataTableResult<WorkerList> list = serv.GetIndexView(vo);
             var result = list.query
             .Select(
-                e => map.Map<DTO.WorkerList, ViewModel.WorkerList>(e)
+                e => map.Map<WorkerList, ViewModel.WorkerList>(e)
             ).AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result
@@ -113,14 +113,14 @@ namespace Machete.Web.Controllers
         {
             // TODO handle exception of next worker number
             var nextnum = serv.GetNextWorkerNum();
-            var w = map.Map<Domain.Worker, ViewModel.Worker>(new Domain.Worker()
-            {
+            var w = map.Map<Worker, ViewModel.Worker>(new Worker {
                 ID = ID,
                 dwccardnum = nextnum
             });
             w.def = def;
             return PartialView("Create", w);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -130,20 +130,23 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "PhoneDesk, Manager, Teacher, Administrator")]
-        public async Task<ActionResult> Create(Domain.Worker worker, string userName, IFormFile imagefile)
+        public async Task<ActionResult> Create(Worker worker, string userName, IFormFile imagefile)
         {
-            UpdateModel(worker);
-            if (imagefile != null) await updateImage(worker, imagefile);
-            Worker newWorker = serv.Create(worker, userName);
-            var result = map.Map<Domain.Worker, ViewModel.Worker>(newWorker);
-            return Json(new
-            {
-                sNewRef = result.tabref,
-                sNewLabel = result.tablabel,
-                iNewID = result.ID,
-                jobSuccess = true
-            });
+            if (await TryUpdateModelAsync(worker)) {
+                if (imagefile != null) await updateImage(worker, imagefile);
+                Worker newWorker = serv.Create(worker, userName);
+                var result = map.Map<Worker, ViewModel.Worker>(newWorker);
+                return Json(new {
+                    sNewRef = result.tabref,
+                    sNewLabel = result.tablabel,
+                    iNewID = result.ID,
+                    jobSuccess = true
+                });
+            } else {
+                return Json(new {jobSuccess = "false"});
+            }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -153,7 +156,7 @@ namespace Machete.Web.Controllers
         public ActionResult Edit(int id)
         {
             Worker w = serv.Get(id);
-            var m = map.Map<Domain.Worker, ViewModel.Worker>(w);
+            var m = map.Map<Worker, ViewModel.Worker>(w);
             m.def = def;
             return PartialView(m);
         }
@@ -170,7 +173,7 @@ namespace Machete.Web.Controllers
         public async Task<ActionResult> Edit(int id, Worker _model, string userName, IFormFile imagefile)
         {
             Worker worker = serv.Get(id);
-            UpdateModel(worker);
+            if (await TryUpdateModelAsync(worker)) {
             
             if (imagefile != null) await updateImage(worker, imagefile);                
             serv.Save(worker, userName);
@@ -178,7 +181,7 @@ namespace Machete.Web.Controllers
             {
                 jobSuccess = true
             });
-
+            } else { return Json(new { jobSuccess = false }); }
         }
         /// <summary>
         /// 

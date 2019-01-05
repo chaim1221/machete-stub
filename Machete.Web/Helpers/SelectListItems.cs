@@ -24,39 +24,7 @@
 
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace System.Web.Mvc.Html
-{
-    public static class SelectExtensions
-    {
-        /// <summary>
-        /// Handles extra attributes for WorkAssignment skill dropdown
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        internal static string ListItemToOption(SelectListItemEx item)
-        {
-            TagBuilder builder = new TagBuilder("option");
-//            {
-//                InnerHtml = HttpUtility.HtmlEncode(item.Text)
-//            };
-            if (item.Value != null)
-            {
-                builder.Attributes["value"] = item.Value;
-            }
-            if (item.Selected)
-            {
-                builder.Attributes["selected"] = "selected";
-            }
-            if (item.wage != null)
-            {
-                builder.Attributes["wage"] = item.wage;
-            }
-            return builder.ToString(); //TagRenderMode.Normal
-        }
-    }
-}
-
-namespace System.Web.Mvc
+namespace Machete.Web.Helpers
 {
     /// <summary>
     /// SelectListItem with extra properties for WorkAssignment skill dropdown

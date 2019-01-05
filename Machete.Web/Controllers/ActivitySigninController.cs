@@ -21,16 +21,18 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
+
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Security.Claims;
 using AutoMapper;
 using Machete.Domain;
 using Machete.Service;
-using DTO = Machete.Service.DTO;
+using Machete.Service.DTO;
 using Machete.Web.Helpers;
-using System;
-using System.Linq;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Machete.Web.Controllers
 {
@@ -40,7 +42,7 @@ namespace Machete.Web.Controllers
         private readonly IActivitySigninService serv;
         private readonly IMapper map;
         private readonly IDefaults def;
-        private System.Globalization.CultureInfo CI;
+        private CultureInfo CI;
 
         public ActivitySigninController(
             IActivitySigninService serv, 
@@ -93,7 +95,7 @@ namespace Machete.Web.Controllers
                 memberInactive = w.isInactive,
                 memberSanctioned = w.isSanctioned,
                 memberExpelled = w.isExpelled,
-                imageRef = imageRef,
+                imageRef,
                 expirationDate = w.memberexpirationdate
             });
         }
@@ -125,14 +127,14 @@ namespace Machete.Web.Controllers
         {
             var vo = map.Map<jQueryDataTableParam, viewOptions>(param);
             vo.CI = CI;
-            dataTableResult<DTO.ActivitySigninList> list = serv.GetIndexView(vo);
+            dataTableResult<ActivitySigninList> list = serv.GetIndexView(vo);
             var result = list.query
                 .Select(
-                    e => map.Map<DTO.ActivitySigninList, ViewModel.ActivitySigninList>(e)
+                    e => map.Map<ActivitySigninList, ViewModel.ActivitySigninList>(e)
                 ).AsEnumerable();
             return Json(new
             {
-                sEcho = param.sEcho,
+                param.sEcho,
                 iTotalRecords = list.totalCount,
                 iTotalDisplayRecords = list.filteredCount,
                 aaData = result

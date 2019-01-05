@@ -27,8 +27,6 @@ using Machete.Data;
 using Machete.Data.Infrastructure;
 using Machete.Domain;
 using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Machete.Service
@@ -391,7 +389,6 @@ namespace Machete.Service
         }
         public override WorkAssignment Create(WorkAssignment record, string user)
         {
-
             if (record.workOrder == null) throw new ArgumentNullException("workOrder object is null");
             record.workOrder.waPseudoIDCounter++;
             record.pseudoID = record.workOrder.waPseudoIDCounter;
@@ -428,9 +425,9 @@ namespace Machete.Service
             record.skillES = lRepo.GetById(record.skillID).text_ES;
             record.minEarnings = (record.days * record.surcharge) + (record.hourlyWage * record.hours * record.days);
             record.maxEarnings = record.hourRange == null ? 0 : (record.days * record.surcharge) + (record.hourlyWage * (int)record.hourRange * record.days);
-            record.fullWAID = System.String.Format("{0,5:D5}-{1,2:D2}",
-                                                    (int)(record.workOrder.paperOrderNum ?? 0),
-                                                    (int)record.pseudoID);
+            var recordPseudoID = record.pseudoID ?? 0;
+            var paperOrderNum = record.workOrder.paperOrderNum ?? 0;
+            record.fullWAID = string.Format("{0,5:D5}-{1,2:D2}", paperOrderNum, recordPseudoID);
         }
     }
 }

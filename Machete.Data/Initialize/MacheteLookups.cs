@@ -21,12 +21,13 @@
 // http://www.github.com/jcii/machete/
 // 
 #endregion
-using Machete.Domain;
+
 using System;
 using System.Collections.Generic;
+using Machete.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Machete.Data
+namespace Machete.Data.Initialize
 {
     // static -- [ class-modifier ]
     //              cannot be instantiated, cannot be used as a type, can only contain
@@ -204,7 +205,7 @@ namespace Machete.Data
                 context.Lookups.Add(u);
             });
             context.Database.OpenConnection();
-            if (context.Database.GetDbConnection().GetType().Name == "SqlServerConnection")
+            if (context.Database.GetDbConnection().GetType().Name == "SqlConnection")
             {
                 context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Lookups ON");
                 context.SaveChanges();

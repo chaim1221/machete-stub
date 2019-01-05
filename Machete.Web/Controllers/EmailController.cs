@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using Machete.Domain;
@@ -12,7 +13,6 @@ using Machete.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static Machete.Web.Controllers.Helpers;
 using Email = Machete.Domain.Email;
 
 namespace Machete.Web.Controllers
@@ -93,8 +93,7 @@ namespace Machete.Web.Controllers
         }
         private string _getTabLabel(Email email)
         {
-            if (email == null) return null;
-            return email.subject;
+            return email == null ? null : email.subject;
         }
         /// <summary>
         /// GET: /Email/Create
@@ -120,10 +119,10 @@ namespace Machete.Web.Controllers
         /// <returns></returns>
         [HttpPost, UserNameFilter]
         [Authorize(Roles = "Administrator, Manager, Teacher")]
-        public JsonResult Create(EmailView emailview, string userName)
+        public async Task<JsonResult> Create(EmailView emailview, string userName)
         {
             Email newEmail;
-            UpdateModel(emailview);
+            if (await TryUpdateModelAsync(emailview)) {
             var email = map.Map<EmailView, Email>(emailview);
             if (emailview.attachment != null)
             {
@@ -146,6 +145,9 @@ namespace Machete.Web.Controllers
                 iNewID = newEmail.ID,
                 jobSuccess = true
             });
+        } else {
+            return Json(new { jobSuccess = false });
+            }
         }
 
         [HttpPost, UserNameFilter]

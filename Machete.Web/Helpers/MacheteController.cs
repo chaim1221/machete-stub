@@ -23,21 +23,13 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks;
-using Machete.Data;
-using Machete.Web.ViewModel;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using NLog;
-using Record = Machete.Domain.Record;
 
 namespace Machete.Web.Controllers
 {
@@ -124,16 +116,5 @@ namespace Machete.Web.Controllers
             messages = messages + "\r\nInnermost exception: \"" + exception.Message + "\"";
             return messages;
         }
-
-        public static void UpdateModel(Domain.Record changed)
-        {
-            // do something with database/EF
-        }
-                
-        public static void UpdateModel(ViewModel.Record changed)
-        {
-            // do stuff
-        }
-
     }
 }

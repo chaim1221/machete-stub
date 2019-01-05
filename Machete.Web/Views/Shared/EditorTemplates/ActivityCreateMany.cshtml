@@ -1,6 +1,4 @@
-@using System.Globalization
 @using Machete.Domain
-@using Machete.Web.Helpers
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Localization
 @model Machete.Web.ViewModel.ActivitySchedule
@@ -19,7 +17,9 @@
 @Html.HiddenFor(model => model.firstID, new { @class="hiddenRecID", id=idPrefix + "isFirstID"})
 <div class="tb-table" style="float: left;">
     <div class="tb-row">
-        @Html.mUITableLabelFor(model => model.type): @(Model.def.byID(Model.type))
+        <div class="tb-label">
+            @Html.LabelFor(model => model.type): @(Model.def.byID(Model.type))
+        </div>
         @Html.HiddenFor(model => model.type)
     </div>
     @if(Model.type == Model.def.byKeys(LCategory.activityType, LActType.Assembly) ||
@@ -30,32 +30,38 @@
     else
     {
     <div class="tb-row">
-        @Html.mUITableLabelFor(model => model.name): @(Model.def.byID(Model.name))
+        <div class="tb-label">
+            @Html.LabelFor(model => model.name): @(Model.def.byID(Model.name))
+        </div>
         @Html.HiddenFor(model => model.name)
     </div>
     }
     <div class="tb-row">
-        @Html.mUITableLabelFor(model => model.dateStart)
+        <div class="tb-label">
+            @Html.LabelFor(model => model.dateStart)
+        </div>
         <div class="tb-field">
             @Html.TextBox("dateStart", 
-                Html.Encode(String.Format("{0:g}",
-                    Model.dateStart)),
+                Html.Encode($"{Model.dateStart:g}"),
                 new { id = idPrefix + "dateStart" })
             @Html.ValidationMessageFor(model => model.dateStart)
         </div>
     </div>
     <div class="tb-row">
-        @Html.mUITableLabelFor(model => model.dateEnd)
+        <div class="tb-label">
+            @Html.LabelFor(model => model.dateEnd)
+        </div>
         <div class="tb-field">
             @Html.TextBox("dateEnd", 
-                Html.Encode(String.Format("{0:g}",
-                    Model.dateEnd)),
+                Html.Encode($"{Model.dateEnd:g}"),
                 new { id = idPrefix + "dateEnd" })
             @Html.ValidationMessageFor(model => model.dateEnd)
         </div>
     </div>
     <div class="tb-row">
-        @Html.mUITableLabelFor(model => model.teacher)
+        <div class="tb-label">
+            @Html.LabelFor(model => model.teacher)
+        </div>
         <div class="tb-field">
             @Html.DropDownListFor(model => model.teacher, 
                 new SelectList(Model.def.getTeachers(), Model.teacher),
@@ -99,11 +105,12 @@
         </div>
     </div>
     <div class="tb-row" style="float:left;">
-        @Html.mUITableLabelFor(model => model.stopDate)
+        <div class="tb-label">
+            @Html.LabelFor(model => model.stopDate)
+        </div>
         <div class="tb-field">
             @Html.TextBox("stopDate", 
-                Html.Encode(String.Format("{0:g}",
-                    Model.dateEnd)),
+                Html.Encode($"{Model.dateEnd:g}"),
                 new { id = idPrefix + "stopDate" })
             @Html.ValidationMessageFor(model => model.stopDate)
         </div>
@@ -111,7 +118,9 @@
 </div>
 <div class="tb-table" style="float:left;">
     <div class="tb-row">
-        @Html.mUITableDescLabelFor(model => model.notes)
+        <div class="tb-label desc-label">
+            @Html.LabelFor(model => model.notes)
+        </div>
         <div class="tb-field desc-field">
             @Html.TextAreaFor(model => model.notes, new { tabindex = "3", @class = "desc-field", id = idPrefix + "notes" })
             @Html.ValidationMessageFor(model => model.notes)

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Machete.Data.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -206,7 +206,7 @@ namespace Machete.Data.Migrations
                 {
                     table.PrimaryKey("PK_Images", x => x.ID);
                 });
-            
+
             migrationBuilder.CreateTable(
                 name: "Lookups",
                 columns: table => new
@@ -240,6 +240,40 @@ namespace Machete.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Lookups", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Persons",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    active = table.Column<bool>(nullable: false),
+                    firstname1 = table.Column<string>(maxLength: 50, nullable: false),
+                    firstname2 = table.Column<string>(maxLength: 50, nullable: true),
+                    nickname = table.Column<string>(maxLength: 50, nullable: true),
+                    lastname1 = table.Column<string>(maxLength: 50, nullable: false),
+                    lastname2 = table.Column<string>(maxLength: 50, nullable: true),
+                    address1 = table.Column<string>(maxLength: 50, nullable: true),
+                    address2 = table.Column<string>(maxLength: 50, nullable: true),
+                    city = table.Column<string>(maxLength: 25, nullable: true),
+                    state = table.Column<string>(maxLength: 2, nullable: true),
+                    zipcode = table.Column<string>(maxLength: 10, nullable: true),
+                    phone = table.Column<string>(maxLength: 12, nullable: true),
+                    cellphone = table.Column<string>(maxLength: 12, nullable: true),
+                    email = table.Column<string>(maxLength: 50, nullable: true),
+                    facebook = table.Column<string>(maxLength: 50, nullable: true),
+                    gender = table.Column<int>(nullable: false),
+                    genderother = table.Column<string>(maxLength: 20, nullable: true),
+                    fullName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Persons", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -327,88 +361,6 @@ namespace Machete.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TransportRules", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Workers",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    fullNameAndID = table.Column<string>(maxLength: 100, nullable: true),
-                    typeOfWorkID = table.Column<int>(nullable: false),
-                    typeOfWork = table.Column<string>(nullable: true),
-                    dateOfMembership = table.Column<DateTime>(nullable: false),
-                    dateOfBirth = table.Column<DateTime>(nullable: true),
-                    memberStatus = table.Column<int>(nullable: false),
-                    memberStatusEN = table.Column<string>(maxLength: 50, nullable: true),
-                    memberStatusES = table.Column<string>(maxLength: 50, nullable: true),
-                    memberReactivateDate = table.Column<DateTime>(nullable: true),
-                    active = table.Column<bool>(nullable: true),
-                    homeless = table.Column<bool>(nullable: true),
-                    housingType = table.Column<int>(nullable: true),
-                    RaceID = table.Column<int>(nullable: true),
-                    raceother = table.Column<string>(maxLength: 20, nullable: true),
-                    height = table.Column<string>(maxLength: 50, nullable: true),
-                    weight = table.Column<string>(maxLength: 10, nullable: true),
-                    englishlevelID = table.Column<int>(nullable: false),
-                    recentarrival = table.Column<bool>(nullable: true),
-                    dateinUSA = table.Column<DateTime>(nullable: true),
-                    dateinseattle = table.Column<DateTime>(nullable: true),
-                    disabled = table.Column<bool>(nullable: true),
-                    disabilitydesc = table.Column<string>(maxLength: 50, nullable: true),
-                    maritalstatus = table.Column<int>(nullable: true),
-                    livewithchildren = table.Column<bool>(nullable: true),
-                    liveWithSpouse = table.Column<bool>(nullable: true),
-                    livealone = table.Column<bool>(nullable: true),
-                    liveWithDescription = table.Column<string>(maxLength: 1000, nullable: true),
-                    numofchildren = table.Column<int>(nullable: true),
-                    americanBornChildren = table.Column<int>(nullable: true),
-                    numChildrenUnder18 = table.Column<int>(nullable: true),
-                    educationLevel = table.Column<int>(nullable: true),
-                    farmLaborCharacteristics = table.Column<int>(nullable: true),
-                    wageTheftVictim = table.Column<bool>(nullable: true),
-                    wageTheftRecoveryAmount = table.Column<double>(nullable: true),
-                    incomeID = table.Column<int>(nullable: true),
-                    emcontUSAname = table.Column<string>(maxLength: 50, nullable: true),
-                    emcontUSArelation = table.Column<string>(maxLength: 30, nullable: true),
-                    emcontUSAphone = table.Column<string>(maxLength: 14, nullable: true),
-                    dwccardnum = table.Column<int>(nullable: false),
-                    neighborhoodID = table.Column<int>(nullable: true),
-                    immigrantrefugee = table.Column<bool>(nullable: true),
-                    countryoforiginID = table.Column<int>(nullable: true),
-                    emcontoriginname = table.Column<string>(maxLength: 50, nullable: true),
-                    emcontoriginrelation = table.Column<string>(maxLength: 30, nullable: true),
-                    emcontoriginphone = table.Column<string>(maxLength: 14, nullable: true),
-                    memberexpirationdate = table.Column<DateTime>(nullable: false),
-                    driverslicense = table.Column<bool>(nullable: true),
-                    licenseexpirationdate = table.Column<DateTime>(nullable: true),
-                    carinsurance = table.Column<bool>(nullable: true),
-                    insuranceexpiration = table.Column<DateTime>(nullable: true),
-                    lastPaymentDate = table.Column<DateTime>(nullable: true),
-                    lastPaymentAmount = table.Column<double>(nullable: true),
-                    ownTools = table.Column<bool>(nullable: true),
-                    healthInsurance = table.Column<bool>(nullable: true),
-                    usVeteran = table.Column<bool>(nullable: true),
-                    healthInsuranceDate = table.Column<DateTime>(nullable: true),
-                    vehicleTypeID = table.Column<int>(nullable: true),
-                    incomeSourceID = table.Column<int>(nullable: true),
-                    introToCenter = table.Column<string>(maxLength: 1000, nullable: true),
-                    ImageID = table.Column<int>(nullable: true),
-                    skill1 = table.Column<int>(nullable: true),
-                    skill2 = table.Column<int>(nullable: true),
-                    skill3 = table.Column<int>(nullable: true),
-                    skillCodes = table.Column<string>(nullable: true),
-                    workerRating = table.Column<float>(nullable: true),
-                    lgbtq = table.Column<bool>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Workers", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -565,174 +517,15 @@ namespace Machete.Data.Migrations
                     ppPaymentToken = table.Column<string>(maxLength: 25, nullable: true),
                     ppPaymentID = table.Column<string>(maxLength: 50, nullable: true),
                     ppPayerID = table.Column<string>(maxLength: 25, nullable: true),
-                    ppState = table.Column<string>(maxLength: 20, nullable: true),
-                    EmailID = table.Column<int>(nullable: true)
+                    ppState = table.Column<string>(maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkOrders", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_WorkOrders_Emails_EmailID",
-                        column: x => x.EmailID,
-                        principalTable: "Emails",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_WorkOrders_Employers_EmployerID",
                         column: x => x.EmployerID,
                         principalTable: "Employers",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TransportProvidersAvailability",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    transportProviderID = table.Column<int>(nullable: false),
-                    key = table.Column<string>(maxLength: 50, nullable: true),
-                    lookupKey = table.Column<string>(maxLength: 50, nullable: true),
-                    day = table.Column<int>(nullable: false),
-                    available = table.Column<bool>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransportProvidersAvailability", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_TransportProvidersAvailability_TransportProviders_transportProviderID",
-                        column: x => x.transportProviderID,
-                        principalTable: "TransportProviders",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TransportCostRules",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    transportRuleID = table.Column<int>(nullable: false),
-                    minWorker = table.Column<int>(nullable: false),
-                    maxWorker = table.Column<int>(nullable: false),
-                    cost = table.Column<double>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransportCostRules", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_TransportCostRules_TransportRules_transportRuleID",
-                        column: x => x.transportRuleID,
-                        principalTable: "TransportRules",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Persons",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    active = table.Column<bool>(nullable: false),
-                    firstname1 = table.Column<string>(maxLength: 50, nullable: false),
-                    firstname2 = table.Column<string>(maxLength: 50, nullable: true),
-                    nickname = table.Column<string>(maxLength: 50, nullable: true),
-                    lastname1 = table.Column<string>(maxLength: 50, nullable: false),
-                    lastname2 = table.Column<string>(maxLength: 50, nullable: true),
-                    address1 = table.Column<string>(maxLength: 50, nullable: true),
-                    address2 = table.Column<string>(maxLength: 50, nullable: true),
-                    city = table.Column<string>(maxLength: 25, nullable: true),
-                    state = table.Column<string>(maxLength: 2, nullable: true),
-                    zipcode = table.Column<string>(maxLength: 10, nullable: true),
-                    phone = table.Column<string>(maxLength: 12, nullable: true),
-                    cellphone = table.Column<string>(maxLength: 12, nullable: true),
-                    email = table.Column<string>(maxLength: 50, nullable: true),
-                    facebook = table.Column<string>(maxLength: 50, nullable: true),
-                    gender = table.Column<int>(nullable: false),
-                    genderother = table.Column<string>(maxLength: 20, nullable: true),
-                    fullName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Persons", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Persons_Workers_ID",
-                        column: x => x.ID,
-                        principalTable: "Workers",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkerSignins",
-                columns: table => new
-                {
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    dwccardnum = table.Column<int>(nullable: false),
-                    memberStatus = table.Column<int>(nullable: true),
-                    dateforsignin = table.Column<DateTime>(nullable: false),
-                    timeZoneOffset = table.Column<double>(nullable: false),
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    WorkAssignmentID = table.Column<int>(nullable: true),
-                    lottery_timestamp = table.Column<DateTime>(nullable: true),
-                    lottery_sequence = table.Column<int>(nullable: true),
-                    WorkerID = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkerSignins", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_WorkerSignins_Workers_WorkerID",
-                        column: x => x.WorkerID,
-                        principalTable: "Workers",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkerRequests",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    WorkOrderID = table.Column<int>(nullable: false),
-                    WorkerID = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkerRequests", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_WorkerRequests_WorkOrders_WorkOrderID",
-                        column: x => x.WorkOrderID,
-                        principalTable: "WorkOrders",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WorkerRequests_Workers_WorkerID",
-                        column: x => x.WorkerID,
-                        principalTable: "Workers",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -801,6 +594,265 @@ namespace Machete.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Workers",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    fullNameAndID = table.Column<string>(maxLength: 100, nullable: true),
+                    typeOfWorkID = table.Column<int>(nullable: false),
+                    typeOfWork = table.Column<string>(nullable: true),
+                    dateOfMembership = table.Column<DateTime>(nullable: false),
+                    dateOfBirth = table.Column<DateTime>(nullable: true),
+                    memberStatus = table.Column<int>(nullable: false),
+                    memberStatusEN = table.Column<string>(maxLength: 50, nullable: true),
+                    memberStatusES = table.Column<string>(maxLength: 50, nullable: true),
+                    memberReactivateDate = table.Column<DateTime>(nullable: true),
+                    active = table.Column<bool>(nullable: true),
+                    homeless = table.Column<bool>(nullable: true),
+                    housingType = table.Column<int>(nullable: true),
+                    RaceID = table.Column<int>(nullable: true),
+                    raceother = table.Column<string>(maxLength: 20, nullable: true),
+                    height = table.Column<string>(maxLength: 50, nullable: true),
+                    weight = table.Column<string>(maxLength: 10, nullable: true),
+                    englishlevelID = table.Column<int>(nullable: false),
+                    recentarrival = table.Column<bool>(nullable: true),
+                    dateinUSA = table.Column<DateTime>(nullable: true),
+                    dateinseattle = table.Column<DateTime>(nullable: true),
+                    disabled = table.Column<bool>(nullable: true),
+                    disabilitydesc = table.Column<string>(maxLength: 50, nullable: true),
+                    maritalstatus = table.Column<int>(nullable: true),
+                    livewithchildren = table.Column<bool>(nullable: true),
+                    liveWithSpouse = table.Column<bool>(nullable: true),
+                    livealone = table.Column<bool>(nullable: true),
+                    liveWithDescription = table.Column<string>(maxLength: 1000, nullable: true),
+                    numofchildren = table.Column<int>(nullable: true),
+                    americanBornChildren = table.Column<int>(nullable: true),
+                    numChildrenUnder18 = table.Column<int>(nullable: true),
+                    educationLevel = table.Column<int>(nullable: true),
+                    farmLaborCharacteristics = table.Column<int>(nullable: true),
+                    wageTheftVictim = table.Column<bool>(nullable: true),
+                    wageTheftRecoveryAmount = table.Column<double>(nullable: true),
+                    incomeID = table.Column<int>(nullable: true),
+                    emcontUSAname = table.Column<string>(maxLength: 50, nullable: true),
+                    emcontUSArelation = table.Column<string>(maxLength: 30, nullable: true),
+                    emcontUSAphone = table.Column<string>(maxLength: 14, nullable: true),
+                    dwccardnum = table.Column<int>(nullable: false),
+                    neighborhoodID = table.Column<int>(nullable: true),
+                    immigrantrefugee = table.Column<bool>(nullable: true),
+                    countryoforiginID = table.Column<int>(nullable: true),
+                    emcontoriginname = table.Column<string>(maxLength: 50, nullable: true),
+                    emcontoriginrelation = table.Column<string>(maxLength: 30, nullable: true),
+                    emcontoriginphone = table.Column<string>(maxLength: 14, nullable: true),
+                    memberexpirationdate = table.Column<DateTime>(nullable: false),
+                    driverslicense = table.Column<bool>(nullable: true),
+                    licenseexpirationdate = table.Column<DateTime>(nullable: true),
+                    carinsurance = table.Column<bool>(nullable: true),
+                    insuranceexpiration = table.Column<DateTime>(nullable: true),
+                    lastPaymentDate = table.Column<DateTime>(nullable: true),
+                    lastPaymentAmount = table.Column<double>(nullable: true),
+                    ownTools = table.Column<bool>(nullable: true),
+                    healthInsurance = table.Column<bool>(nullable: true),
+                    usVeteran = table.Column<bool>(nullable: true),
+                    healthInsuranceDate = table.Column<DateTime>(nullable: true),
+                    vehicleTypeID = table.Column<int>(nullable: true),
+                    incomeSourceID = table.Column<int>(nullable: true),
+                    introToCenter = table.Column<string>(maxLength: 1000, nullable: true),
+                    ImageID = table.Column<int>(nullable: true),
+                    skill1 = table.Column<int>(nullable: true),
+                    skill2 = table.Column<int>(nullable: true),
+                    skill3 = table.Column<int>(nullable: true),
+                    skillCodes = table.Column<string>(nullable: true),
+                    workerRating = table.Column<float>(nullable: true),
+                    lgbtq = table.Column<bool>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Workers", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Workers_Persons_ID",
+                        column: x => x.ID,
+                        principalTable: "Persons",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransportProvidersAvailability",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    transportProviderID = table.Column<int>(nullable: false),
+                    key = table.Column<string>(maxLength: 50, nullable: true),
+                    lookupKey = table.Column<string>(maxLength: 50, nullable: true),
+                    day = table.Column<int>(nullable: false),
+                    available = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransportProvidersAvailability", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_TransportProvidersAvailability_TransportProviders_transportProviderID",
+                        column: x => x.transportProviderID,
+                        principalTable: "TransportProviders",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransportCostRules",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    transportRuleID = table.Column<int>(nullable: false),
+                    minWorker = table.Column<int>(nullable: false),
+                    maxWorker = table.Column<int>(nullable: false),
+                    cost = table.Column<double>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransportCostRules", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_TransportCostRules_TransportRules_transportRuleID",
+                        column: x => x.transportRuleID,
+                        principalTable: "TransportRules",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinWorkOrderEmail",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    WorkOrderID = table.Column<int>(nullable: false),
+                    EmailID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinWorkOrderEmail", x => new { x.EmailID, x.WorkOrderID });
+                    table.ForeignKey(
+                        name: "FK_JoinWorkOrderEmail_Emails_EmailID",
+                        column: x => x.EmailID,
+                        principalTable: "Emails",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinWorkOrderEmail_WorkOrders_WorkOrderID",
+                        column: x => x.WorkOrderID,
+                        principalTable: "WorkOrders",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinEventImage",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    EventID = table.Column<int>(nullable: false),
+                    ImageID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinEventImage", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_JoinEventImage_Events_EventID",
+                        column: x => x.EventID,
+                        principalTable: "Events",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinEventImage_Images_ImageID",
+                        column: x => x.ImageID,
+                        principalTable: "Images",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkerRequests",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    WorkOrderID = table.Column<int>(nullable: false),
+                    WorkerID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkerRequests", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_WorkerRequests_WorkOrders_WorkOrderID",
+                        column: x => x.WorkOrderID,
+                        principalTable: "WorkOrders",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkerRequests_Workers_WorkerID",
+                        column: x => x.WorkerID,
+                        principalTable: "Workers",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkerSignins",
+                columns: table => new
+                {
+                    datecreated = table.Column<DateTime>(nullable: false),
+                    dateupdated = table.Column<DateTime>(nullable: false),
+                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
+                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
+                    dwccardnum = table.Column<int>(nullable: false),
+                    memberStatus = table.Column<int>(nullable: true),
+                    dateforsignin = table.Column<DateTime>(nullable: false),
+                    timeZoneOffset = table.Column<double>(nullable: false),
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    WorkAssignmentID = table.Column<int>(nullable: true),
+                    lottery_timestamp = table.Column<DateTime>(nullable: true),
+                    lottery_sequence = table.Column<int>(nullable: true),
+                    WorkerID = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkerSignins", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_WorkerSignins_Workers_WorkerID",
+                        column: x => x.WorkerID,
+                        principalTable: "Workers",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkAssignments",
                 columns: table => new
                 {
@@ -861,36 +913,6 @@ namespace Machete.Data.Migrations
                         principalTable: "WorkerSignins",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "JoinEventImage",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    datecreated = table.Column<DateTime>(nullable: false),
-                    dateupdated = table.Column<DateTime>(nullable: false),
-                    Createdby = table.Column<string>(maxLength: 30, nullable: true),
-                    Updatedby = table.Column<string>(maxLength: 30, nullable: true),
-                    EventID = table.Column<int>(nullable: false),
-                    ImageID = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_JoinEventImage", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_JoinEventImage_Events_EventID",
-                        column: x => x.EventID,
-                        principalTable: "Events",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_JoinEventImage_Images_ImageID",
-                        column: x => x.ImageID,
-                        principalTable: "Images",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -959,6 +981,11 @@ namespace Machete.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinWorkOrderEmail_WorkOrderID",
+                table: "JoinWorkOrderEmail",
+                column: "WorkOrderID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransportCostRules_transportRuleID",
                 table: "TransportCostRules",
                 column: "transportRuleID");
@@ -999,11 +1026,6 @@ namespace Machete.Data.Migrations
                 column: "WorkerID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkOrders_EmailID",
-                table: "WorkOrders",
-                column: "EmailID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WorkOrders_EmployerID",
                 table: "WorkOrders",
                 column: "EmployerID");
@@ -1034,6 +1056,9 @@ namespace Machete.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "JoinEventImage");
+
+            migrationBuilder.DropTable(
+                name: "JoinWorkOrderEmail");
 
             migrationBuilder.DropTable(
                 name: "Lookups");
@@ -1072,6 +1097,9 @@ namespace Machete.Data.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
+                name: "Emails");
+
+            migrationBuilder.DropTable(
                 name: "TransportRules");
 
             migrationBuilder.DropTable(
@@ -1084,16 +1112,13 @@ namespace Machete.Data.Migrations
                 name: "WorkOrders");
 
             migrationBuilder.DropTable(
-                name: "Persons");
-
-            migrationBuilder.DropTable(
-                name: "Emails");
+                name: "Workers");
 
             migrationBuilder.DropTable(
                 name: "Employers");
 
             migrationBuilder.DropTable(
-                name: "Workers");
+                name: "Persons");
         }
     }
 }
